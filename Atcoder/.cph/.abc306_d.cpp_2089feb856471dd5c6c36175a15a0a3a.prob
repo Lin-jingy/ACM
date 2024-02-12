@@ -1,0 +1,1 @@
+{"name":"Local: abc306_d","url":"c:\\Users\\sugon\\Desktop\\vscode\\mycode\\mycode-1\\Atcoder\\abc306_d.cpp","tests":[{"id":1691150784299,"input":"5\n1 100\n1 300\n0 -200\n1 500\n1 300","output":"600"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"c:\\Users\\sugon\\Desktop\\vscode\\mycode\\mycode-1\\Atcoder\\abc306_d.cpp","group":"local","local":true}

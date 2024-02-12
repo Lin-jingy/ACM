@@ -1,0 +1,1 @@
+{"name":"Local: P9883","url":"c:\\Users\\123\\Desktop\\programming\\VScode\\mycode\\c++\\luogu\\P9883.cpp","tests":[{"id":1707014086409,"input":"3\n5\n10110\n5\n00000\n5\n11111","output":"3\n0\n3"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"c:\\Users\\123\\Desktop\\programming\\VScode\\mycode\\c++\\luogu\\P9883.cpp","group":"local","local":true}
