@@ -1,10 +1,7 @@
 #include <iostream>
-#include <vector>
+
 int main() {
-    std::cout << "123" << std::endl;
-    std::vector<int> v = {1 ,2,3};
-    for(auto i:v) {
-        std::cout << i;
-    }
-    return 0;
+    long long a, b;
+    std::cin >> a >> b;
+    std::cout << a + b << '\n';
 }
