@@ -88,15 +88,3 @@ public:
         else return {hashcode_1.back(), 0};
     }
 };
-
-signed main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-    
-    StringHash T("1231231111111111", OPTION::Double);
-    StringHash S("123231232123", OPTION::Double);
-    std::cout << T.get(0, 2).first << ' ' << T.get(0, 2).second << '\n';
-    std::cout << S.get(0, 2).first << ' ' << S.get(0, 2).second << '\n';
-
-    return 0;
-}

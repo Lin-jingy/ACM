@@ -89,14 +89,24 @@ public:
     }
 };
 
+void solve() {
+    int n;
+    std::cin >> n;
+    std::set<std::pair<int, int>> s;
+    while(n--) {
+        std::string p;
+        std::cin >> p;
+        s.insert(StringHash(p, OPTION::Double).getAll());
+    }
+    std::cout << s.size();
+}
+
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    
-    StringHash T("1231231111111111", OPTION::Double);
-    StringHash S("123231232123", OPTION::Double);
-    std::cout << T.get(0, 2).first << ' ' << T.get(0, 2).second << '\n';
-    std::cout << S.get(0, 2).first << ' ' << S.get(0, 2).second << '\n';
-
+    // freopen("C:/Users/123/Desktop/P3370_1.in", "r", stdin);
+    int T = 1;
+    // std::cin >> T;
+    while(T--) solve();
     return 0;
 }
