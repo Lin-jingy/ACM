@@ -1,75 +1,103 @@
 #include <bits/stdc++.h>
+#include <stdexcept>
 
-template <class T>
+namespace STL{
+
+
+template <typename T>
 class vector {
-private:
-    T* a;       // 存放数据的容器
-    size_t si;  // 当前的大小
-    size_t mx;  // 容器的大小
-    const int k = 1.5;
-    void big() {  // 执行扩容
-        T* mid = (T*)malloc(sizeof(T) * k * mx);
-        memcpy(mid, a, mx * sizeof(T));
-        mx = k * mx;
-        free(a);
-        a = mid;
-    }
-    void check() {
-        if (si == mx) big();
-    }
-
 public:
-    vector() {
-        mx = 100;
-        si = 0;
-        a = (T*)malloc(sizeof(T) * mx);
-    }
-    vector(size_t x) {
-        si = x;
-        mx = si;
-        a = (T*)malloc(sizeof(T) * mx);
-    }
-    vector(size_t x, T val) {
-        si = x;
-        mx = si;
-        a = (T*)malloc(sizeof(T) * mx);
-        for (size_t i = 0; i < si; ++i) a[i] = val;
-    }
-    ~vector() {
-        free(a);
-    }
-    void push_back(T x) {
-        check();
-        ++si;
-        a[si - 1] = x;
-    }
-    bool pop_back() {
-        if (si == 0) return false;
-        --si;
-        return true;
-    }
-    bool empty() {
-        if (si == 0)
-            return true;
-        else
-            return false;
-    }
-    T front() {
-        return a[0];
-    }
-    T back() {
-        return a[si - 1];
-    }
-    void clear() {
-        free(a);
-        si = 0;
-        mx = 100;
-        a = (T*)malloc(sizeof(T) * mx);
-    }
-    size_t size() {
-        return si;
-    }
-    T& operator[](int i) {
-        return a[i];
-    }
+    vector();
+    ~vector();
+    void push_back(const T& value);
+    void pop_back();
+    T& at(size_t pos);
+    T& operator[] (size_t pos);
+    T& front();
+    T& back();
+    bool empty();
+    size_t size();
+    void swap(vector<T> other);
+
+private:
+    T *data;
+    size_t m_size;
+    size_t m_capacity;
+    void expand(size_t n);
 };
+
+template <typename T>
+void vector<T>::expand(size_t n) {
+    m_capacity = n;
+    T *copy_data = new T[m_capacity];
+    memcpy(copy_data, data, sizeof(data));
+    delete[] data;
+    data = copy_data;
+}
+
+template<typename T>
+vector<T>::vector() {
+    m_size = 0;
+    m_capacity = 0;
+}
+
+
+template<typename T>
+vector<T>::~vector() {
+    m_size = 0;
+    m_capacity = 0;
+    delete[] data;
+}
+
+template<typename T>
+void vector<T>::push_back(const T& value) {
+    if(m_size == m_capacity) expand();
+    data[m_size++] = value;
+}
+
+template<typename T>
+void vector<T>::pop_back() {
+    m_size--;
+}
+
+template<typename T>
+T& vector<T>::at(size_t pos) {
+    if(pos >= m_size) {
+        throw std::out_of_range("out of range");
+    }
+    return data[pos];
+}
+
+template<typename T>
+T& vector<T>::operator[](size_t pos) {
+    return data[pos];
+}
+
+template<typename T>
+T& vector<T>::front() {
+    return data[0];
+}
+
+template<typename T>
+T& vector<T>::back() {
+    return data[m_size - 1];
+}
+
+template<typename T>
+bool vector<T>::empty() {
+    return m_size == 0;
+}
+
+template<typename T>
+size_t vector<T>::size() {
+    return m_size;
+}
+
+template<typename T>
+void vector<T>::swap(vector<T> other) {
+    
+}
+
+
+}
+

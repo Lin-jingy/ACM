@@ -6,7 +6,7 @@ private:
     T* a;//存放数据的容器
     size_t si;//当前的大小
     size_t mx;//容器的大小
-    const int k = 1.5;
+    const int k = 2;
     void big() {//执行扩容
         T* mid = (T*)malloc(sizeof(T) * k * mx);
         memcpy(mid, a, mx * sizeof(T));

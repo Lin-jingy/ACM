@@ -1,31 +1,41 @@
-#include<bits/stdc++.h>
-using namespace std;
-#define int long long
-bool prime(int x) {
-    if (x < 2)return false;
-    else if (x == 2 or x == 3)return true;
-    else {
-        int k = sqrt(x);
-        for (int i = 3; i <= k; i += 2)if (x % i == 0)return false;
+#include <bits/stdc++.h>
+
+static bool isPrime(int n) {  // O(7logn)
+    if (n < 3 || n % 2 == 0) return n == 2;
+    int u = n - 1, t = 0;
+    while (u % 2 == 0) u /= 2, ++t;
+    auto quickPow = [](int a, int b, int p) {
+        long long res = 1;
+        while (b) {
+            if (b & 1) res = (long long)res * a % p;
+            a = (long long)a * a % p;
+            b >>= 1;
+        }
+        return res;
+    };
+    int p[] = {2, 325, 9375, 28178, 450775, 9780504, 1795265022};
+    for (int i = 0; i < 7; ++i) {
+        int a = p[i] % (n - 2) + 2, v = quickPow(a, u, n);
+        if (v == 1) continue;
+        int s;
+        for (s = 0; s < t; ++s) {
+            if (v == n - 1) break;
+            v = (long long)v * v % n;
+        }
+        if (s == t) return false;
     }
     return true;
 }
+
 signed main() {
-    int l, r; cin >> l >> r;
-    //大于3的素数只分布在6n-1和6n+1两数列中
-    int ans = 0, k = 0;
-    for (int i = l; i <= r; ++i) {
-        if (i == 2 or i == 3)ans++;
-        else if (i % 6 == 0) {
-            k = i;
-            break;
-        }
-    }
-    for (int i = k; i <= r; i += 6) {
-        if (i - 1 >= l and prime(i - 1))++ans;
-        if (i + 1 <= r and prime(i + 1))++ans;
-    }
-    cout << ans;
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    
+    int l, r;
+    std::cin >> l >> r;
+    int ans = 0;
+    for(int i = l; i <= r; ++i) if(isPrime(i)) ++ans;
+    std::cout << ans << '\n';
+
     return 0;
 }
-
