@@ -7,10 +7,10 @@ static std::vector<int> get_prime(int n) {  // Euler
 
     for (int i = 2; i <= n; ++i) {
         if (!not_prime[i]) prime.push_back(i);
-        for (int pri_j : prime) {
-            if (i * pri_j > n) break;
-            not_prime[i * pri_j] = true;
-            if (i % pri_j == 0) break;
+        for (int j : prime) {
+            if (i * j > n) break;
+            not_prime[i * j] = true; 
+            if (i % j == 0) break;
         }
     }
     return std::move(prime);
@@ -112,11 +112,11 @@ static std::vector<int> get_inv(int n, int p) {
     return std::move(inv);
 }
 static long long CRT(std::vector<int> &a, std::vector<int> &p) {  // 中国剩余定律
-                                                                  /*
-                                                                     a1 % p1 = x
-                                                                     a2 % p2 = x
-                                                                     ...
-                                                                  */
+/*
+   a1 % p1 = x
+   a2 % p2 = x
+   ...
+*/
     long long n = 1, ans = 0;
     int k = a.size();
     for (int i = 0; i < k; i++) n = n * p[i];

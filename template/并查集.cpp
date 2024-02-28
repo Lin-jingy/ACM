@@ -1,4 +1,4 @@
-```c++
+#include <bits/stdc++.h>
 
 class DSU {
 private:
@@ -10,4 +10,3 @@ public:
     void merge(int x,int y) {if(!same(x,y))siz[find(y)]+=siz[find(x)],f[find(x)]=find(y);}
     int qsz(int x){return siz[find(x)];}
 };
-```
