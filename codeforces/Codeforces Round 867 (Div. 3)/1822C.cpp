@@ -1,8 +1,9 @@
 #include <bits/stdc++.h>
 
 void solve() {
-    std::unordered_map<int, int> mp;
-    mp.insert(10, 20);
+    int n;
+    std::cin >> n;
+    std::cout << 1LL * n * n + 2 * n + 2 << '\n';
 }
 
 signed main() {
