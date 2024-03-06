@@ -1,9 +1,8 @@
-# KMP
+#include <bits/stdc++.h>
 
-```c++
 class KMP {
 	std::string pattern;
-	int *next;
+	std::vector<int> next;
 	void buildNext() {
 		for (int i = 1, j = 0; i < pattern.size(); i++) {
         	while (j && pattern[i] != pattern[j]) j = next[j - 1];
@@ -24,15 +23,9 @@ public:
     	}
 		return p;
 	}
-	int* get_next() {
-		return next;
-	}
-	KMP(std::string Pattern) {
-		pattern = Pattern;
-		next = (int*)malloc(sizeof(int) * pattern.size());
-        memset(next, 0, sizeof(next));
+	std::vector<int>& get_next() { return next; }
+	KMP(std::string& Pattern) : pattern(Pattern), next(pattern.size()){
 		buildNext();
 	}
 };
 
-```

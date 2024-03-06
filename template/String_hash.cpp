@@ -59,8 +59,7 @@ private:
         (hashcode_2[r] + 1LL * (mod_2 - hashcode_2[l - 1]) * p_2[r - l + 1]) % mod_2};
     }
 public:
-    StringHash(const std::string &s, enum OPTION option) {
-        op = option;
+    StringHash(const std::string &s, enum OPTION option) : op(option){
         static bool first = true;
         static int MOD_1;
         static int MOD_2;
