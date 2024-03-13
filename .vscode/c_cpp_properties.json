@@ -9,6 +9,7 @@
                 "C:/Users/123/Desktop/programming/LLVM/bin/../lib/gcc/x86_64-w64-mingw32/13.2.0/../../../../x86_64-w64-mingw32/include"
             ],
             "defines": [
+                "_LOCAL",
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"

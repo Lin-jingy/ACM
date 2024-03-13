@@ -13,7 +13,8 @@ operator<<(std::ostream& out, const std::vector<T>& v) {
 for(auto i=v.begin();i!=v.end();++i)out<<*i<<" \n"[i==v.end()];
 return out;}template<class T,class FUN>void foreach
 (std::vector<T>&v,FUN fun){for(int i=0;i<v.size();++i)fun(v[i],i);}
-template <class T>void Sort(std::vector<T>&v) {std::sort(v.begin(),v.end());}
+template <class T>void sort(std::vector<T>&v) {std::sort(v.begin(),v.end());}
+template<class T>void input(T begin,T end){while(begin!=end)std::cin>>*begin++;}
 using Pii = std::pair<int, int>;using i128 = __int128;
 #define rep(i,b,e) for(int i=b;i<(int)(e);++i)
 #define range(i,b,e,step) for(int i=b;(b<e?i<e:i>e);i+=(b<e?step:-step))
@@ -25,18 +26,23 @@ using Pii = std::pair<int, int>;using i128 = __int128;
 #define INF = LONG_LONG_MAX;
 
 
-
 void solve() {
-	int n = 100;
-	range(i, 1, 2, 1) std::cout << i << ' ';
-
+    int n;
+    std::string s;
+    std::cin >> n >> s;
+    std::string rs = s;
+    std::reverse(All(rs));
+    if(rs < s) {
+        s = rs + s;
+    } 
+    std::cout << s << '\n';
 }
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while(T--) solve();
     return 0;
 }

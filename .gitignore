@@ -1,2 +1,4 @@
 .vscode
 .cph
+CMakeLists.txt
+cmake-build-debug

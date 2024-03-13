@@ -10,4 +10,9 @@ public:
         auto time = std::chrono::duration<double, std::nano>(end - begin).count();
         std::cout << "\nThe program takes: " << time / 1e9 << " s\n";
     }
+    double get() {
+        auto end = std::chrono::system_clock::now();
+        auto time = std::chrono::duration<double, std::nano>(end - begin).count();
+        return time / 1e9;
+    }
 };

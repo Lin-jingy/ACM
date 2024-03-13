@@ -24,11 +24,30 @@ using Pii = std::pair<int, int>;using i128 = __int128;
 #define inf = INT_MAX
 #define INF = LONG_LONG_MAX;
 
-
-
 void solve() {
-	int n = 100;
-	range(i, 1, 2, 1) std::cout << i << ' ';
+    int n, q;
+    std::cin >> n >> q;
+    std::multiset<int> s;
+    rep(i, 0, n) {
+        int x;
+        std::cin >> x;
+        s.insert(x);
+    }
+    while(q--) {
+        int op, x;
+        std::cin >> op >> x;
+        if(op == 1) {
+            if(s.count(x)) {
+                s.erase(s.find(x));
+                std::cout << (*s.rbegin() - *s.begin()) * 2 << '\n';
+            } else {
+                std::cout << "-1\n";
+            }
+        } else {
+            s.insert(x);
+            std::cout << (*s.rbegin() - *s.begin()) * 2 << '\n';
+        }
+    }
 
 }
 
