@@ -14,8 +14,8 @@
 #define All(x) x.begin(),x.end()
 #define pb(x) push_back(x)
 #define eb(x) emplace_back(x)
-#define inf INT_MAX
-#define INF LONG_LONG_MAX;
+#define inf = INT_MAX
+#define INF = LONG_LONG_MAX;
 template <class T>using vec=std::vector<T>;
 template<class K,class V> using umap=std::unordered_map<K,V>;
 template<class T>std::istream& operator>>(std::istream&in,std::vector<T>&v) 
@@ -31,6 +31,23 @@ template <class T,class FUN>void sort(std::vector<T>&v,FUN fun)
 using Pii = std::pair<int, int>;
 
 void solve() {
+    int n, c;
+    std::cin >> n >> c;
+    vec<int> v(n);
+    std::cin >> v;
+    sort(v);
+    int ans = (c + 2) * (c + 1) / 2;
+    for(auto i:v) ans -= i / 2 + 1;
+    for(auto i:v) ans -= c - i + 1;
+    int a = 0, b = 0;
+    for(auto i:v) {
+        if(i % 2) ++a;
+        else ++b;
+    }
+    ans += a * (a + 1) / 2 + b * (b + 1) / 2;
+
+    std::cout << ans << '\n';
+
 
 }
 
@@ -38,7 +55,7 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while(T--) solve();
     return 0;
 }

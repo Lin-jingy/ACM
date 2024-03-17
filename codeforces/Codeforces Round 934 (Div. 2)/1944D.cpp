@@ -1,6 +1,34 @@
 #include <bits/stdc++.h>
+
+#if defined (_WIN64)
+#pragma clang diagnostic ignored "-Wunused-value"
+// #pragma clang diagnostic ignored "-Wshift-op-parentheses"
+#define LOG(x) if(!(x)){std::cout<<"error at:"<<__LINE__<<std::endl;exit(-1);}
+#else
+#define LOG(x)
+#endif
 #define int long long
-#include <bits/stdc++.h>
+#define rep(i,b,e) for(int i=b;i<(int)(e);++i)
+#define range(i,b,e,step) for(int i=b;(b<e?i<e:i>e);i+=(b<e?step:-step))
+#define RETURN(x) do{return x,void();}while(0);
+#define All(x) x.begin(),x.end()
+#define pb(x) push_back(x)
+#define eb(x) emplace_back(x)
+#define inf INT_MAX
+#define INF LONG_LONG_MAX;
+template <class T>using vec=std::vector<T>;
+template<class K,class V> using umap=std::unordered_map<K,V>;
+template<class T>std::istream& operator>>(std::istream&in,std::vector<T>&v) 
+{for(auto &i:v)in>>i;return in;}template<class T>std::ostream& 
+operator<<(std::ostream&out,const std::vector<T>&v) {
+for(auto i=v.begin();i!=v.end();++i)out<<*i<<" \n"[i==v.end()];
+return out;}template<class T,class FUN>void foreach
+(std::vector<T>&v,FUN fun){for(int i=0;i<v.size();++i)fun(v[i],i);}
+template <class T>void sort(std::vector<T>&v) {std::sort(v.begin(),v.end());}
+template <class T,class FUN>void sort(std::vector<T>&v,FUN fun) 
+{std::sort(v.begin(),v.end(),fun);}template<class T>void input
+(T begin,T end){while(begin!=end)std::cin>>*begin++;}
+using Pii = std::pair<int, int>;
 
 enum OPTION {
     Nature,
@@ -94,7 +122,69 @@ public:
         else return {hashcode_1.back(), 0};
     }
 };
+
+void solve() {
+    int n, q;
+    std::cin >> n >> q;
+    std::string s;
+    std::cin >> s;
+    std::string rs = s;
+    std::reverse(All(rs));
+    s = ' ' + s;
+    rs = ' ' + rs;
+    StringHash hashS(s, OPTION::Double);
+    StringHash hashRS(rs, OPTION::Double);
+    vec<vec<int>> p(n + 1, vec<int>(26));
+    vec<vec<int>> p0(n + 1, vec<int>(26));
+    vec<vec<int>> p1(n + 1, vec<int>(26));
+    rep(i, 1, n + 1) {
+        rep(j, 0, 26) p[i][j] += p[i - 1][j];
+        p[i][s[i] - 'a']++;
+    }
+    rep(i, 1, n + 1) {
+        rep(j, 0, 26) p0[i][j] += p0[i - 1][j];
+        if(i % 2 == 1) p0[i][s[i] - 'a']++;
+    }
+    rep(i, 2, n + 1) {
+        rep(j, 0, 26) p1[i][j] += p1[i - 1][j];
+        if(i % 2 == 0) p1[i][s[i] - 'a']++;
+    }
+    for(int i = 1; i <= q; ++i) {
+        int l, r;
+        std::cin >> l >> r;
+        int mx1 = 0, mx2 = 0;
+        rep(i, 0, 26) {
+            if(p[r][i] - p[l - 1][i] == r - l + 1) {
+                std::cout << "0\n";
+                goto NEXT;
+            }
+        }
+        rep(i, 0, 26) {
+            mx1 = std::max(p0[r][i] - p0[l - 1][i], mx1);
+            mx2 = std::max(p1[r][i] - p1[l - 1][i], mx2);
+        }
+        if(mx1 + mx2 == r - l + 1) {
+            int len = r - l + 1;
+            if(len % 2 == 1) --len;
+            std::cout << (2 + len) * (len / 2) / 2 << '\n';
+            goto NEXT;
+        }
+        if(hashS.get(l, r) == hashRS.get(n - r  + 1, n - l + 1)) {
+            std::cout << (2 + r - l) * (r - l - 1) / 2 << '\n';
+        } else {
+            std::cout << (2 + r - l + 1) * (r - l) / 2 << '\n';
+        }
+        NEXT:;
+    }
+
+    
+}
+
 signed main() {
-    std::cout << StringHash("12345", OPTION::Double).get(0, 2).first << '\n';
-    std::cout << StringHash("45123", OPTION::Double).get(2, 4).first << '\n';
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    int T = 1;
+    std::cin >> T;
+    while(T--) solve();
+    return 0;
 }

@@ -31,7 +31,24 @@ template <class T,class FUN>void sort(std::vector<T>&v,FUN fun)
 using Pii = std::pair<int, int>;
 
 void solve() {
-
+    int n;
+    std::cin >> n;
+    vec<int> a(n);
+    std::cin >> a;
+    vec<int> p(2e5 + 1);
+    std::set<int> s;
+    for(auto i:a) p[i]++, s.insert(i);
+    rep(i, 1, 2e5 + 1) p[i] += p[i - 1];
+    int mx = 0;
+    for(auto i:s) {
+        int k = 0;
+        rep(j, 1, inf) {
+            k += i * j * (p[std::min((j + 1) * i - 1, (int)2e5)] - p[j * i - 1]);
+            if((j + 1) * i > 2e5) break;
+        }
+        mx = std::max(mx, k);
+    }
+    std::cout << mx << '\n';
 }
 
 signed main() {

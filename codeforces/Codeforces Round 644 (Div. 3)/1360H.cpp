@@ -1,3 +1,4 @@
+#include <string>
 #include <bits/stdc++.h>
 
 #if defined (_WIN64)
@@ -31,14 +32,37 @@ template <class T,class FUN>void sort(std::vector<T>&v,FUN fun)
 using Pii = std::pair<int, int>;
 
 void solve() {
-
+    int n, m;
+    std::cin >> n >> m;
+    vec<int> a(n);
+    int cnt = (1ll << m) - n;
+    int k = (cnt - 1) / 2;
+    rep(i, 0, n) {
+        std::string s;
+        std::cin >> s;
+        a[i] = stoll(s, 0, 2);
+    }
+    sort(a);
+    int ans = -1, last = 0;
+    rep (i, 0, n) {
+        if (k < a[i] - last) {
+            ans = last + k;
+            break;
+        }
+        k -= a[i] - last;
+        last = a[i] + 1;
+    }
+    if (ans == -1) ans = last + k;
+    for (int i = m - 1; i >= 0; --i)
+        std::cout << (ans >> i & 1);
+    std::cout << "\n";
 }
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while(T--) solve();
     return 0;
 }

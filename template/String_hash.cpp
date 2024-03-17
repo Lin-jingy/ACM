@@ -25,28 +25,33 @@ private:
     void init_nature(const std::string &s) {
         hashcode_1.assign(s.size() + 1, {});
         p_1.assign(s.size() + 1, {});
-        p_1[1] = 1;
-        for(int i = 1; i <= s.size(); ++i) hashcode_1[i] = hashcode_1[i - 1] * base_1 + s[i - 1];
-        for(int i = 2; i <= s.size(); ++i) p_1[i] = p_1[i - 1] * base_1;
+        p_1[0] = hashcode_1[0] = 1;
+        for(int i = 1; i <= s.size(); ++i) {
+            hashcode_1[i] = hashcode_1[i - 1] * base_1 + s[i - 1];
+            p_1[i] = p_1[i - 1] * base_1;
+        }
     }
     void init_single(const std::string &s) {
         hashcode_1.assign(s.size() + 1, {});
         p_1.assign(s.size() + 1, {});
-        p_1[1] = 1;
-        for(int i = 1; i <= s.size(); ++i) hashcode_1[i] = (1LL * hashcode_1[i - 1] * base_1 + s[i - 1]) % mod_1;
-        for(int i = 2; i <= s.size(); ++i) p_1[i] = 1LL * p_1[i - 1] * base_1 % mod_1;
+        p_1[0] = hashcode_1[0] = 1;
+        for(int i = 1; i <= s.size(); ++i) {
+            hashcode_1[i] = (1LL * hashcode_1[i - 1] * base_1 + s[i - 1]) % mod_1;
+            p_1[i] = 1LL * p_1[i - 1] * base_1 % mod_1;
+        }
     }
     void init_double(const std::string &s) {
         hashcode_1.assign(s.size() + 1, {});
         hashcode_2.assign(s.size() + 1, {});
         p_1.assign(s.size() + 1, {});
         p_2.assign(s.size() + 1, {});
-        p_1[1] = 1;
-        p_2[1] = 1;
-        for(int i = 1; i <= s.size(); ++i) hashcode_1[i] = (1LL * hashcode_1[i - 1] * base_1 + s[i - 1]) % mod_1;
-        for(int i = 1; i <= s.size(); ++i) hashcode_2[i] = (1LL * hashcode_2[i - 1] * base_2 + s[i - 1]) % mod_2;
-        for(int i = 2; i <= s.size(); ++i) p_1[i] = 1LL * p_1[i - 1] * base_1 % mod_1;
-        for(int i = 2; i <= s.size(); ++i) p_2[i] = 1LL * p_2[i - 1] * base_2 % mod_2;
+        p_1[0] = p_2[0] = hashcode_1[0] = hashcode_2[0] = 1;
+        for(int i = 1; i <= s.size(); ++i) {
+            hashcode_1[i] = (1LL * hashcode_1[i - 1] * base_1 + s[i - 1]) % mod_1;
+            hashcode_2[i] = (1LL * hashcode_2[i - 1] * base_2 + s[i - 1]) % mod_2;
+            p_1[i] = 1LL * p_1[i - 1] * base_1 % mod_1;
+            p_2[i] = 1LL * p_2[i - 1] * base_2 % mod_2;
+        }
     }
     std::pair<int, int> get_nature(int l, int r) {
         return {hashcode_1[r] - hashcode_1[l - 1] * p_1[r - l + 1], 0LL};

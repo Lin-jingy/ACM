@@ -31,14 +31,28 @@ template <class T,class FUN>void sort(std::vector<T>&v,FUN fun)
 using Pii = std::pair<int, int>;
 
 void solve() {
-
+    int n;
+    std::cin >> n;
+    vec<int> a(n);
+    std::cin >> a;
+    int last = 0;
+    for(auto i:a) {
+        if(i >= last) {
+            if(i >= 10 and i / 10 >= last and i % 10 >= i / 10) last = i % 10;
+            else last = i;
+        } else {
+            std::cout << "NO\n";
+            return ;
+        }
+    }
+    std::cout << "YES\n";
 }
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while(T--) solve();
     return 0;
 }

@@ -7,7 +7,7 @@
 #else
 #define LOG(x)
 #endif
-#define int long long
+// #define int long long
 #define rep(i,b,e) for(int i=b;i<(int)(e);++i)
 #define range(i,b,e,step) for(int i=b;(b<e?i<e:i>e);i+=(b<e?step:-step))
 #define RETURN(x) do{return x,void();}while(0);
@@ -31,6 +31,26 @@ template <class T,class FUN>void sort(std::vector<T>&v,FUN fun)
 using Pii = std::pair<int, int>;
 
 void solve() {
+    int n;
+    std::cin >> n;
+    vec<int> a(2 * n + 2);
+    rep(i, 1, n + 1) std::cin >> a[i];
+    rep(i, n + 1, 2 * n + 1) a[i] = a[i - n];
+    
+    vec<int> code(2 * n + 2), P(2 * n + 2);
+    P[0] = 1;
+    rep(i, 1, 2 * n + 1) {
+        code[i] = code[i - 1] * 1331 + a[i];
+        P[i] = P[i - 1] * 1331;
+    }
+    auto get = [&](int l, int r) -> int {
+        return code[r] - code[l - 1] * P[r - l + 1];
+    };
+    int L = 1, R = n, left = 1, right = n;
+    rep(i, 1, n + 1) {
+        int l = left, r = right, len = 0;
+
+    }
 
 }
 

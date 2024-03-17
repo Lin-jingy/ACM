@@ -31,14 +31,37 @@ template <class T,class FUN>void sort(std::vector<T>&v,FUN fun)
 using Pii = std::pair<int, int>;
 
 void solve() {
-
+    int n;
+    std::cin >> n;
+    vec<int> a(n);
+    std::cin >> a;
+    std::map<int, int> mp;
+    for(auto i:a) mp[i]++; 
+    int l = 1, r = n, ans = 0;
+    auto check = [&](int x) ->bool {
+        int num1 = 0, num2 = 0;
+        for(auto [i, j] : mp) {
+            if(i >= x) break;
+            if(j == 1) num1++;
+            if(j >= 2) num2++;
+        }
+        if(num1 <= 1 and num2 >= std::max(x - 1, 0LL) and num1 + num2 == x) return true;
+        else return false;
+    };
+    while(l <= r) {
+        int mid = (l + r) >> 1;
+        if(check(mid)) l = mid + 1, ans = mid;
+        else r = mid - 1;
+    }
+    std::cout << ans << '\n';
+    
 }
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while(T--) solve();
     return 0;
 }
