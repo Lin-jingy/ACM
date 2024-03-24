@@ -28,7 +28,7 @@ template <class T,class FUN>void sort(std::vector<T>&v,FUN fun)
 (T begin,T end){while(begin!=end)std::cin>>*begin++;}
 using Pii = std::pair<int, int>;
 static std::vector<int> Dijkstra(std::vector<std::vector<std::pair<int, int>>> *v, int begin) {
-    std::vector<int> dis(v->size(), INT_MAX);
+    std::vector<int> dis(v->size());
     std::vector<bool> vis(v->size());
     std::priority_queue<std::pair<int, int>,
                         std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>>
@@ -81,11 +81,18 @@ void solve() {
     }
     vec<int> dis = Dijkstra(&v, x);
     std::map<int, int> mp;
-    rep(i, 1, n + 1) if(i != x) mp[dis[i]]++;
+    rep(i, 1, dis.size()) if(i != x) mp[dis[i]]++;
     while(q--) {
         int k;
         std::cin >> k;
-        
+        int ans = 0;
+        int tot = n - 1;
+        for(auto [i, j] : mp) {
+            ans += C(tot, k - 1) * j % mod;
+            ans %= mod;
+        }
+        std::cout << ans << '\n';
+
     }
 }
 

@@ -1,8 +1,6 @@
 #include <bits/stdc++.h>
 
 #if defined (_WIN64)
-#pragma clang diagnostic ignored "-Wunused-value"
-// #pragma clang diagnostic ignored "-Wshift-op-parentheses"
 #define LOG(x) if(!(x)){std::cout<<"error at:"<<__LINE__<<std::endl;exit(-1);}
 #else
 #define LOG(x)

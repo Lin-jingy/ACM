@@ -1,8 +1,6 @@
 #include <bits/stdc++.h>
 
 #if defined (_WIN64)
-#pragma clang diagnostic ignored "-Wunused-value"
-// #pragma clang diagnostic ignored "-Wshift-op-parentheses"
 #define LOG(x) if(!(x)){std::cout<<"error at:"<<__LINE__<<std::endl;exit(-1);}
 #else
 #define LOG(x)
@@ -30,84 +28,29 @@ template <class T,class FUN>void sort(std::vector<T>&v,FUN fun)
 (T begin,T end){while(begin!=end)std::cin>>*begin++;}
 using Pii = std::pair<int, int>;
 
-vec<vec<bool>> a;
-vec<Pii> v;
-int k, n, m;
-void dfs(vec<bool> &p);
-void check(int x, int y, int p, vec<bool> &P) {
-    if(x + v[p].first - 1 > n || y + v[p].second - 1 > m) goto A;
-    rep(i, x, x + v[p].first) {
-        rep(j, y, y + v[p].second) {
-            if(a[i][j]) goto A;
-        }
+void solve() {
+    std::string s;
+    std::cin >> s;
+    vec<int> a(26);
+    for(char i:s) a[i - 'a']++;
+    vec<int> p(s.size() + 1, 1);
+    int n = s.size();
+    int ans = (n - 1) * n / 2;
+    bool k = false;
+    rep(i, 0, 26) {
+        if(a[i] <= 1) continue;
+        ans -= (a[i] - 1) * a[i] / 2;
+        if(!k) k = 1, ans++;
     }
-    rep(i, x, x + v[p].first) {
-        rep(j, y, y + v[p].second) {
-            a[i][j] = 1;
-        }
-    }
-    
-    dfs(P);
-    rep(i, x, x + v[p].first) {
-        rep(j, y, y + v[p].second) {
-            a[i][j] = 0;
-        }
-    }
-    A:;
-    if(x + v[p].second - 1 > n || y + v[p].first - 1 > m) return;
-    rep(i, x, x + v[p].second) {
-        rep(j, y, y + v[p].first) {
-            if(a[i][j]) return ;
-        }
-    }
-    rep(i, x, x + v[p].second) {
-        rep(j, y, y + v[p].first) {
-            a[i][j] = 1;
-        }
-    }
-    dfs(P);
-    rep(i, x, x + v[p].second) {
-        rep(j, y, y + v[p].first) {
-            a[i][j] = 0;
-        }
-    }
-}
+    std::cout << ans << '\n';
 
-void dfs(vec<bool> &p) {
-    int X, Y;
-    rep(i, 1, n + 1) {
-        rep(j, 1, m + 1) {
-            if(!a[i][j]) {
-                X = i, Y = j;
-                goto A;
-            }
-        }
-    }
-    std::cout << "Yes\n";
-    exit(0);
-    A:;
-    rep(i, 0, k) {
-        if(p[i]) continue;
-        p[i] = 1;
-        check(X, Y, i,  p);
-        p[i] = 0;
-    }
 }
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    
-    std::cin >> k >> n >> m;
-    a.assign(n + 1, vec<bool>(m + 1));
-    rep(i, 0, k) {
-        Pii x;
-        std::cin >> x.first >> x.second;
-        v.pb(x);
-    }
-    vec<bool> p(k);
-    dfs(p);
-    std::cout << "No\n";
-
+    int T = 1;
+    // std::cin >> T;
+    while(T--) solve();
     return 0;
 }

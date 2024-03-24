@@ -1,8 +1,7 @@
 #include <bits/stdc++.h>
+#include <queue>
 
 #if defined (_WIN64)
-#pragma GCC optimize(3,"Ofast","inline")
-// #pragma GCC optimize(2)
 #define LOG(x) if(!(x)){std::cout<<"error at:"<<__LINE__<<std::endl;exit(-1);}
 #else
 #define LOG(x)
@@ -29,40 +28,33 @@ template <class T,class FUN>void sort(std::vector<T>&v,FUN fun)
 {std::sort(v.begin(),v.end(),fun);}template<class T>void input
 (T begin,T end){while(begin!=end)std::cin>>*begin++;}
 using Pii = std::pair<int, int>;
+using i128 = __int128;
 
-struct node { int b, k, id; };
-bool cmp(Pii L0, Pii L1, Pii R0, Pii R1) {
-    return (L1.first - L0.first) * (R1.second - R0.second) > (L1.second - L0.second) * (R1.first - R0.first);
+void solve() {
+    int n;
+    std::cin >> n;
+    std::priority_queue<int, std::vector<int>, std::greater<int>> q;
+    rep(i, 0, n) {
+        int x;
+        std::cin >> x;
+        q.push(x);
+    }
+    i128 k = 0;
+    i128 add = 0;
+    while(q.size() > 1) {
+        int x = q.top();
+        q.pop();
+        add += x + k;
+        if(x <= -k) k += x + k;
+    }
+    std::cout << (int)(q.top() + add) << '\n';
 }
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int n, m;
-    std::cin >> n >> m;
-    vec<int> a(n);
-    std::cin >> a;
-    vec<node> query(m);
-    rep(i, 0, m) std::cin >> query[i].b >> query[i].k, query[i].id = i;
-    if(n == 1) {
-        rep(i, 0, m) std::cout << query[i].b - a[0] << '\n';
-        return 0;
-    }
-    vec<node> Cquery = query;
-    sort(query, [](node a, node b){return a.k < b.k;});
-    vec<int> ans(m);
-    vec<Pii> P;
-    P.push_back({a[0], 0});
-    P.push_back({a[1], 1});
-    rep(i, 2, n) {
-        while(P.size() >= 2 and cmp(P.back(), {a[i], i}, P[P.size() - 2], P.back())) P.pop_back();
-        P.push_back({a[i], i});
-    }
-    rep(i, 0, P.size() - 1) {
-        while(!query.empty() and query.back().k >= 1.0 * (P[i + 1].first - P[i].first) / (P[i + 1].second - P[i].second)) 
-        ans[query.back().id] = P[i].second, query.pop_back();
-    }
-    while(!query.empty()) ans[query.back().id] = P.back().second, query.pop_back();
-    rep(i, 0, m) std::cout << Cquery[i].b + ans[i] * Cquery[i].k - a[ans[i]] << '\n';
+    int T = 1;
+    std::cin >> T;
+    while(T--) solve();
     return 0;
 }

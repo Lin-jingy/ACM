@@ -53,8 +53,6 @@ private:
         return n;
     }
     void init_nature(const std::string &s) {
-        hashcode_1.assign(s.size() + 1, {});
-        p_1.assign(s.size() + 1, {});
         p_1[0] = hashcode_1[0] = 1;
         for(int i = 1; i <= s.size(); ++i) {
             hashcode_1[i] = hashcode_1[i - 1] * base_1 + s[i - 1];
@@ -62,8 +60,6 @@ private:
         }
     }
     void init_single(const std::string &s) {
-        hashcode_1.assign(s.size() + 1, {});
-        p_1.assign(s.size() + 1, {});
         p_1[0] = hashcode_1[0] = 1;
         for(int i = 1; i <= s.size(); ++i) {
             hashcode_1[i] = (1LL * hashcode_1[i - 1] * base_1 + s[i - 1]) % mod_1;
@@ -71,9 +67,7 @@ private:
         }
     }
     void init_double(const std::string &s) {
-        hashcode_1.assign(s.size() + 1, {});
         hashcode_2.assign(s.size() + 1, {});
-        p_1.assign(s.size() + 1, {});
         p_2.assign(s.size() + 1, {});
         p_1[0] = p_2[0] = hashcode_1[0] = hashcode_2[0] = 1;
         for(int i = 1; i <= s.size(); ++i) {
@@ -94,12 +88,10 @@ private:
         (hashcode_2[r] + 1LL * (mod_2 - hashcode_2[l - 1]) * p_2[r - l + 1]) % mod_2};
     }
 public:
-    StringHash(const std::string &s, enum OPTION option) : op(option){
-        static bool first = true;
+    StringHash(const std::string &s, enum OPTION option) : op(option), hashcode_1(s.size() + 1), p_1(s.size() + 1){
         static int MOD_1;
         static int MOD_2;
-        if(first) {
-            first = false;
+        if(!MOD_1) {
             std::mt19937 rnd(time(0));
             MOD_1 = findPrime(rnd() % 900000000 + 100000000);
             MOD_2 = findPrime(rnd() % 900000000 + 100000000);
