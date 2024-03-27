@@ -29,7 +29,7 @@ template <class T,class FUN>void sort(std::vector<T>&v,FUN fun)
 using Pii = std::pair<int, int>;
 
 void solve() {
-
+    
 }
 
 signed main() {
