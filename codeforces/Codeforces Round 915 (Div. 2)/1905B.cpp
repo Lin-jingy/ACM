@@ -1,11 +1,12 @@
 #include <bits/stdc++.h>
+#include <system_error>
 
 #if defined (_WIN64)
 #define log(x...) do{std::cout<<#x<<" -> ";_log(x);}while(0)
 void _log(){std::cout<<std::endl;}
 template<class T,class ...Ts>
 void _log(T arg,Ts ...args){std::cout<<arg<<' ';_log(args...);}
-#define sure(x) if(!(x)){std::cout<<"error at:"<<__LINE__<<std::endl;exit(-1);}
+#define sure(x) if(!(x)){std::cerr<<"error at:"<<__LINE__<<std::endl;exit(-1);}
 #else
 #define log(x...)
 #define sure(x)
@@ -34,24 +35,25 @@ using Pii = std::pair<int, int>;
 void solve() {
     int n;
     std::cin >> n;
-    vec<int> a(n + 1);
-    rep(i, 1, n + 1) std::cin >> a[i];
-    vec<int> mxl(n + 10), mxr(n + 10);
-    rep(i, 1, n + 1) mxl[i] = std::max(mxl[i - 1], a[i] + n - i);
-    rep(i, n, 0) mxr[i] = std::max(mxr[i + 1], a[i] + i - 1);
-    int ans = INT_MAX;
-    rep(i, 1, n + 1) {
-        ans = std::min(ans, std::max({a[i], mxl[i - 1], mxr[i + 1]}));
+    vec<int> du(n + 1);
+    rep(i, 1, n) {
+        int a, b;
+        std::cin >> a >> b;
+        du[a]++;
+        du[b]++;
     }
-    std::cout << ans << '\n';
-    
+    int ans = 0;
+    rep(i, 1, n + 1) {
+        if(du[i] == 1) ans++;
+    }
+    std::cout << (ans + 1) / 2 << '\n';
 }
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while(T--) solve();
     return 0;
 }

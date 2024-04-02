@@ -1,12 +1,17 @@
 #include <bits/stdc++.h>
 
 #if defined (_WIN64)
-#define LOG(x) if(!(x)){std::cout<<"error at:"<<__LINE__<<std::endl;exit(-1);}
+#define log(x...) do{std::cout<<#x<<" -> ";_log(x);}while(0)
+void _log(){std::cout<<std::endl;}
+template<class T,class ...Ts>
+void _log(T arg,Ts ...args){std::cout<<arg<<' ';_log(args...);}
+#define sure(x) if(!(x)){std::cerr<<"error at:"<<__LINE__<<std::endl;exit(-1);}
 #else
-#define LOG(x)
+#define log(x...)
+#define sure(x)
 #endif
 #define int long long
-#define rep(i,b,e) for(int i=b;i<(int)(e);++i)
+#define rep(i,b,e) for(int i=b;i<e;++i)
 #define range(i,b,e,step) for(int i=b;(b<e?i<e:i>e);i+=(b<e?step:-step))
 #define RETURN(x) do{return x,void();}while(0);
 #define All(x) x.begin(),x.end()
@@ -20,12 +25,10 @@ template<class T>std::istream& operator>>(std::istream&in,std::vector<T>&v)
 {for(auto &i:v)in>>i;return in;}template<class T>std::ostream& 
 operator<<(std::ostream&out,const std::vector<T>&v) {
 for(auto i=v.begin();i!=v.end();++i)out<<*i<<" \n"[i==v.end()];
-return out;}template<class T,class FUN>void foreach
-(std::vector<T>&v,FUN fun){for(int i=0;i<v.size();++i)fun(v[i],i);}
-template <class T>void sort(std::vector<T>&v) {std::sort(v.begin(),v.end());}
-template <class T,class FUN>void sort(std::vector<T>&v,FUN fun) 
-{std::sort(v.begin(),v.end(),fun);}template<class T>void input
-(T begin,T end){while(begin!=end)std::cin>>*begin++;}
+return out;}template <class T>void sort(T&v) 
+{std::sort(v.begin(),v.end());}template <class T,class FUN>void 
+sort(std::vector<T>&v,FUN fun) {std::sort(v.begin(),v.end(),fun);}
+template<class T>void input(T begin,T end){while(begin!=end)std::cin>>*begin++;}
 using Pii = std::pair<int, int>;
 
 void solve() {
