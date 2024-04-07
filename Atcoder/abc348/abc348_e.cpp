@@ -32,7 +32,45 @@ void _log(T arg,Ts ...args){std::clog<<arg<<' ';_log(args...);}
 #endif
 
 void solve() {
-    
+    int n;
+    std::cin >> n;
+    vec<vec<int>> v(n + 1);
+    rep(i, 1, n) {
+        int a, b;
+        std::cin >> a >> b;
+        v[a].pb(b);
+        v[b].pb(a);
+    }
+    vec<int> c(n + 1), up(n + 1), down(n + 1), sumdown(n + 1);
+    int sum = 0;
+    rep(i, 1, n + 1) std::cin >> c[i], sum += c[i];
+    int ans = LONG_LONG_MAX;
+    auto dfs = [&](auto &&self, int p, int fa) ->void{
+        for(auto i:v[p]) {
+            if(i == fa) continue;
+            self(self, i, p);
+            down[p] += down[i] + sumdown[i];
+            sumdown[p] += sumdown[i];
+        }
+        sumdown[p] += c[p];
+    };
+    dfs(dfs, 1, 0);
+    auto dfs1 = [&](auto &&self, int p, int fa) ->void {
+        ans = std::min(ans, up[p] + down[p]);
+        int add = 0;
+        for(auto i:v[p]) {
+            if(i == fa) continue;
+            add += down[i];
+        }
+        for(auto i:v[p]) {
+            if(i == fa) continue;
+            up[i] = up[p] + sum - sumdown[i] + add - down[i] + sum - sumdown[i] - (sum - sumdown[p]) - c[p];
+            self(self, i, p);
+        }
+        
+    };
+    dfs1(dfs1, 1, 0);
+    std::cout << ans << '\n';
 }
 
 signed main() {

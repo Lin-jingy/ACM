@@ -30,16 +30,31 @@ void _log(T arg,Ts ...args){std::clog<<arg<<' ';_log(args...);}
 #define log(x...)
 #define sure(x)
 #endif
-
+using namespace std;
 void solve() {
-    
+    int a,b;cin>>a>>b;
+    if(a==b){
+        cout<<0<<'\n';
+        return ;
+    }
+    if(a<b){
+        int d=abs(a-b);
+        if(d%2==1)cout<<1<<'\n';
+        else if (d % 4 == 2) cout << 2 << '\n';
+        else cout<<3<<'\n';
+    }else{
+        int d=abs(a-b);
+        if(d%2==0)cout<<1<<'\n';
+        else cout<<2<<'\n';
+    }
+    return ;
 }
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while(T--) solve();
     return 0;
 }

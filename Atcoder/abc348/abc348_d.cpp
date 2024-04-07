@@ -31,8 +31,49 @@ void _log(T arg,Ts ...args){std::clog<<arg<<' ';_log(args...);}
 #define sure(x)
 #endif
 
+int rx[] = {1, -1, 0, 0};
+int ry[] = {0, 0, 1, -1};
+
 void solve() {
-    
+    int n, m;
+    std::cin >> n >> m;
+    vec<vec<char>> v(n + 10, vec<char>(m + 10));
+    Pii begin, end;
+    rep(i, 1, n + 1) {
+        rep(j, 1, m + 1) {
+            std::cin >> v[i][j];
+            if(v[i][j] == 'S') begin = {i, j}, v[i][j] = '.';
+            else if(v[i][j] == 'T') end = {i, j}, v[i][j] = '.';
+        }
+    }
+    vec<vec<int>> a(n + 10, vec<int>(m + 10)), mx(n + 10, vec<int>(m + 10));
+    int k;
+    std::cin >> k;
+    rep(i, 0, k) {
+        int x, y, z;
+        std::cin >> x >> y >> z;
+        a[x][y] = z;
+    }
+    auto dfs = [&](auto &&self, int x, int y, int val) ->void {
+        if(x == end.first and y == end.second) {
+            std::cout << "Yes\n";
+            exit(0);
+        }
+        if(v[x][y] != '.') return ;
+        val = std::max(val, a[x][y]);
+        if(val <= mx[x][y] or val == 0) return ;
+        mx[x][y] = val;
+        int mid = a[x][y];
+        a[x][y] = 0;
+        rep(i, 0, 4) {
+            self(self, x + rx[i], y + ry[i], val - 1);
+        }
+        a[x][y] = mid;
+    };
+    int mid = a[begin.first][begin.second];
+    a[begin.first][begin.second] = 0;
+    dfs(dfs, begin.first, begin.second, mid);
+    std::cout << "No";
 }
 
 signed main() {

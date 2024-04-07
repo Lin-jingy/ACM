@@ -30,9 +30,25 @@ void _log(T arg,Ts ...args){std::clog<<arg<<' ';_log(args...);}
 #define log(x...)
 #define sure(x)
 #endif
+using namespace std;
 
 void solve() {
-    
+    string s;cin >> s;
+    int len = s.size();
+    int cnt = 0;
+    for (int i = 0;i < len;i++) {
+        if (s[i] == 'c' && cnt == 0) cnt++;
+        else if (s[i] == 'j' && cnt == 1) cnt++;
+        else if (s[i] == 'b' && cnt == 2) cnt++;
+        else {
+            cnt = 0;
+            if (s[i] == 'c') cnt++;
+        }
+        cout << s[i];
+        if (cnt == 3) {
+            cout << ',';
+        }
+    }
 }
 
 signed main() {

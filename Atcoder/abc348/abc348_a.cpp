@@ -32,7 +32,12 @@ void _log(T arg,Ts ...args){std::clog<<arg<<' ';_log(args...);}
 #endif
 
 void solve() {
-    
+    int n;
+    std::cin >> n;
+    rep(i, 1, n + 1) {
+        if(i % 3 == 0) std::cout << "x";
+        else std::cout << "o";
+    }
 }
 
 signed main() {

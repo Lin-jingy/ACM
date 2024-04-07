@@ -32,7 +32,22 @@ void _log(T arg,Ts ...args){std::clog<<arg<<' ';_log(args...);}
 #endif
 
 void solve() {
-    
+    int n;
+    std::cin >> n;
+    vec<Pii> v(n);
+    rep(i, 0, n) std::cin >> v[i].first >> v[i].second;
+    rep(i, 0, n) {
+        int mx = 0, id;
+        rep(j, 0, n) {
+            if(i == j) continue;
+            int D = (v[i].first - v[j].first) * (v[i].first - v[j].first) + (v[i].second - v[j].second) * (v[i].second - v[j].second);
+            if(D > mx) {
+                mx = D;
+                id = j;
+            }
+        }
+        std::cout << id + 1 << '\n';
+    }
 }
 
 signed main() {

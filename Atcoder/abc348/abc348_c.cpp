@@ -32,7 +32,20 @@ void _log(T arg,Ts ...args){std::clog<<arg<<' ';_log(args...);}
 #endif
 
 void solve() {
-    
+    int n;
+    std::cin >> n;
+    std::map<int, int> mp;
+    rep(i, 0, n) {
+        int a, b;
+        std::cin >> a >> b;
+        if(!mp.count(b)) mp[b] = a;
+        else mp[b] = std::min(mp[b], a);
+    }
+    int mx = 0;
+    for(auto [i, j] : mp) {
+        mx = std::max(mx, j);
+    }
+    std::cout << mx << '\n';
 }
 
 signed main() {
