@@ -21,9 +21,10 @@ template<class...Ts>auto&print(Ts...ts){return((std::cerr<<ts<<" "),...);}
 #endif
 
 
-
 void solve() {
-    
+    int a, b, n;
+    std::cin >> n >> a >> b;
+    std::cout << std::min(a * n, n / 2 * b + (n % 2) * a) << '\n';
 
 }
 
@@ -31,7 +32,7 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }

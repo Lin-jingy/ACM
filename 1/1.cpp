@@ -20,10 +20,53 @@ template<class...Ts>auto&print(Ts...ts){return((std::cerr<<ts<<" "),...);}
 #define log(...)111
 #endif
 
-
-
+int n, m;
+class DSU {
+private:
+    std::vector<int> f, siz;
+public:
+    DSU(int n):f(n+1),siz(n+1){for(int i=1;i<=n;i++)siz[i]=1,f[i]=i;}
+    int find(int x){return x==f[x]?x:f[x]=find(f[x]);}
+    bool same(int x,int y){return find(x)==find(y);}
+    void merge(int x,int y) {if(!same(x,y))siz[find(y)]+=siz[find(x)],f[find(x)]=find(y);}
+    int qsz(int x){return siz[find(x)];}
+};
+int get(int i, int j) {
+    return (i - 1) * m + j;
+}
+int px[] = {1, -1, 0, 0};
+int py[] = {0, 0, 1, -1};
 void solve() {
-    
+    std::cin >> n >> m;
+    vvec(int, v, n + 1, m + 1, 0);
+    rep(i, 1, n + 1) rep(j, 1, m + 1) std::cin >> v[i][j];
+    vec<int> list;
+    rep(i, 1, n + 1) rep(j, 1, m + 1) {
+        int x;
+        std::cin >> x;
+        if(x == 1) list.pb(get(i, j));
+    }
+    auto check = [&](int mid) ->bool {
+        DSU T(n * m + 1000);
+        rep(i, 1, n + 1) {
+            rep(j, 1, m + 1) {
+                rep(k, 0, 4) { 
+                    int X = i + px[k], Y = j + py[k];
+                    if(X >= 1 and X <= n and Y >= 1 and Y <= m and std::abs(v[i][j] - v[X][Y]) <= mid) 
+                        T.merge(get(i, j), get(X, Y)); 
+                }
+            }
+        }
+        for(auto i:list) if(!T.same(i, list.front())) return false;
+        return true;
+    };
+    int l = 0, r = 1e9 + 7, ans = 0;
+    while(l <= r) {
+        int mid = (l + r) / 2;
+        if(check(mid)) r = mid - 1, ans = mid;
+        else l = mid + 1;
+    }
+    std::cout << ans << '\n';
 
 }
 

@@ -1,123 +1,169 @@
 #include <bits/stdc++.h>
+#include <stdexcept>
 
-template <typename T, size_t N>
+template<class T, size_t size>
 class array {
 private:
-    T m_data[N];
+    T m_data[size];
 public:
-    array() {}
-    array(const array<T, N>&other) {
-        memcpy(m_data, other.m_data, N * sizeof(T));
-    }
-    array(T *other) {
-        memcpy(m_data, other, N * sizeof(T));
-    }
-    ~array() {}
-    
-    T& at(size_t pos) {
-        if(pos >= N) throw std::out_of_range("array out of range");
+    array() = default;
+    ~array() = default;
+
+    //Element access
+    constexpr T& at(size_t pos) {
+        if(pos < 0 or pos >= size) throw std::out_of_range("err=>at()");
         return m_data[pos];
     }
-    T& operator[](size_t pos) {
+    constexpr const T& at(size_t pos) const {
+        if(pos < 0 or pos >= size) throw std::out_of_range("err=>at()");
         return m_data[pos];
     }
-    T& front() {
+    constexpr T& operator[](size_t pos) noexcept {
+        return m_data[pos];
+    }
+    constexpr const T& operator[](size_t pos) const noexcept {
+        return m_data[pos];
+    }
+    constexpr T& front() noexcept {
         return m_data[0];
     }
-    T& back() {
-        return m_data[N - 1];
+    constexpr const T& front() const noexcept {
+        return m_data[0];
     }
-    T* data() {
+    constexpr T& back() noexcept {
+        return m_data[size - 1];
+    }
+    constexpr const T& back() const noexcept {
+        return m_data[size - 1];
+    }
+    constexpr T* data() noexcept {
         return m_data;
     }
-    bool empty() {
-        return N == 0;
+    constexpr const T* data() const noexcept {
+        return m_data;
     }
-    size_t size() {
-        return N;
-    }
-
-    void swap(array<T, N> &other) {
-        std::swap(m_data, other.m_data);
-    }
-
-    void operator= (const array<T, N> &other) {
-        memcpy(m_data, other.m_data, N * sizeof(T));
-    }
-
-    void operator= (const T *other) {
-        memcpy(m_data, other, N * sizeof(T));
-    }
-
-    bool operator== (const array<T, N> &other) {
-        return memcmp(m_data, other.m_data, N * sizeof(T)) == 0;
-    }
-    bool operator!= (const array<T, N> &other) {
-        return memcmp(m_data, other.m_data, N * sizeof(T)) != 0;
-    }
-
-    friend std::ostream &operator<<(std::ostream &out, const array<T, N> &arr) {
-		for(int i = 0; i < N; ++i) out << arr.m_data[i] << " ";
-        return out;
-	}
-
+    
+    //Iterators
     class iterator {
     private:
-        T *m_point;
+        T *m_ptr;
     public:
-        iterator() :m_point(nullptr){}
-        iterator(T *point) :m_point(point){}
-        ~iterator(){}
-        bool operator== (const iterator &other){
-            return m_point == other.m_point;
+        iterator() = default;
+        ~iterator() = default;
+        iterator(T *ptr) : m_ptr(ptr){}
+        iterator(const iterator &ptr): m_ptr(ptr.m_ptr){}
+        T& operator*() const noexcept {
+            return *m_ptr;
         }
-        bool operator!= (const iterator &other){
-            return m_point != other.m_point;
+        T* operator->() const noexcept {
+            return m_ptr;
         }
-        iterator operator= (const iterator &other){
-            m_point = other.m_point;
+        iterator& operator=(const iterator &ptr) {
+            m_ptr = ptr;
+        }
+        iterator& operator++() noexcept {
+            ++m_ptr;
             return *this;
         }
-        iterator operator++(){
-            ++m_point;
+        iterator operator++(int) noexcept {
+            iterator mid(*this);
+            ++m_ptr;
+            return mid;
+        }
+        iterator& operator--() noexcept {
+            --m_ptr;
             return *this;
         }
-        iterator operator++(int){
-            iterator it = *this;
-            ++m_point;
-            return it;
+        iterator operator--(int) noexcept {
+            iterator mid(*this);
+            --m_ptr;
+            return mid;
         }
-        iterator operator+(int i){
-            m_point += i;
+        iterator& operator+=(const size_t pos) noexcept {
+            m_ptr += pos;
             return *this;
         }
-        iterator& operator+=(int i){
-            m_point += i;
+        iterator operator+(const size_t pos) const noexcept {
+            iterator mid(*this);
+            m_ptr += pos;
+            return mid;
+        }
+        iterator& operator-=(const size_t pos) noexcept {
+            m_ptr -= pos;
             return *this;
         }
-        iterator operator-(int i){
-            m_point -= i;
-            return *this;
+        iterator operator-(const size_t pos) const noexcept {
+            iterator mid(*this);
+            m_ptr -= pos;
+            return mid;
         }
-        iterator& operator-=(int i){
-            m_point -= i;
-            return *this;
+        friend bool operator==(const iterator a, const iterator b) {
+            return a.m_ptr == b.m_ptr;
         }
-        size_t operator- (const iterator &other) {
-            return m_point - other.m_point;
-        }
-        T& operator*(){
-            return *m_point;
-        }
-        T* operator->(){
-            return m_point;
+        friend bool operator!=(const iterator a, const iterator b) {
+            return a.m_ptr != b.m_ptr;
         }
     };
-    iterator begin() {
+    class const_iterator : public iterator {
+        T& operator*() const noexcept = delete;
+        T* operator->() const noexcept = delete;
+    };
+    class reverse_iterator : public iterator {
+        iterator& operator++() noexcept {
+            return iterator::operator--();
+        }
+        iterator operator++(int) noexcept {
+            return iterator::operator()--;
+        }
+        iterator& operator--() noexcept {
+            return iterator::operator++();
+        }
+        iterator operator--(int) noexcept {
+            return iterator::operator()++;
+        }
+        iterator& operator+=(const size_t pos) noexcept {
+            return iterator::operator+=(pos);
+        }
+        iterator operator+(const size_t pos) const noexcept {
+            return iterator::operator+(pos);
+        }
+        iterator& operator-=(const size_t pos) noexcept {
+            return iterator::operator-=(pos);
+        }
+        iterator operator-(const size_t pos) const noexcept {
+            return iterator::operator-(pos);
+        }
+    };
+    class const_reverse_iterator : public reverse_iterator {
+        T& operator*() const noexcept = delete;
+        T* operator->() const noexcept = delete;
+    };
+    iterator begin() noexcept {
         return iterator(m_data);
     }
-    iterator end() {
-        return iterator(m_data + N);
+    const_iterator begin() const noexcept {
+        return const_iterator(m_data);
     }
-
+    iterator end() noexcept {
+        return iterator(m_data + size);
+    }
+    const_iterator end() const noexcept {
+        return const_iterator(m_data + size);
+    }
+    reverse_iterator rbegin() noexcept {
+        return reverse_iterator(m_data + size - 1);
+    }
+    const_reverse_iterator rbegin() const noexcept {
+        return const_reverse_iterator(m_data + size - 1);
+    }
+    reverse_iterator rend() noexcept {
+        return reverse_iterator(m_data - 1);
+    }
+    const_reverse_iterator rend() const noexcept {
+        return const_reverse_iterator(m_data - 1);
+    }
 };
+
+int main() {
+    
+}

@@ -21,17 +21,34 @@ template<class...Ts>auto&print(Ts...ts){return((std::cerr<<ts<<" "),...);}
 #endif
 
 
-
 void solve() {
-    
-
+    int n, c, d;
+    std::cin >> n >> c >> d;
+    vec<int> b(n * n);
+    std::cin >> b;
+    std::ranges::sort(b);
+    vvec(int, a, n + 1, n + 1, 0);
+    a[1][1] = b.front();
+    rep(i, 2, n + 1) a[1][i] = a[1][i - 1] + d;
+    rep(i, 2, n + 1) a[i][1] = a[i - 1][1] + c;
+    rep(i, 2, n + 1) {
+        rep(j, 2, n + 1) {
+            if(a[i - 1][j] + c != a[i][j - 1] + d) RETURN(std::cout << "NO\n");
+            a[i][j] = a[i - 1][j] + c;
+        }
+    }
+    vec<int> D;
+    rep(i, 1, n + 1) rep(j, 1, n + 1) D.eb(a[i][j]);
+    std::ranges::sort(D);
+    rep(i, 0, n * n) if(b[i] != D[i]) RETURN(std::cout << "NO\n");
+    std::cout << "YES\n";
 }
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }

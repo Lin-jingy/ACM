@@ -1,7 +1,4 @@
-#include <any>
 #include <bits/stdc++.h>
-#include <memory>
-#include <type_traits>
 
 #define int long long
 #define rep(i,b,e)for(int i=b;i<e;++i)
@@ -23,81 +20,30 @@ template<class...Ts>auto&print(Ts...ts){return((std::cerr<<ts<<" "),...);}
 #define log(...)111
 #endif
 
-class var {
-public:
-    // 默认构造函数，创建一个空的Var对象
-    var() = default;
-    ~var() = default;
-
-    // 通用构造函数，接受任意类型的参数并存储其值
-    template <typename T>
-    var(T&& value): m_value(std::forward<T>(value)){}
-
-    // 重载赋值运算符，允许改变存储的值（类型可能变化）
-    template <typename T>
-    var& operator=(T&& value) {
-        m_value = std::forward<T>(value);
-        return *this;
-    }
-
-    // 获取当前存储值的类型名称（用于调试或错误信息）
-    const char* type_name() const {
-        return m_value.type().name();
-    }
-
-
-    // const版本的get方法
-    template <typename T>
-    const T& get() const {
-        return const_cast<var*>(this)->get<T>();
-    }
-
-    template<typename T>
-    const T& get() {
-        if (m_value.has_value()) {
-            if (m_value.type() == typeid(int)) {
-                return std::any_cast<int>(m_value);
-            } else if (m_value.type() == typeid(double)) {
-                return std::any_cast<double>(m_value);
-            } else if (m_value.type() == typeid(std::string)) {
-                return std::any_cast<std::string>(m_value);
-            } else {
-                return "<unknown type>";
-            }
-        } else {
-            return "<undefine>";
-        }
-    }
-
-    // 重载输出流运算符<<，将Var对象的值输出到ostream
-    friend std::ostream& operator<<(std::ostream& os, const var& var) {
-        if (var.m_value.has_value()) {
-            const auto& value = var.m_value;
-            if (value.type() == typeid(int)) {
-                os << std::any_cast<int>(value);
-            } else if (value.type() == typeid(double)) {
-                os << std::any_cast<double>(value);
-            } else if (value.type() == typeid(std::string)) {
-                os << std::any_cast<std::string>(value);
-            } else {
-                os << "<unknown type>";
-            }
-        } else {
-            os << "<undefine>";
-        }
-        return os;
-    }
-
-
-
-private:
-    std::any m_value;  // 存储任意类型值的容器
-};
-
-
+constexpr int mod1 = 1e9 + 7, mod2 = 998244353;
+constexpr int p1 = 1332331, p2 = 1123331, p3 = 1237;
 
 void solve() {
-
+    int n;
+    std::cin >> n;
+    vec<int> val(n + 1);
+    rep(i, 1, n + 1) std::cin >> val[i];
+    vec<Pii> v(n + 1);
+    rep(i, 1, n + 1) std::cin >> v[i];
+    int ans = 0;
+    vec<int> P1(n + 1), P2(n + 1);
+    P1[0] = P2[0] = 1;
+    rep(i, 1, n + 1) P1[i] = P1[i - 1] * p1 % mod1;
+    rep(i, 1, n + 1) P2[i] = P2[i - 1] * p2 % mod2;
+    auto dfs = [&](auto &&self, int p) ->std::array<int, 3> {
+        std::array<int, 3> L = {0, 0, 0}, R = {0, 0, 0};
+        if(v[p].first != -1) L = self(self, v[p].first);
+        if(v[p].second != -1) R = self(self, v[p].second);
+        if(L[0] == R[1] and L[1] == R[0] and  L[2] == R[2]) ans = std::max(ans, L[2] + R[2] + 1);
+        return {(L[0] * p1 % mod2 + val[p] * p2 % mod2 + R[0] * p3 % mod2) % mod2, (R[1] * p1 % mod2 + val[p] * p2 % mod2 + L[1] * p3 % mod2) % mod2, L[2] + R[2] + 1};
+    };
+    dfs(dfs, 1);
+    std::cout << ans << '\n';
 }
 
 signed main() {

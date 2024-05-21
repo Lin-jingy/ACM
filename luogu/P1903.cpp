@@ -1,7 +1,4 @@
-#include <any>
 #include <bits/stdc++.h>
-#include <memory>
-#include <type_traits>
 
 #define int long long
 #define rep(i,b,e)for(int i=b;i<e;++i)
@@ -23,81 +20,41 @@ template<class...Ts>auto&print(Ts...ts){return((std::cerr<<ts<<" "),...);}
 #define log(...)111
 #endif
 
-class var {
-public:
-    // 默认构造函数，创建一个空的Var对象
-    var() = default;
-    ~var() = default;
-
-    // 通用构造函数，接受任意类型的参数并存储其值
-    template <typename T>
-    var(T&& value): m_value(std::forward<T>(value)){}
-
-    // 重载赋值运算符，允许改变存储的值（类型可能变化）
-    template <typename T>
-    var& operator=(T&& value) {
-        m_value = std::forward<T>(value);
-        return *this;
-    }
-
-    // 获取当前存储值的类型名称（用于调试或错误信息）
-    const char* type_name() const {
-        return m_value.type().name();
-    }
-
-
-    // const版本的get方法
-    template <typename T>
-    const T& get() const {
-        return const_cast<var*>(this)->get<T>();
-    }
-
-    template<typename T>
-    const T& get() {
-        if (m_value.has_value()) {
-            if (m_value.type() == typeid(int)) {
-                return std::any_cast<int>(m_value);
-            } else if (m_value.type() == typeid(double)) {
-                return std::any_cast<double>(m_value);
-            } else if (m_value.type() == typeid(std::string)) {
-                return std::any_cast<std::string>(m_value);
-            } else {
-                return "<unknown type>";
-            }
-        } else {
-            return "<undefine>";
-        }
-    }
-
-    // 重载输出流运算符<<，将Var对象的值输出到ostream
-    friend std::ostream& operator<<(std::ostream& os, const var& var) {
-        if (var.m_value.has_value()) {
-            const auto& value = var.m_value;
-            if (value.type() == typeid(int)) {
-                os << std::any_cast<int>(value);
-            } else if (value.type() == typeid(double)) {
-                os << std::any_cast<double>(value);
-            } else if (value.type() == typeid(std::string)) {
-                os << std::any_cast<std::string>(value);
-            } else {
-                os << "<unknown type>";
-            }
-        } else {
-            os << "<undefine>";
-        }
-        return os;
-    }
-
-
-
-private:
-    std::any m_value;  // 存储任意类型值的容器
-};
-
-
-
+constexpr int size = 366;
 void solve() {
-
+    int n, m;
+    std::cin >> n >> m;
+    vec<int> a(n + 1);
+    for (int i = 0; i < n; ++i) {
+        std::cin >> a[i];
+    }
+    vec<umap<int, int>> k(size + 100);
+    for(int i = 0; i < n; ++i) {
+        k[i / size][a[i]]++;
+    }
+    while(m--) {
+        char op;
+        int x, y;
+        std::cin >> op >> x >> y;
+        if(op == 'Q') {
+            --x, --y;
+            int L = x / size, R = y / size;
+            uset<int> mp;
+            for(int i = L + 1; i < R; ++i) {
+                for(auto i:k[i]) mp.insert(i.first);
+            }
+            for(int i = x; i < L * size; ++i) mp.insert(a[i]);
+            for(int i = R * size + 1; i < y; ++i) mp.insert(a[i]);
+            mp.insert(a[x]);
+            mp.insert(a[y]);
+            std::cout << mp.size() << '\n';
+        } else {
+            --x;
+            k[x / size][a[x]]--;
+            a[x] = y;
+            k[x / size][a[x]]++;
+        }
+    }
 }
 
 signed main() {

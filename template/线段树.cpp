@@ -26,10 +26,7 @@ private:
     }
 
 public:
-    SegmentTree(int n) {
-        a.assign(n + 10, 0);
-        v.assign(n << 3, {});
-    }
+    SegmentTree(int n) : a(n + 10), v(n << 3){}
     void build(int p, int l, int r) {
         if (l == r) {
             f(p) = a[l];

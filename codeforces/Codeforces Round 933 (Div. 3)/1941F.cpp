@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <bits/stdc++.h>
+#include <queue>
 
 #define int long long
 #define rep(i,b,e) for(int i=b;i<e;++i)
@@ -30,24 +32,47 @@ void _log(T arg,Ts ...args){std::clog<<arg<<' ';_log(args...);}
 #define log(x...)
 #define sure(x)
 #endif
-using namespace std;
+
 void solve() {
-    int a,b;cin>>a>>b;
-    if(a==b){
-        cout<<0<<'\n';
-        return ;
+    int n, m, k;
+    std::cin >> n >> m >> k;
+    vec<int> a(n), d(m), f(k);
+    std::cin >> a >> d >> f;
+    int l = a[0], r = a[1];
+    rep(i, 1, a.size()) if(a[i] - a[i - 1] > r - l) r = a[i], l = a[i - 1];
+    std::priority_queue<int> Q;
+    rep(i, 1, a.size()) Q.push(a[i] - a[i - 1]);
+    Q.pop();
+    int ans = r - l;
+    std::ranges::sort(f);
+    f.erase(std::unique(All(f)), f.end());
+    rep(i, 0, d.size()) {
+        int last_l = l - d[i];
+        int last_r = r - d[i];
+        if(d[i] + f.front() > r or d[i] + f.back() < l) continue;
+        int L = std::upper_bound(All(f), last_l) - f.begin();
+        int R = std::lower_bound(All(f), last_r) - f.begin();
+        --R;
+        int k = r - l;
+        while(L <= R) {
+            int mid = (L + R) >> 1;
+            int val = std::max(r - (f[mid] + d[i]), (f[mid] + d[i]) - l);
+            if(val < k) k = val;
+            if(mid == R) {
+                int vall = std::max(r - (f[mid - 1] + d[i]), (f[mid - 1] + d[i]) - l);
+                if(vall > val) L = mid + 1;
+                else R = mid - 1;
+            }
+            else {
+                int valr = std::max(r - (f[mid + 1] + d[i]), (f[mid + 1] + d[i]) - l);
+                if(valr < val) L = mid + 1;
+                else R = mid - 1;
+            }
+        }
+        ans = std::min(ans, k);
     }
-    if(a<b){
-        int d=abs(a-b);
-        if(d%2==1)cout<<1<<'\n';
-        else if (d % 4 == 2) cout << 2 << '\n';
-        else cout<<3<<'\n';
-    }else{
-        int d=abs(a-b);
-        if(d%2==0)cout<<1<<'\n';
-        else cout<<2<<'\n';
-    }
-    return ;
+    Q.push(ans);
+    std::cout << Q.top() << '\n';
 }
 
 signed main() {

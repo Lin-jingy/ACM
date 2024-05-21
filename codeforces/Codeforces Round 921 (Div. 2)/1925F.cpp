@@ -18,10 +18,10 @@ public:
 	int a, b;
 	node(int x, int y) : a(x), b(y) {}
     friend node operator+ (node a, node b) {
-	    return node((a.a + b.a) % mod, (a.b + b.b) % mod);
+        return node((a.a + b.a) % mod, (a.b + b.b) % mod);
     }
     friend node operator- (node a, node b) {
-	    return node((a.a - b.a + mod) % mod, (a.b - b.b + mod) % mod);
+        return node((a.a - b.a + mod) % mod, (a.b - b.b + mod) % mod);
     }
     friend node operator* (node a, node b) {
 	    return node((a.a * b.a + a.b * b.b * 2) % mod, (a.a * b.b + a.b * b.a) % mod);
@@ -36,7 +36,7 @@ public:
         return x * node(y.a, mod - y.b) * qpow((y.a * y.a - y.b * y.b * 2) % mod, mod - 2);
     }
 };
- 
+
 inline node qpow(node a, int b) {
 	node sum(1, 0);
 	while (b) {
@@ -46,7 +46,7 @@ inline node qpow(node a, int b) {
 	}
 	return sum;
 }
- 
+
 void solve() {
 	int n;
     std::cin >> n;

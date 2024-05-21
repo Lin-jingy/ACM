@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 
-#define int long long
+// #define int long long
 #define rep(i,b,e)for(int i=b;i<(e);++i)
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
@@ -20,10 +20,57 @@ template<class...Ts>auto&print(Ts...ts){return((std::cerr<<ts<<" "),...);}
 #define log(...)111
 #endif
 
+class SegmentTree {
+public:
+struct Treenode {
+    int f;
+};
+std::vector<int> a;
+std::vector<Treenode> v;
+#define f(x) (v[x].f)
+#define ls(x) (x << 1)
+#define rs(x) (x << 1 | 1)
+    void pushUp(int p) {
+        f(p) = std::min(f(ls(p)), f(rs(p)));
+    }
 
+public:
+    SegmentTree(int n) : a(n + 10), v(n << 2){}
+    void build(int p, int l, int r) {
+        if (l == r) {
+            f(p) = a[l];
+            return;
+        }
+        int mid = (l + r) >> 1;
+        build(ls(p), l, mid);
+        build(rs(p), mid + 1, r);
+        pushUp(p);
+    }
+    int query(int p, int l, int r, int i, int j) {
+        if (i <= l and j >= r) return f(p);
+        int mid = (l + r) >> 1, sum = inf;
+        if (i <= mid) sum = query(ls(p), l, mid, i, j);
+        if (j > mid) sum = std::min(sum, query(rs(p), mid + 1, r, i, j));
+        return sum;
+    }
+};
 
 void solve() {
-    
+    int n;
+    std::cin >> n;
+    SegmentTree T(n + 1);
+    rep(i, 1, n + 1) {
+        int x;
+        std::cin >> x;
+        T.a[i] = T.a[i - 1] + x;
+    }
+    T.build(1, 1, n);
+    int ans = 0;
+    for(int i = 2; i <= n; ++i) {
+        if(T.query(1, 1, n, i, n) - T.a[i - 1] < 0) continue;
+        if(T.a[n] - T.a[i - 1] + T.query(1, 1, n, 1, i - 1) >= 0) ++ans;
+    }
+    std::cout << ans + (T.v[1].f >= 0) << '\n';
 
 }
 

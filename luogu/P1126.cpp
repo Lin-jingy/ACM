@@ -1,9 +1,6 @@
-#include <any>
 #include <bits/stdc++.h>
-#include <memory>
-#include <type_traits>
 
-#define int long long
+// #define int long long
 #define rep(i,b,e)for(int i=b;i<e;++i)
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
@@ -23,88 +20,63 @@ template<class...Ts>auto&print(Ts...ts){return((std::cerr<<ts<<" "),...);}
 #define log(...)111
 #endif
 
-class var {
-public:
-    // 默认构造函数，创建一个空的Var对象
-    var() = default;
-    ~var() = default;
-
-    // 通用构造函数，接受任意类型的参数并存储其值
-    template <typename T>
-    var(T&& value): m_value(std::forward<T>(value)){}
-
-    // 重载赋值运算符，允许改变存储的值（类型可能变化）
-    template <typename T>
-    var& operator=(T&& value) {
-        m_value = std::forward<T>(value);
-        return *this;
+int ch(char op) {
+    switch (op) {
+        case 'N': return 0;
+        case 'E': return 1;
+        case 'S': return 2;
+        case 'W': return 3;
     }
-
-    // 获取当前存储值的类型名称（用于调试或错误信息）
-    const char* type_name() const {
-        return m_value.type().name();
-    }
-
-
-    // const版本的get方法
-    template <typename T>
-    const T& get() const {
-        return const_cast<var*>(this)->get<T>();
-    }
-
-    template<typename T>
-    const T& get() {
-        if (m_value.has_value()) {
-            if (m_value.type() == typeid(int)) {
-                return std::any_cast<int>(m_value);
-            } else if (m_value.type() == typeid(double)) {
-                return std::any_cast<double>(m_value);
-            } else if (m_value.type() == typeid(std::string)) {
-                return std::any_cast<std::string>(m_value);
-            } else {
-                return "<unknown type>";
-            }
-        } else {
-            return "<undefine>";
-        }
-    }
-
-    // 重载输出流运算符<<，将Var对象的值输出到ostream
-    friend std::ostream& operator<<(std::ostream& os, const var& var) {
-        if (var.m_value.has_value()) {
-            const auto& value = var.m_value;
-            if (value.type() == typeid(int)) {
-                os << std::any_cast<int>(value);
-            } else if (value.type() == typeid(double)) {
-                os << std::any_cast<double>(value);
-            } else if (value.type() == typeid(std::string)) {
-                os << std::any_cast<std::string>(value);
-            } else {
-                os << "<unknown type>";
-            }
-        } else {
-            os << "<undefine>";
-        }
-        return os;
-    }
-
-
-
-private:
-    std::any m_value;  // 存储任意类型值的容器
-};
-
+    return 0;
+}
 
 
 void solve() {
-
+    int n, m;
+    std::cin >> n >> m;
+    vvec(int, v, n + 1, m + 1, 0);
+    rep(i, 1, n + 1) {
+        rep(j, 1, m + 1) {
+            std::cin >> v[i][j];
+        }
+    }
+    Pii begin, end;
+    char op;
+    std::cin >> begin >> end >> op;
+    std::queue<std::array<int, 4>> q;
+    vec<vec<std::array<int, 4>>> mn(n + 1, vec<std::array<int, 4>>(m + 1, {inf, inf, inf, inf})); 
+    q.push({0, begin.first, begin.second, ch(op)});
+    while(!q.empty()) {
+        auto [dis, x, y, op] = q.front();
+        q.pop();
+        if(x <= 0  or x >= n or y <= 0 or y >= m or mn[x][y][op] < dis) continue;
+        mn[x][y][op] = dis;
+        if(mn[x][y][(op + 1) % 4] > dis + 1) q.push({dis + 1, x, y, (op + 1) % 4});
+        if(mn[x][y][(op + 3) % 4] > dis + 1) q.push({dis + 1, x, y, (op + 3) % 4});
+        int rx, ry;
+        if(op == 0) rx = -1, ry = 0;
+        else if(op == 1) rx = 0, ry = 1;
+        else if(op == 2) rx = 1, ry = 0;
+        else rx = 0, ry = -1;
+        for(int i = 1; i <= 3; ++i) {
+            int X = x + rx * i, Y = y + ry * i;
+            if(X <= 0  or X >= n or Y <= 0 or Y >= m) break;
+            if(v[X][Y] != 1 and v[X][Y + 1] != 1 and v[X + 1][Y] != 1 and v[X + 1][Y + 1] != 1) {
+                if(mn[X][Y][op] > dis + 1) q.push({dis + 1, X, Y, op});
+            } else {
+                break;
+            }
+        }
+    }
+    int ans = inf;
+    rep(i, 0, 4) ans = std::min(ans, mn[end.first][end.second][i]);
+    if(ans >= 1e5) std::cout << "-1\n";
+    else std::cout << ans << '\n';
 }
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int T = 1;
-    // std::cin >> T;
-    while (T--) solve();
+    solve();
     return 0;
 }
