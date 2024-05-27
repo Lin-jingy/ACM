@@ -17,7 +17,7 @@ template<class T>using vec=std::vector<T>;using str=std::string;template<class K
 #if defined(_WIN64)
 #define log(...)print(#__VA_ARGS__" ::",__VA_ARGS__)<<std::endl
 template<class...Ts>auto&print(Ts...ts){return((std::cerr<<ts<<" "),...);}
-#define sure(x)if(!(x)){std::cerr<<"error at:"<<__LINE__<<std::endl;exit(-1);}
+#define ensure(x)if(!(x)){std::cerr<<"error at:"<<__LINE__<<std::endl;exit(-1);}
 #else
 #define sure(x)111
 #define log(...)111
