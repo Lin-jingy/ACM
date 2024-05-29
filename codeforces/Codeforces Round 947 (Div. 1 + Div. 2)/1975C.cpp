@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <optional>
 
 #define int long long
 #define rep(i,b,e)for(int i=b;i<(e);++i)
@@ -21,18 +20,31 @@ template<class...Ts>auto&print(Ts...ts){return((std::cerr<<ts<<" "),...);}
 #define log(...)111
 #endif
 
+// * 3 2 3
 
 
 void solve() {
-    
-    
+    int n;
+    std::cin >> n;
+    vec<int> a(n);
+    std::cin >> a;
+    int ans = 1;
+    rep(i, 1, n) {
+        ans = std::max(ans, std::min(a[i], a[i - 1]));
+    }
+    rep(i, 2, n) {
+        arr<int, 3> k = {a[i], a[i - 1], a[i - 2]};
+        std::ranges::sort(k);
+        ans = std::max(ans, k[1]);
+    }
+    std::cout << ans << '\n';
 }
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }

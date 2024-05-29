@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <optional>
 
 #define int long long
 #define rep(i,b,e)for(int i=b;i<(e);++i)
@@ -14,25 +13,66 @@ template<class T>using vec=std::vector<T>;using str=std::string;template<class K
 #define vvec(type,x,sz1,sz2,val)std::vector<std::vector<type>>x(sz1,std::vector<type>(sz2,val));
 #if defined(_WIN64)
 #define log(...)print(#__VA_ARGS__" ::",__VA_ARGS__)<<std::endl
-template<class...Ts>auto&print(Ts...ts){return((std::cerr<<ts<<" "),...);}
-#define sure(x)if(!(x)){std::cerr<<"error at:"<<__LINE__<<std::endl;exit(-1);}
+template<class...Ts>auto&print(Ts...ts){return((std::clog<<ts<<" "),...);}
+#define ensure(x)if(!(x)){std::cerr<<"error at:"<<__LINE__<<std::endl<<#x<<std::endl;exit(-1);}
 #else
 #define sure(x)111
 #define log(...)111
 #endif
 
+class Rand {
+private:
+    std::mt19937_64 rnd;
+public:
+    Rand() : rnd((std::chrono::high_resolution_clock::now()).time_since_epoch().count()) {}
+    int get(int l, int r) {
+        return rnd() % (r - l + 1) + l;
+    }
+};
 
-
-void solve() {
-    
-    
-}
+void solve(str problemID, str dataID, str in_out);
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int T = 1;
-    // std::cin >> T;
-    while (T--) solve();
+    
+    str problemID = "19";
+    int begin = 1;
+    int end = 1;
+    for(int i = begin; i <= end; ++i) solve(problemID, std::to_string(i), "in");
+
     return 0;
+}
+
+void solve(str problemID, str dataID, str in_out) {
+    str address = std::format("C:/Users/123/Desktop/programming/VScode/ACM/data/{}/data/{}.in",problemID,dataID);
+    log(dataID);
+    if(in_out == "in") freopen(address.data(), "r", stdin);
+    else if(in_out == "out") freopen(address.data(), "w", stdout);
+    Rand r;
+
+    // !begin test
+    int T;
+    std::cin >> T;
+    ensure(T >= 1 and T <= 10'000);
+    int sum = 0;
+    for(int i = 1; i <= T; ++i) {
+        int n;
+        std::cin >> n;
+        ensure(n >= 1 and n <= 300'000);
+        sum += n;
+        for(int j = 1; j <= n; ++j) {
+            int p;
+            std::cin >> p;
+            ensure(p >= 1 and p <= 1'000'000'000);
+        }
+    }
+    ensure(sum <= 300'000);
+
+    // !end test
+
+    if(in_out == "in") fclose(stdin);
+    else if(in_out == "out") fclose(stdout);
+    log("ok-------------");
+
 }

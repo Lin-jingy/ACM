@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <optional>
 
 #define int long long
 #define rep(i,b,e)for(int i=b;i<(e);++i)
@@ -24,15 +23,29 @@ template<class...Ts>auto&print(Ts...ts){return((std::cerr<<ts<<" "),...);}
 
 
 void solve() {
-    
-    
+    int n;
+    std::cin >> n;
+    vec<int> a(n);
+    std::cin >> a;
+    std::ranges::sort(a);
+    int k1 = a.front();
+    int k2 = a[1];
+    rep(i, 1, n) {
+        k2 = a[i];
+        if(k2 % k1 != 0) break;
+    }
+    for(int i = 0; i < n; i++) {
+        if(a[i] % k1 == 0 or a[i] % k2 == 0) continue;
+        RETURN(std::cout << "No\n");
+    }
+    std::cout << "Yes\n";
 }
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }

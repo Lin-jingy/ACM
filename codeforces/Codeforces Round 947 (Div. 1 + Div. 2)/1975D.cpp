@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <optional>
 
 #define int long long
 #define rep(i,b,e)for(int i=b;i<(e);++i)
@@ -24,15 +23,93 @@ template<class...Ts>auto&print(Ts...ts){return((std::cerr<<ts<<" "),...);}
 
 
 void solve() {
-    
-    
+    int n;
+    std::cin >> n;
+    int a, b;
+    std::cin >> a >> b;
+    vec<vec<int>> v(n + 1);
+    rep(i, 1, n) {
+        int x, y;
+        std::cin >> x >> y;
+        v[x].pb(y);
+        v[y].pb(x);
+    }
+    vec<bool> vis(n + 1);
+    vec<int> list;
+    vec<int> list1 = {b};
+    //求 a->b路径
+    auto dfs1 = [&](auto &&self, int p, int dis)->void {
+        vis[p] = 1;
+        if(p == a) {
+            list = list1;
+            return;
+        }
+        for(auto i:v[p]) {
+            if(vis[i]) continue;
+            list1.pb(i);
+            self(self, i, dis + 1);
+            list1.pop_back();
+        }
+    };
+    dfs1(dfs1, b, 0);
+    //求到a的最长路径
+    int mx = 0;
+    auto dfs = [&](auto &&self, int p, int dep) ->void {
+        vis[p] = 1;
+        mx = std::max(mx, dep);
+        for(auto i:v[p]) {
+            if(vis[i]) continue;
+            self(self, i, dep + 1);
+        }
+    };
+    //求dis
+    auto dfs2 = [&](auto &&self, int p)->int {
+        vis[p] = 1;
+        int sum = 0;
+        for(auto i:v[p]) {
+            if(vis[i]) continue;
+            sum += self(self, i);
+        }
+        return sum + 2;
+    };
+    int ans;
+    if(list.size() % 2 == 1) {
+        int k = list[list.size() / 2];
+        ans = list.size() / 2;
+        rep(i, 0, n + 1) vis[i] = 0;
+        dfs(dfs, k, 0);
+        ans -= mx;
+        rep(i, 0, n + 1) vis[i] = 0;
+        ans += dfs2(dfs2, k) - 2;
+    } else {
+        int k1 = list[list.size() / 2 - 1], k2 = list[list.size() / 2];
+        int ans1 = list.size() / 2 + 1, ans2 = list.size() / 2;
+        {
+            mx = 0;
+            rep(i, 0, n + 1) vis[i] = 0;
+            dfs(dfs, k1, 0);
+            ans1 -= mx;
+            rep(i, 0, n + 1) vis[i] = 0;
+            ans1 += dfs2(dfs2, k1) - 2;
+        }
+        {
+            mx = 0;
+            rep(i, 0, n + 1) vis[i] = 0;
+            dfs(dfs, k2, 0);
+            ans2 -= mx;
+            rep(i, 0, n + 1) vis[i] = 0;
+            ans2 += dfs2(dfs2, k2) - 2;
+        }
+        ans = std::min(ans1, ans2);
+    }
+    std::cout << ans << '\n';
 }
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
