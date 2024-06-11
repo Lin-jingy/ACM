@@ -19,18 +19,33 @@ template<class...Ts>auto&print(Ts...ts){return((std::clog<<ts<<" "),...);}
 #define sure(x)111
 #define log(...)111
 #endif
-
+enum model {
+    generator = 0,
+    check = 1,
+    standard = 2
+};
 class Rand {
 private:
     std::mt19937_64 rnd;
 public:
     Rand() : rnd((std::chrono::high_resolution_clock::now()).time_since_epoch().count()) {}
-    int get(int l, int r) {
-        return rnd() % (r - l + 1) + l;
-    }
+    int get(int l, int r) { return rnd() % (r - l + 1) + l; }
+    int operator()() { return rnd(); }
+    std::mt19937_64 data() { return rnd; }
 };
-
-void solve(str problemID, str dataID, str in_out);
+void print(auto x) { std::cout << x << ' ';}
+void println(auto x) { std::cout << x << std::endl; }
+void println(auto x, auto y) { std::cout << x << ' ' << y << std::endl; }
+void ranges_print(int n, int l, int r) {
+    Rand R;
+    for(int i = 1; i < n; ++i) print(R.get(l, r));
+    println(R.get(l, r));
+}
+void println(vec<int>& x) {
+    for(int i = 0; i < x.size() - 1; ++i) print(x[i]);
+    println(x.back());
+}
+void solve(str problemID, int dataID, model op);
 
 signed main() {
     std::ios::sync_with_stdio(false);
@@ -39,16 +54,21 @@ signed main() {
     str problemID = "";
     int begin = 1;
     int end = 1;
-    for(int i = begin; i <= end; ++i) solve(problemID, std::to_string(i), "in");
+    for(int i = begin; i <= end; ++i) solve(problemID, i, generator);
 
     return 0;
 }
 
-void solve(str problemID, str dataID, str in_out) {
-    str address = std::format("C:/Users/123/Desktop/programming/VScode/ACM/data/{}/data/{}.in",problemID,dataID);
+void solve(str problemID, int dataID, model op) {
+    str address1 = std::format("C:/Users/123/Desktop/programming/VScode/ACM/data/{}/data/{}.in",problemID,dataID);
+    str address2 = std::format("C:/Users/123/Desktop/programming/VScode/ACM/data/{}/data/{}.out",problemID,dataID);
     log(dataID);
-    if(in_out == "in") freopen(address.data(), "r", stdin);
-    else if(in_out == "out") freopen(address.data(), "w", stdout);
+    if(op == check) freopen(address1.c_str(), "r", stdin);
+    else if(op == generator) freopen(address1.c_str(), "w", stdout);
+    else {
+        freopen(address1.c_str(), "r", stdin);
+        freopen(address2.c_str(), "w", stdout);
+    }
     Rand r;
 
     // !begin test
@@ -57,8 +77,8 @@ void solve(str problemID, str dataID, str in_out) {
 
     // !end test
 
-    if(in_out == "in") fclose(stdin);
-    else if(in_out == "out") fclose(stdout);
+    fclose(stdin);
+    fclose(stdout);
     log("ok-------------");
 
 }

@@ -24,7 +24,7 @@ static std::vector<int> Dijkstra(std::vector<std::vector<std::pair<int, int>>> &
             }
         }
     }
-    return std::move(dis);
+    return dis;
 }
 static void Floyd(std::vector<std::vector<int>> &v) {
     int n = v.size() - 1;
@@ -67,6 +67,6 @@ static std::vector<int> SPFA(std::vector<std::vector<std::pair<int, int>>> &v, i
             }
         }
     }
-    return std::move(dis);
+    return dis;
 }
 }

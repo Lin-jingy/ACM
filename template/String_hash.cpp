@@ -58,7 +58,7 @@ private:
         (hashcode_2[r] + 1LL * (mod_2 - hashcode_2[l - 1]) * p_2[r - l + 1]) % mod_2};
     }
 public:
-    StringHash(const std::string &s, enum OPTION option) : op(option), hashcode_1(s.size() + 1), p_1(s.size() + 1){
+    StringHash(const std::string &s, OPTION option) : op(option), hashcode_1(s.size() + 1), p_1(s.size() + 1){
         static int MOD_1;
         static int MOD_2;
         if(!MOD_1) {
@@ -68,19 +68,19 @@ public:
         }
         mod_1 = MOD_1;
         mod_2 = MOD_2;
-        if(op == OPTION::Nature) init_nature(s);
-        else if(op == OPTION::Single) init_single(s);
-        else if(op == OPTION::Double) init_double(s);
+        if(op == Nature) init_nature(s);
+        else if(op == Single) init_single(s);
+        else if(op == Double) init_double(s);
     }
     std::pair<int, int> get(int l, int r) {
         ++l, ++r;
-        if(op == OPTION::Nature) return get_nature(l, r);
-        else if(op == OPTION::Single) return get_single(l, r);
-        else if(op == OPTION::Double) return get_double(l, r);
+        if(op == Nature) return get_nature(l, r);
+        else if(op == Single) return get_single(l, r);
+        else if(op == Double) return get_double(l, r);
         return {0, 0};
     }
     std::pair<int, int> getAll() {
-        if(op == OPTION::Double) return {hashcode_1.back(), hashcode_2.back()};
+        if(op == Double) return {hashcode_1.back(), hashcode_2.back()};
         else return {hashcode_1.back(), 0};
     }
 };

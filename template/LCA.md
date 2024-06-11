@@ -6,26 +6,17 @@ private:
     std::vector<int> dep;
     std::vector<std::array<int, 20>> f;
     void dfs(int pos, int fa, std::vector<std::vector<int>> &v) {
-        dep[pos] = dep[fa] + 1;
-        f[pos][0] = fa;
+        dep[pos] = dep[fa] + 1, f[pos][0] = fa;
         for (int i = 1; i < 20; ++i) f[pos][i] = f[f[pos][i - 1]][i - 1];
-        for (auto i : v[pos])
-            if (i != fa) dfs(i, pos, v);
+        for (auto i : v[pos]) if (i != fa) dfs(i, pos, v);
     }
 public:
-    LCA(int n, std::vector<std::vector<int>> &v) {
-        dep.assign(n + 1, {});
-        f.assign(n + 1, {});
-        dfs(1, 0, v);
-    }
+    LCA(int n, std::vector<std::vector<int>> &v):dep(n+1),f(n+1){dfs(1, 0, v);}
     int lca(int u, int v) {
         if (dep[u] < dep[v]) std::swap(u, v);
-        for (int i = 19; i >= 0; i--)
-            if (dep[f[u][i]] >= dep[v]) u = f[u][i];
+        for (int i = 19; i >= 0; i--) if (dep[f[u][i]] >= dep[v]) u = f[u][i];
         if (u == v) return u;
-        for (int i = 19; i >= 0; i--)
-            if (f[u][i] != f[v][i])
-                u = f[u][i], v = f[v][i];
+        for (int i = 19; i >= 0; i--) if (f[u][i] != f[v][i]) u = f[u][i], v = f[v][i];
         return f[u][0];
     }
 };
