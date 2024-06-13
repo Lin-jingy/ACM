@@ -1,130 +1,62 @@
-#include <cstdio>
+#include "testlib.h"
 
 using namespace std;
 
-typedef long long ll;
+#define REP(i, a, b) for (int i = (a), i##_end_ = (b); i < i##_end_; ++i)
+#define debug(...) fprintf(stderr, __VA_ARGS__)
+#define mp make_pair
+#define x first
+#define y second
+#define pb push_back
+#define SZ(x) (int((x).size()))
+#define ALL(x) (x).begin(), (x).end()
+
+template<typename T> inline bool chkmin(T &a, const T &b) { return a > b ? a = b, 1 : 0; }
+template<typename T> inline bool chkmax(T &a, const T &b) { return a < b ? a = b, 1 : 0; }
+
+typedef long long LL;
+
+const int oo = 0x3f3f3f3f;
+
+const int lim = 820000;
+const int maxn = 55, maxm = 410;
 
 int n, m;
-int a[1 << 20];
+int a[maxn + 5][maxm + 5], empty1[maxn + 5];
 
-const ll MOD = 1000000007;
-struct node {
-  ll m[2][2];
-  ll lz[2][2];
-} st[1 << 20];
-#define nd(l, r) st[(l + r) | (l != r)]
-#define rt nd(l, r)
-#define lc nd(l, m)
-#define rc nd(m + 1, r)
-
-ll T[2][2] = {{1, 1}, {1, 0}};
-void mul(ll z[2][2], ll x[2][2], ll y[2][2]) {
-  ll t[2][2];
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 2; j++) {
-      t[i][j] = 0;
-      for (int k = 0; k < 2; k++) {
-        t[i][j] = (t[i][j] + x[i][k] * y[k][j]) % MOD;
-      }
-    }
-  }
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 2; j++) {
-      z[i][j] = t[i][j];
-    }
-  }
-}
-void pw(ll z[2][2], ll x[2][2], ll y) {
-  ll tx[2][2], tz[2][2];
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 2; j++) {
-      tx[i][j] = x[i][j];
-      tz[i][j] = i == j;
-    }
-  }
-  while (y) {
-    if (y & 1) {
-      mul(tz, tz, tx);
-    }
-    mul(tx, tx, tx);
-    y >>= 1;
-  }
-
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 2; j++) {
-      z[i][j] = tz[i][j];
-    }
-  }
-}
-void bld(int l, int r) {
-  rt.m[0][0] = rt.m[1][1] = r - l + 1;
-  rt.lz[0][0] = rt.lz[1][1] = 1;
-  if (l != r) {
-    int m = (l + r) >> 1;
-    bld(l, m);
-    bld(m + 1, r);
-  }
-}
-void upd(node& n, ll m[2][2]) {
-  mul(n.m, n.m, m);
-  mul(n.lz, n.lz, m);
-}
-void upd(int l, int r, int L, int R, ll t[2][2]) {
-  if (R < l || r < L) {
-    return;
-  } else if (L <= l && r <= R) {
-    upd(rt, t);
-  } else {
-    int m = (l + r) >> 1;
-    upd(lc, rt.lz);
-    upd(rc, rt.lz);
-    upd(l, m, L, R, t);
-    upd(m + 1, r, L, R, t);
-    for (int i = 0; i < 2; i++) {
-      for (int j = 0; j < 2; j++) {
-        rt.m[i][j] = (lc.m[i][j] + rc.m[i][j]) % MOD;
-        rt.lz[i][j] = i == j;
-      }
-    }
-  }
-}
-ll qry(int l, int r, int L, int R) {
-  if (R < l || r < L) {
-    return 0;
-  } else if (L <= l && r <= R) {
-    return rt.m[1][0];
-  } else {
-    int m = (l + r) >> 1;
-    upd(lc, rt.lz);
-    upd(rc, rt.lz);
-    for (int i = 0; i < 2; i++) {
-      for (int j = 0; j < 2; j++) {
-        rt.lz[i][j] = i == j;
-      }
-    }
-    return (qry(l, m, L, R) + qry(m + 1, r, L, R)) % MOD;
-  }
+inline void move(int x, int y, int id)
+{
+	if (x == y) ouf.quitf(_wa, "A %d", id + 1);
+	if (empty1[x] >= m) ouf.quitf(_wa, "A %d", id + 1);
+	if (empty1[y] <= 0) ouf.quitf(_wa, "A %d", id + 1);
+	a[y][--empty1[y]] = a[x][empty1[x]++];
 }
 
-int main() {
-  scanf("%d%d", &n, &m);
-  bld(0, n - 1);
-  for (int i = 0; i < n; i++) {
-    scanf("%d", &a[i]);
-    ll tmp[2][2];
-    pw(tmp, T, a[i]);
-    upd(0, n - 1, i, i, tmp);
-  }
-  for (int i = 0; i < m; i++) {
-    int op, l, r, x;
-    scanf("%d%d%d", &op, &l, &r);
-    if (op == 1) {
-      scanf("%d", &x);
-      ll tmp[2][2];
-      pw(tmp, T, x);
-      upd(0, n - 1, l - 1, r - 1, tmp);
-    } else {
-      printf("%d\n", (int)qry(0, n - 1, l - 1, r - 1));
-    }
-  }
+int main(int argc, char * argv[])
+{
+    registerTestlibCmd(argc, argv);
+    inf.name = ouf.name = ans.name = "";
+	n = inf.readInt();
+	m = inf.readInt();
+	REP(i, 0, n) empty1[i] = 0;
+	empty1[n] = m;
+	REP(i, 0, n) 
+	{
+		REP(j, 0, m) a[i][j] = inf.readInt(), --a[i][j];
+		reverse(a[i], a[i] + m);
+	}
+	int K = ouf.readInt(0, lim, "K");
+	REP(i, 0, K)
+	{
+		int u = ouf.readInt(1, n + 1, ::format("u[%d]", i + 1)), v = ouf.readInt(1, n + 1, ::format("v[%d]", i + 1));
+		--u, --v;
+		move(u, v, i + 1);
+	}
+	REP(i, 0, n + 1)
+	{
+		if (!(empty1[i] == 0 || empty1[i] == m)) ouf.quitf(_wa, "B %d", i + 1);
+		if (empty1[i] == 0) REP(j, 1, m) if (a[i][j] != a[i][j - 1]) ouf.quitf(_wa, "B %d", i + 1);
+	}
+	quitf(_ok, "OK");
+	return 0;
 }

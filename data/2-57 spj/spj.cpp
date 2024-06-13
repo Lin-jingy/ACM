@@ -13,14 +13,15 @@ int main(int argc, char *argv[]) {
 
     for(int i = 1; i <= n; ++i) {
         i64 a = ouf.readLong(0LL, 5'000'000'000'000'000'000);
-        char op = ouf.readChar();
+        std::string op = ouf.readToken();
         i64 b = ouf.readLong(0LL, 5'000'000'000'000'000'000);
         if(!s.count(a) or !s.count(b)) {
             quitf(_wa, "The selected number is illegal");
             return 0;
         }
-        if(op == '^') s.insert(a ^ b);
-        if(op == '+') s.insert(a + b);
+        if(op == "^") s.insert(a ^ b);
+        else if(op == "+") s.insert(a + b);
+        else quitf(_fail, "spj error");
     }
     
     if(s.count(1)) quitf(_ok, "AC");

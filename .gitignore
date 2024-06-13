@@ -2,3 +2,4 @@
 .cph
 CMakeLists.txt
 cmake-build-debug
+data

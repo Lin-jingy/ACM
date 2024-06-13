@@ -1,5 +1,6 @@
+
 #include <bits/stdc++.h>
-#include <optional>
+
 
 #define int long long
 #define rep(i,b,e)for(int i=b;i<(e);++i)
@@ -12,27 +13,81 @@
 template<class T>using vec=std::vector<T>;using str=std::string;template<class K,class V>using umap=std::unordered_map<K,V>;template<class T>using uset=std::unordered_set<T>;template<class K,class V>std::istream&operator>>(std::istream&in,std::pair<K,V>&v){in>>v.first>>v.second;return in;}template<class K,class V>std::ostream&operator<<(std::ostream&out,const std::pair<K,V>&v){out<<'{'<<v.first<<","<<v.second<<'}';return out;}template<class T>std::istream&operator>>(std::istream&in,std::vector<T>&v){for(auto&i:v)in>>i;return in;}template<class T>std::ostream&operator<<(std::ostream&out,const std::vector<T>&v){for(auto i=v.begin();i!=v.end();++i)out<<*i<<" \n"[i==v.end()];return out;}template<class T>std::ostream&operator<<(std::ostream&out,const std::set<T>&s){out<<"\nsize:"<<s.size()<<'\n';for(auto i=s.begin();i!=s.end();++i)out<<*i<<" \n"[i==s.end()];return out;}template<class K,class V>std::ostream&operator<<(std::ostream&out,const std::map<K,V>&mp){out<<"\nsize:"<<mp.size()<<'\n';for(auto i=mp.begin();i!=mp.end();++i)out<<'{'<<i->first<<","<<i->second<<"}\n";return out;}using Pii=std::pair<int,int>;template<class T>using vvec=std::vector<std::vector<T>>;template<class K,class V>struct std::hash<std::pair<K,V>>{size_t operator()(const std::pair<K,V>&p)const{return std::hash<K>{}(p.first)^std::hash<V>{}(p.second);}};template<class T>using min_heap=std::priority_queue<T,std::vector<T>,std::greater<T>>;template<class T>using max_heap=std::priority_queue<T>;template<class T,size_t S>using arr=std::array<T,S>;class Timer {private:std::chrono::system_clock::time_point begin;public:Timer() { begin = std::chrono::system_clock::now(); }~Timer() {auto end = std::chrono::system_clock::now();auto time = std::chrono::duration<double, std::nano>(end - begin).count();std::clog << "\nThe program takes: " << time / 1e9 << " s\n";}double get() {auto end = std::chrono::system_clock::now();auto time = std::chrono::duration<double, std::nano>(end - begin).count();return time / 1e9;}};
 #define vec(type,x,sz,val)std::vector<type>x(sz,val);
 #define vvec(type,x,sz1,sz2,val)std::vector<std::vector<type>>x(sz1,std::vector<type>(sz2,val));
-#if defined(_WIN64)
-#define log(...)print(#__VA_ARGS__" ::",__VA_ARGS__)<<std::endl
-template<class...Ts>auto&print(Ts...ts){return((std::cerr<<ts<<" "),...);}
-#define sure(x)if(!(x)){std::cerr<<"error at:"<<__LINE__<<std::endl;exit(-1);}
-#else
-#define sure(x)111
-#define log(...)111
-#endif
+#define log(...)PRINT(#__VA_ARGS__" ::",__VA_ARGS__)<<std::endl
+template<class...Ts>auto&PRINT(Ts...ts){return((std::clog<<ts<<" "),...);}
+#define ensure(x)if(!(x)){std::cerr<<"ensure error:("<<#x<<")->at line:"<<__LINE__<<std::endl;exit(-1);}
 
+using ld = long double;
 
-
-void solve() {
-    
-    
-}
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int T = 1;
-    // std::cin >> T;
-    while (T--) solve();
+    
+    int n, k, X;
+    std::cin >> n >> k >> X;
+    vec<int> a(n);
+    std::cin >> a;
+    int sum = 0;
+    for(auto i:a) sum += i;
+    vec<arr<int, 3>> l, r;
+    for(int i = 0; i < n; ++i) {
+        for(int j = i + 1; j < n; ++j) {
+            l.push_back({a[i] + a[j], i, j});
+            r.push_back({a[i] + a[j], i, j});
+        }
+    }
+    std::ranges::sort(r);
+    std::ranges::sort(a);
+    long double ans = (ld)std::abs(sum - n * X) / n;
+
+    if(k == 4) {
+        int qu = (n - 4) * X;
+        for(auto &[val, x, y] : l) {
+            int pos = std::lower_bound(All(r), arr<int, 3>{sum - qu - val, 0, 0}) - r.begin();
+            for(int i = pos; i < r.size(); ++i) if(r[i][1] != x && r[i][1] != y && r[i][2] != x && r[i][2] != y) {
+                ans = std::min(ans, (ld)std::abs(sum - qu - val - r[i][0]) / (n - 4));
+                break;
+            }
+            for(int i = pos - 1; i >= 0; --i) if(r[i][1] != x && r[i][1] != y && r[i][2] != x && r[i][2] != y) {
+                ans = std::min(ans, (ld)std::abs(sum - qu - val - r[i][0]) / (n - 4));
+                break;
+            }
+        }
+    } 
+    // log(ans);
+    if(k >= 3) {
+        int qu = (n - 3) * X;
+        for(auto &[val, x, y] : l) {
+            int pos = std::lower_bound(All(a), sum - qu - val) - a.begin();
+            for(int i = pos; i < a.size(); ++i) if(i != x && i != y) {
+                ans = std::min(ans, (ld)std::abs(sum - qu - val - a[i]) / (n - 3));
+                break;
+            }
+            for(int i = pos - 1; i >= 0; --i) if(i != x && i != y) {
+                ans = std::min(ans, (ld)std::abs(sum - qu - val - a[i]) / (n - 3));
+                break;
+            }
+        }
+    } 
+    // log(ans);
+    if(k >= 2) {
+        int qu = (n - 2) * X;
+        for(int i = 0; i < n; ++i) {
+            for(int j = i + 1; j < n; ++j) {
+                ans = std::min(ans, (ld)std::abs(sum - qu - a[i] - a[j]) / (n - 2));
+            }
+        }
+    } 
+    // log(ans);
+    if(k >= 1) {
+        int qu = (n - 1) * X;
+        for(int i = 0; i < n; ++i) {
+            ans = std::min(ans, (ld)std::abs(sum - qu - a[i]) / (n - 1));
+        }
+    } 
+    // ensure(ans >= 0);
+    assert(ans >= 0);
+    printf("%.20Lf", ans);
     return 0;
 }

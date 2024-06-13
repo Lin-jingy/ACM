@@ -23,136 +23,33 @@ template <class _KEY, class _VALUE, class _Compare = std::less<_KEY>>
 using pbds_map = __gnu_pbds::tree<_KEY, _VALUE, _Compare,__gnu_pbds::rb_tree_tag,
 __gnu_pbds::tree_order_statistics_node_update>;
 
-enum OPTION {
-    Nature,
-    Single,
-    Double,
-};
-class StringHash {
-private:
-    std::vector<int> hashcode_1, hashcode_2, p_1, p_2;
-    int base_1 = 131; 
-    int base_2 = 133331;
-    OPTION op;
-    int mod_1;
-    int mod_2;
-    constexpr bool isprime(int n) {
-        if (n <= 1) return false;
-        for (int i = 2; i * i <= n; i++) if (n % i == 0) return false;
-        return true;
-    }
-    constexpr int findPrime(int n) {
-        while (!isprime(n)) n++;
-        return n;
-    }
-    void init_nature(const std::string &s) {
-        p_1[0] = hashcode_1[0] = 1;
-        for(int i = 1; i <= s.size(); ++i) {
-            hashcode_1[i] = hashcode_1[i - 1] * base_1 + s[i - 1];
-            p_1[i] = p_1[i - 1] * base_1;
-        }
-    }
-    void init_single(const std::string &s) {
-        p_1[0] = hashcode_1[0] = 1;
-        for(int i = 1; i <= s.size(); ++i) {
-            hashcode_1[i] = (1LL * hashcode_1[i - 1] * base_1 + s[i - 1]) % mod_1;
-            p_1[i] = 1LL * p_1[i - 1] * base_1 % mod_1;
-        }
-    }
-    void init_double(const std::string &s) {
-        hashcode_2.assign(s.size() + 1, {});
-        p_2.assign(s.size() + 1, {});
-        p_1[0] = p_2[0] = hashcode_1[0] = hashcode_2[0] = 1;
-        for(int i = 1; i <= s.size(); ++i) {
-            hashcode_1[i] = (1LL * hashcode_1[i - 1] * base_1 + s[i - 1]) % mod_1;
-            hashcode_2[i] = (1LL * hashcode_2[i - 1] * base_2 + s[i - 1]) % mod_2;
-            p_1[i] = 1LL * p_1[i - 1] * base_1 % mod_1;
-            p_2[i] = 1LL * p_2[i - 1] * base_2 % mod_2;
-        }
-    }
-    std::pair<int, int> get_nature(int l, int r) {
-        return {hashcode_1[r] - hashcode_1[l - 1] * p_1[r - l + 1], 0LL};
-    }
-    std::pair<int, int> get_single(int l, int r) {
-        return {(hashcode_1[r] + (mod_1 - hashcode_1[l - 1]) * p_1[r - l + 1]) % mod_1, 0LL};
-    }
-    std::pair<int, int> get_double(int l, int r) {
-        return {(hashcode_1[r] + 1LL * (mod_1 - hashcode_1[l - 1]) * p_1[r - l + 1]) % mod_1,
-        (hashcode_2[r] + 1LL * (mod_2 - hashcode_2[l - 1]) * p_2[r - l + 1]) % mod_2};
-    }
-public:
-    StringHash(const std::string &s, OPTION option) : op(option), hashcode_1(s.size() + 1), p_1(s.size() + 1){
-        static int MOD_1;
-        static int MOD_2;
-        if(!MOD_1) {
-            std::mt19937 rnd(time(0));
-            MOD_1 = findPrime(rnd() % 900000000 + 100000000);
-            MOD_2 = findPrime(rnd() % 900000000 + 100000000);
-        }
-        mod_1 = MOD_1;
-        mod_2 = MOD_2;
-        if(op == Nature) init_nature(s);
-        else if(op == Single) init_single(s);
-        else if(op == Double) init_double(s);
-    }
-    std::pair<int, int> get(int l, int r) {
-        ++l, ++r;
-        if(op == Nature) return get_nature(l, r);
-        else if(op == Single) return get_single(l, r);
-        else if(op == Double) return get_double(l, r);
-        return {0, 0};
-    }
-    std::pair<int, int> getAll() {
-        if(op == Double) return {hashcode_1.back(), hashcode_2.back()};
-        else return {hashcode_1.back(), 0};
-    }
-};
+
 void solve() {
-    int n;
+    int n, m;
     std::cin >> n;
-    std::set<Pii> s;
-    for(int i = 1; i <= n; ++i) {
+    umap<str, int> mp;
+    std::queue<Pii> q;
+    vec<int> v(n + 1);
+    for (int i = 1; i <= n; ++i) {
         str x;
         std::cin >> x;
-        s.insert(StringHash(x, Single).getAll());
+        mp[x] = i;
     }
-    int m;
-    std::cin >> m;
-    vec<Pii> v(m + 1);
-    for(int i = 1; i <= m; ++i) {
-        str x;
-        std::cin >> x;
-        v[i] = StringHash(x, Single).getAll();
-    }
-    int l = 0, r = n;
     int ans1 = 0, ans2 = 0;
-    auto check = [&](int mid) {
-        std::map<Pii, int> mp;
-        std::deque<int> dq;
-        int ans = m + 1;
-        for(int i = 1; i <= m; ++i) {
-            if(mp.size() == mid) ans = std::min(ans, (int)dq.size());
-            if(mp.size() <= mid) {
-                dq.pb(i);
-                if(s.count(v[i])) mp[v[i]]++;
-            }
-            if(mp.size() > mid) {
-                if(s.count(v[dq.front()])) mp[v[dq.front()]]--;
-                dq.pop_front();
-            }
-        }
-        if(ans <= n) {
-            ans1 = mid;
-            ans2 = ans;
-        }
-        return ans <= n;
-    };
-    while(l <= r) {
-        int mid = (l + r) >> 1;
-        if(check(mid)) l = mid + 1;
-        else r = mid - 1;
+    std::cin >> m;
+    for (int i = 1; i <= m; ++i) {
+        str x;
+        std::cin >> x;
+        if(!mp.count(x)) continue;
+        int k = mp[x];
+        if (!v[k]) ++ans1, ans2 = inf;
+        v[k] = i; 
+        q.emplace(i, k);
+        while (q.front().first != v[q.front().second]) q.pop();
+        ans2 = std::min(ans2, i - q.front().first + 1);
     }
-    std::cout << std::format("{} {}\n", ans1, ans2);
+    std::cout << std::format("{}\n{}\n", ans1, ans2);
+
 
 }
 
