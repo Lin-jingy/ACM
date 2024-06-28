@@ -1,93 +1,67 @@
-
 #include <bits/stdc++.h>
+// 通用随机访问迭代器模板
+template<class Iter>
+class GeneralRandomAccessIterator {
+public:
+    using value_type = typename std::iterator_traits<Iter>::value_type;
+    using reference = typename std::iterator_traits<Iter>::reference;
+    using pointer = typename std::iterator_traits<Iter>::pointer;
+    using iterator_category = std::random_access_iterator_tag;
+    using difference_type = typename std::iterator_traits<Iter>::difference_type;
 
+    GeneralRandomAccessIterator(Iter it) : it_(it) {}
 
-#define int long long
-#define rep(i,b,e)for(int i=b;i<(e);++i)
-#define RETURN(x)do{return x,void();}while(0)
-#define All(x)x.begin(),x.end()
-#define pb(x)push_back(x)
-#define eb(x)emplace_back(x)
-#define inf INT_MAX
-#define INF LONG_LONG_MAX
-template<class T>using vec=std::vector<T>;using str=std::string;template<class K,class V>using umap=std::unordered_map<K,V>;template<class T>using uset=std::unordered_set<T>;template<class K,class V>std::istream&operator>>(std::istream&in,std::pair<K,V>&v){in>>v.first>>v.second;return in;}template<class K,class V>std::ostream&operator<<(std::ostream&out,const std::pair<K,V>&v){out<<'{'<<v.first<<","<<v.second<<'}';return out;}template<class T>std::istream&operator>>(std::istream&in,std::vector<T>&v){for(auto&i:v)in>>i;return in;}template<class T>std::ostream&operator<<(std::ostream&out,const std::vector<T>&v){for(auto i=v.begin();i!=v.end();++i)out<<*i<<" \n"[i==v.end()];return out;}template<class T>std::ostream&operator<<(std::ostream&out,const std::set<T>&s){out<<"\nsize:"<<s.size()<<'\n';for(auto i=s.begin();i!=s.end();++i)out<<*i<<" \n"[i==s.end()];return out;}template<class K,class V>std::ostream&operator<<(std::ostream&out,const std::map<K,V>&mp){out<<"\nsize:"<<mp.size()<<'\n';for(auto i=mp.begin();i!=mp.end();++i)out<<'{'<<i->first<<","<<i->second<<"}\n";return out;}using Pii=std::pair<int,int>;template<class T>using vvec=std::vector<std::vector<T>>;template<class K,class V>struct std::hash<std::pair<K,V>>{size_t operator()(const std::pair<K,V>&p)const{return std::hash<K>{}(p.first)^std::hash<V>{}(p.second);}};template<class T>using min_heap=std::priority_queue<T,std::vector<T>,std::greater<T>>;template<class T>using max_heap=std::priority_queue<T>;template<class T,size_t S>using arr=std::array<T,S>;class Timer {private:std::chrono::system_clock::time_point begin;public:Timer() { begin = std::chrono::system_clock::now(); }~Timer() {auto end = std::chrono::system_clock::now();auto time = std::chrono::duration<double, std::nano>(end - begin).count();std::clog << "\nThe program takes: " << time / 1e9 << " s\n";}double get() {auto end = std::chrono::system_clock::now();auto time = std::chrono::duration<double, std::nano>(end - begin).count();return time / 1e9;}};
-#define vec(type,x,sz,val)std::vector<type>x(sz,val);
-#define vvec(type,x,sz1,sz2,val)std::vector<std::vector<type>>x(sz1,std::vector<type>(sz2,val));
-#define log(...)PRINT(#__VA_ARGS__" ::",__VA_ARGS__)<<std::endl
-template<class...Ts>auto&PRINT(Ts...ts){return((std::clog<<ts<<" "),...);}
-#define ensure(x)if(!(x)){std::cerr<<"ensure error:("<<#x<<")->at line:"<<__LINE__<<std::endl;exit(-1);}
-
-using ld = long double;
-
-
-signed main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-    
-    int n, k, X;
-    std::cin >> n >> k >> X;
-    vec<int> a(n);
-    std::cin >> a;
-    int sum = 0;
-    for(auto i:a) sum += i;
-    vec<arr<int, 3>> l, r;
-    for(int i = 0; i < n; ++i) {
-        for(int j = i + 1; j < n; ++j) {
-            l.push_back({a[i] + a[j], i, j});
-            r.push_back({a[i] + a[j], i, j});
-        }
+    // 前置递增运算符
+    GeneralRandomAccessIterator& operator++() {
+        ++it_;
+        return *this;
     }
-    std::ranges::sort(r);
-    std::ranges::sort(a);
-    long double ans = (ld)std::abs(sum - n * X) / n;
 
-    if(k == 4) {
-        int qu = (n - 4) * X;
-        for(auto &[val, x, y] : l) {
-            int pos = std::lower_bound(All(r), arr<int, 3>{sum - qu - val, 0, 0}) - r.begin();
-            for(int i = pos; i < r.size(); ++i) if(r[i][1] != x && r[i][1] != y && r[i][2] != x && r[i][2] != y) {
-                ans = std::min(ans, (ld)std::abs(sum - qu - val - r[i][0]) / (n - 4));
-                break;
-            }
-            for(int i = pos - 1; i >= 0; --i) if(r[i][1] != x && r[i][1] != y && r[i][2] != x && r[i][2] != y) {
-                ans = std::min(ans, (ld)std::abs(sum - qu - val - r[i][0]) / (n - 4));
-                break;
-            }
-        }
-    } 
-    // log(ans);
-    if(k >= 3) {
-        int qu = (n - 3) * X;
-        for(auto &[val, x, y] : l) {
-            int pos = std::lower_bound(All(a), sum - qu - val) - a.begin();
-            for(int i = pos; i < a.size(); ++i) if(i != x && i != y) {
-                ans = std::min(ans, (ld)std::abs(sum - qu - val - a[i]) / (n - 3));
-                break;
-            }
-            for(int i = pos - 1; i >= 0; --i) if(i != x && i != y) {
-                ans = std::min(ans, (ld)std::abs(sum - qu - val - a[i]) / (n - 3));
-                break;
-            }
-        }
-    } 
-    // log(ans);
-    if(k >= 2) {
-        int qu = (n - 2) * X;
-        for(int i = 0; i < n; ++i) {
-            for(int j = i + 1; j < n; ++j) {
-                ans = std::min(ans, (ld)std::abs(sum - qu - a[i] - a[j]) / (n - 2));
-            }
-        }
-    } 
-    // log(ans);
-    if(k >= 1) {
-        int qu = (n - 1) * X;
-        for(int i = 0; i < n; ++i) {
-            ans = std::min(ans, (ld)std::abs(sum - qu - a[i]) / (n - 1));
-        }
-    } 
-    // ensure(ans >= 0);
-    assert(ans >= 0);
-    printf("%.20Lf", ans);
-    return 0;
-}
+    // 后置递增运算符
+    GeneralRandomAccessIterator operator++(int) {
+        GeneralRandomAccessIterator tmp(*this);
+        ++(*this);
+        return tmp;
+    }
+
+    // 前置递减运算符
+    GeneralRandomAccessIterator& operator--() {
+        --it_;
+        return *this;
+    }
+
+    // 后置递减运算符
+    GeneralRandomAccessIterator operator--(int) {
+        GeneralRandomAccessIterator tmp(*this);
+        --(*this);
+        return tmp;
+    }
+
+    reference operator*() const { return *it_; }
+    pointer operator->() const { return &(*it_); }
+
+    // 加法运算符
+    GeneralRandomAccessIterator operator+(difference_type n) const {
+        return GeneralRandomAccessIterator(it_ + n);
+    }
+
+    // 减法运算符
+    GeneralRandomAccessIterator operator-(difference_type n) const {
+        return GeneralRandomAccessIterator(it_ - n);
+    }
+
+    // 赋值运算符
+    reference operator[](difference_type n) const {
+        return it_[n];
+    }
+
+    bool operator==(const GeneralRandomAccessIterator& other) const { return it_ == other.it_; }
+    bool operator!=(const GeneralRandomAccessIterator& other) const { return !(*this == other); }
+    bool operator<(const GeneralRandomAccessIterator& other) const { return it_ < other.it_; }
+    bool operator<=(const GeneralRandomAccessIterator& other) const { return it_ <= other.it_; }
+    bool operator>(const GeneralRandomAccessIterator& other) const { return it_ > other.it_; }
+    bool operator>=(const GeneralRandomAccessIterator& other) const { return it_ >= other.it_; }
+
+private:
+    Iter it_;
+};

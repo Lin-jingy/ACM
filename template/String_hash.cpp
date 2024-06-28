@@ -62,7 +62,7 @@ public:
         static int MOD_1;
         static int MOD_2;
         if(!MOD_1) {
-            std::mt19937 rnd(time(0));
+            std::mt19937_64 rnd(time(0));
             MOD_1 = findPrime(rnd() % 900000000 + 100000000);
             MOD_2 = findPrime(rnd() % 900000000 + 100000000);
         }

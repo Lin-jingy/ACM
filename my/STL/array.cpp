@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <stdexcept>
 
 template<class T, size_t size>
 class array {

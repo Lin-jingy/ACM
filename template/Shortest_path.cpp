@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 
 namespace Shortest_path {
-static std::vector<int> Dijkstra(std::vector<std::vector<std::pair<int, int>>> &v, int begin) {
+static std::vector<int> Dijkstra(const std::vector<std::vector<std::pair<int, int>>> &v, const int begin) {
     std::vector<int> dis(v.size(), LONG_LONG_MAX);
     std::vector<bool> vis(v.size());
     std::priority_queue<std::pair<int, int>,
@@ -26,7 +26,7 @@ static std::vector<int> Dijkstra(std::vector<std::vector<std::pair<int, int>>> &
     }
     return dis;
 }
-static void Floyd(std::vector<std::vector<int>> &v) {
+constexpr static void Floyd(std::vector<std::vector<int>> &v) {
     int n = v.size() - 1;
     for (int k = 1; k <= n; ++k) {
         for (int i = 1; i <= n; ++i) {
@@ -37,7 +37,7 @@ static void Floyd(std::vector<std::vector<int>> &v) {
         }
     }
 }
-static void Floyd(int **v, int n) {
+constexpr static void Floyd(int **v, const int n) {
     for (int k = 1; k <= n; ++k) {
         for (int i = 1; i <= n; ++i) {
             for (int j = 1; j <= n; ++j) {
@@ -47,7 +47,7 @@ static void Floyd(int **v, int n) {
         }
     }
 }
-static std::vector<int> SPFA(std::vector<std::vector<std::pair<int, int>>> &v, int begin) {
+static std::vector<int> SPFA(const std::vector<std::vector<std::pair<int, int>>> &v, const int begin) {
     std::vector<int> dis(v.size(), LONG_LONG_MAX), cnt(v.size());
     std::vector<bool> vis(v.size());
     std::queue<int> q;

@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 
 namespace Math {
-static std::vector<int> get_prime(int n) {  // Euler
+constexpr static std::vector<int> get_prime(const int n) {  // Euler
     std::vector<int> prime;
     std::vector<bool> not_prime(n + 1);
 
@@ -13,9 +13,9 @@ static std::vector<int> get_prime(int n) {  // Euler
             if (i % j == 0) break;
         }
     }
-    return std::move(prime);
+    return prime;
 }
-constexpr long long quickPow(int a, int b, int p) {
+constexpr static long long quickPow(int a, int b, const int p) {
     long long res = 1;
     while (b) {
         if (b & 1) res = (long long)res * a % p;
@@ -25,7 +25,7 @@ constexpr long long quickPow(int a, int b, int p) {
     return res;
 }
 
-constexpr static bool isPrime(int n) {  // O(7logn)
+constexpr static bool isPrime(const int n) {  // O(7logn)
     if (n < 3 || n % 2 == 0) return n == 2;
     int u = n - 1, t = 0;
     while (u % 2 == 0) u /= 2, ++t;
@@ -42,7 +42,7 @@ constexpr static bool isPrime(int n) {  // O(7logn)
     }
     return true;
 }
-static std::vector<int> get_factor(int x) {  // O(sqrt(x))
+constexpr static std::vector<int> get_factor(const int x) {  // O(sqrt(x))
     std::vector<int> factor;
     for (int i = 1; i * i <= x; ++i) {
         if (x % i == 0) {
@@ -50,9 +50,9 @@ static std::vector<int> get_factor(int x) {  // O(sqrt(x))
             if (i != x / i) factor.push_back(x / i);
         }
     }
-    return std::move(factor);
+    return factor;
 }
-static std::vector<int> get_prime_factor(int x) {  // O(sqrt(x))
+constexpr static std::vector<int> get_prime_factor(int x) {  // O(sqrt(x))
     std::vector<int> prime_factor;
     for (int i = 2; i * i <= x; i++) {
         if (x % i == 0) {
@@ -61,9 +61,9 @@ static std::vector<int> get_prime_factor(int x) {  // O(sqrt(x))
         }
     }
     if (x != 1) prime_factor.push_back(x);
-    return std::move(prime_factor);
+    return prime_factor;
 }
-static int euler_phi(int n) {  // 求一个数的欧拉函数值
+constexpr static int euler_phi(int n) {  // 求一个数的欧拉函数值
                                // 小于等于 n 和 n 互质的数的个数
     int m = sqrt(n + 0.5);
     int ans = n;
@@ -75,7 +75,7 @@ static int euler_phi(int n) {  // 求一个数的欧拉函数值
     if (n > 1) ans = ans / n * (n - 1);
     return ans;
 }
-static std::vector<int> euler_phi_pre(int n) {  // 求1~n所有数的欧拉函数值
+constexpr static std::vector<int> euler_phi_pre(const int n) {  // 求1~n所有数的欧拉函数值
     std::vector<int> prime, phi(n + 1);
     std::vector<bool> not_prime(n + 1);
     phi[1] = 1;
@@ -94,9 +94,9 @@ static std::vector<int> euler_phi_pre(int n) {  // 求1~n所有数的欧拉函�
             phi[i * j] = phi[i] * phi[j];
         }
     }
-    return std::move(phi);
+    return phi;
 }
-static int Exgcd(int a, int b, int &x, int &y) {
+constexpr static int Exgcd(const int a, const int b, int &x, int &y) {
     // ax * by ===
     if (!b) {
         x = 1, y = 0;
@@ -106,13 +106,13 @@ static int Exgcd(int a, int b, int &x, int &y) {
     y -= a / b * x;
     return d;
 }
-static std::vector<int> get_inv(int n, int p) {
+constexpr static std::vector<int> get_inv(const int n, const int p) {
     std::vector<int> inv(n + 1);
     inv[1] = 1;
     for (int i = 2; i <= n; ++i) inv[i] = (long long)(p - p / i) * inv[p % i] % p;
-    return std::move(inv);
+    return inv;
 }
-static long long CRT(std::vector<int> &a, std::vector<int> &p) {  // 中国剩余定律
+constexpr static long long CRT(const std::vector<int> &a, const std::vector<int> &p) {  // 中国剩余定律
 /*
    a1 % p1 = x
    a2 % p2 = x
