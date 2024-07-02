@@ -1,67 +1,51 @@
 #include <bits/stdc++.h>
-// 通用随机访问迭代器模板
-template<class Iter>
-class GeneralRandomAccessIterator {
-public:
-    using value_type = typename std::iterator_traits<Iter>::value_type;
-    using reference = typename std::iterator_traits<Iter>::reference;
-    using pointer = typename std::iterator_traits<Iter>::pointer;
-    using iterator_category = std::random_access_iterator_tag;
-    using difference_type = typename std::iterator_traits<Iter>::difference_type;
 
-    GeneralRandomAccessIterator(Iter it) : it_(it) {}
+#define int long long
 
-    // 前置递增运算符
-    GeneralRandomAccessIterator& operator++() {
-        ++it_;
-        return *this;
+void solve() {
+    int n, m;
+    std::cin >> n >> m;
+    std::vector<int> a(n), b(n), c(m);
+    for(int &i:a) std::cin >> i;
+    for(int &i:b) std::cin >> i;
+    for(int &i:c) std::cin >> i;
+    int ans = 0;
+    std::map<int, int> mp;
+    for(int i = 0; i < n; ++i) {
+        if(mp.count(a[i]))mp[a[i]] = std::min(mp[a[i]], a[i] - b[i]);
+        else mp[a[i]] = a[i] - b[i];
     }
-
-    // 后置递增运算符
-    GeneralRandomAccessIterator operator++(int) {
-        GeneralRandomAccessIterator tmp(*this);
-        ++(*this);
-        return tmp;
+    for(auto it = ++mp.begin(); it != mp.end(); ) {
+        auto pre = it;
+        --pre;
+        if(it->second > pre->second) it = mp.erase(it);
+        else ++it;
     }
-
-    // 前置递减运算符
-    GeneralRandomAccessIterator& operator--() {
-        --it_;
-        return *this;
+    std::vector<int> dp(1e6 + 1);
+    int mn = mp.rbegin()->second;
+    auto it = ++mp.begin();
+    for(int i = mp.begin()->first; i <= 1e6; ++i) {
+        if(i == it->first) ++it;
+        dp[i] = std::max(dp[i - 1], dp[i - (--it)->second] + 2);
+        ++it;
     }
-
-    // 后置递减运算符
-    GeneralRandomAccessIterator operator--(int) {
-        GeneralRandomAccessIterator tmp(*this);
-        --(*this);
-        return tmp;
+    for(auto &i:c) {
+        if(i >= 1e6) {
+            int num = (i - 1e6 - 10) / mn;
+            ans += num * 2;
+            i -= num * mn;
+        }
+        while(i > 1e6) i -= mn, ans += 2;
+        ans += dp[i];
     }
+    std::cout << ans << '\n';
+}
 
-    reference operator*() const { return *it_; }
-    pointer operator->() const { return &(*it_); }
-
-    // 加法运算符
-    GeneralRandomAccessIterator operator+(difference_type n) const {
-        return GeneralRandomAccessIterator(it_ + n);
-    }
-
-    // 减法运算符
-    GeneralRandomAccessIterator operator-(difference_type n) const {
-        return GeneralRandomAccessIterator(it_ - n);
-    }
-
-    // 赋值运算符
-    reference operator[](difference_type n) const {
-        return it_[n];
-    }
-
-    bool operator==(const GeneralRandomAccessIterator& other) const { return it_ == other.it_; }
-    bool operator!=(const GeneralRandomAccessIterator& other) const { return !(*this == other); }
-    bool operator<(const GeneralRandomAccessIterator& other) const { return it_ < other.it_; }
-    bool operator<=(const GeneralRandomAccessIterator& other) const { return it_ <= other.it_; }
-    bool operator>(const GeneralRandomAccessIterator& other) const { return it_ > other.it_; }
-    bool operator>=(const GeneralRandomAccessIterator& other) const { return it_ >= other.it_; }
-
-private:
-    Iter it_;
-};
+signed main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    int T = 1;
+    // std::cin >> T;
+    while(T--) solve();
+    return 0;
+}

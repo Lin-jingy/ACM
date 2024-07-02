@@ -1,6 +1,7 @@
-.vscode
-.cph
+*.vscode
+*.cph
 CMakeLists.txt
 cmake-build-debug
 data
-.bin
+*.bin
+*.exe
