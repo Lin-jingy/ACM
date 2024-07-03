@@ -1,7 +1,5 @@
-# 随机哈希
-```c++
 #include<chrono>
-#include<unordered_map>
+
 struct custom_hash {
     static uint64_t splitmix64(uint64_t x) {
         x += 0x9e3779b97f4a7c15;
@@ -15,5 +13,3 @@ struct custom_hash {
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-std::unordered_map<int, int, custom_hash>m;
-```
