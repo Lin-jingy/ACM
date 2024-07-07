@@ -20,30 +20,39 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
-constexpr int mod = 1e9 + 7;
-constexpr int N = 1e5 + 5;
-int dp[N][1 << 5];
-
 void solve() {
-    int n, m, k;
-    std::cin >> n >> m >> k;
-    int M = 1 << m;
-    int ans = 0;
-    for(int k = 0; k < M; ++k) {
-        memset(dp, 0, sizeof(0));
-        dp[0][k] = 1;
-        for(int i = 1; i <= n; ++i) {
-            for(int j = 0; j < M; ++j) {
-                if(__builtin_popcount(j) <= k) dp[i][j] = (dp[i - 1][j << 1 | 1] + dp[i - 1][j << 1]) % mod;
-            }
-        }
-        ans = (ans + dp[n][k]) % mod;
+    int n;
+    std::cin >> n;
+    vec<int> a(n);
+    std::cin >> a;
+    // for(auto &i:a) i = std::abs(i);
+    std::set<int> s;
+    for(int i = 0; i < (1 << n); ++i) {
+        // for(int j = 0; j < n; ++j) if((i >> j) & 1) a[j] = -a[j]; 
+        // vec<int> mid = {0};
+        // for(int j = 0; j < n - 1; ++j) {
+        //     mid.pb(mid.back() + a[j]);
+        // }
+        // for(int j = 0; j < n; ++j) {
+        //     for(int k = 0; k < n; ++k) {
+        //         if(mid[k] - mid[j] == a.back()) {
+        //             std::cout << "YES\n";
+        //             return ;
+        //         }
+        //     }
+        // }
+        // for(int j = 0; j < n; ++j) if((i >> j) & 1) a[j] = -a[j]; 
+        int sum = 0;
+        for(int j = 0; j < n; ++j) if((i >> j) & 1) sum += a[j]; 
+        s.insert(sum);
     }
+    if(s.size() == (1 << n)) std::cout << "NO\n";
+    else std::cout << "YES\n";
     
-    std::cout << ans << '\n';
+    // std::cout << "NO\n";
 }

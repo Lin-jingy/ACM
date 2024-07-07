@@ -25,25 +25,15 @@ signed main() {
     return 0;
 }
 
-constexpr int mod = 1e9 + 7;
-constexpr int N = 1e5 + 5;
-int dp[N][1 << 5];
-
 void solve() {
-    int n, m, k;
-    std::cin >> n >> m >> k;
-    int M = 1 << m;
-    int ans = 0;
-    for(int k = 0; k < M; ++k) {
-        memset(dp, 0, sizeof(0));
-        dp[0][k] = 1;
-        for(int i = 1; i <= n; ++i) {
-            for(int j = 0; j < M; ++j) {
-                if(__builtin_popcount(j) <= k) dp[i][j] = (dp[i - 1][j << 1 | 1] + dp[i - 1][j << 1]) % mod;
-            }
-        }
-        ans = (ans + dp[n][k]) % mod;
+    int n, m;
+    std::cin >> n >> m;
+    vec<int> a(n + 1);
+    std::iota(a.begin() + 1, a.end(), 1);
+    while(m--) {
+        int l, r;
+        std::cin >> l >> r;
+        std::reverse(a.begin() + l, a.begin() + r + 1);
     }
-    
-    std::cout << ans << '\n';
+    for(int i = 1; i <= n; ++i) std::cout << a[i] << ' ';
 }

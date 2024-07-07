@@ -24,26 +24,35 @@ signed main() {
     while (T--) solve();
     return 0;
 }
-
-constexpr int mod = 1e9 + 7;
-constexpr int N = 1e5 + 5;
-int dp[N][1 << 5];
-
+constexpr int N = 1e4 + 5;
+constexpr int Time = 1e3 + 10;
+int dp[N][Time];
 void solve() {
-    int n, m, k;
-    std::cin >> n >> m >> k;
-    int M = 1 << m;
-    int ans = 0;
-    for(int k = 0; k < M; ++k) {
-        memset(dp, 0, sizeof(0));
-        dp[0][k] = 1;
-        for(int i = 1; i <= n; ++i) {
-            for(int j = 0; j < M; ++j) {
-                if(__builtin_popcount(j) <= k) dp[i][j] = (dp[i - 1][j << 1 | 1] + dp[i - 1][j << 1]) % mod;
+    int h1, m1, h2, m2, n;
+    scanf("%d:%d %d:%d %d", &h1, &m1, &h2, &m2, &n);
+    vec<int> t(n + 1), c(n + 1), p(n + 1);
+    for(int i = 1; i <= n; ++i) scanf("%d%d%d", &t[i], &c[i], &p[i]);
+
+    int time = (h2 - h1) * 60 + m2 - m1;
+    // logs(time);
+    for(int i = 1; i <= n; ++i) {
+        for(int k = time; k >= 0; --k) dp[i][k] = dp[i - 1][k];
+        if(p[i] == 0) {
+            for(int j = t[i]; j <= time; ++j) {
+                dp[i][j] = std::max(dp[i][j - t[i]] + c[i], dp[i][j]);
+            }
+        } else {
+            for(int j = 1; j <= p[i]; ++j) {
+                for(int k = time; k >= t[i] * j; --k) {
+                    dp[i][k] = std::max(dp[i - 1][k - t[i] * j] + c[i] * j, dp[i][k]);
+                }
             }
         }
-        ans = (ans + dp[n][k]) % mod;
+        
     }
-    
-    std::cout << ans << '\n';
+    int mx = 0;
+    for(int i = 1; i <= n; ++i) {
+        for(int j = 1; j <= time; ++j) mx = std::max(mx, dp[i][j]);
+    }
+    std::cout << mx << '\n';
 }

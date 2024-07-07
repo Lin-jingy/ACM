@@ -20,12 +20,11 @@ constexpr int inf=INT_MAX;constexpr long long INF=LONG_LONG_MAX;template<class T
 
 void solve();
 
-
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
@@ -35,11 +34,18 @@ void solve() {
     std::cin >> n;
     vec<int> a(n + 1);
     for(int i = 1; i <= n; ++i) std::cin >> a[i];
-    int ans = 0;
-    for(int i = 1; i <= n; ++i) {
-        for(int j = i + 1; j <= n; ++j) {
-            if((a[i] + a[j]) % (i + j) == 0) ++ans;
+
+    long long ans = 0;
+    vec<long long> v(4 * n + 100);
+    for(int k = 1; k <= n; ++k) {
+        for(int i = 1; i * k <= 2 * n and i <= n; ++i) {
+            int x = a[i] - k * i + 2 * n;
+            ans += v[x];
+            v[k * i - a[i] + 2 * n]++;
         }
+        for(int i = 1; i * k <= 2 * n and i <= n; ++i) v[k * i - a[i] + 2 * n]--;
     }
+
     std::cout << ans << '\n';
+    
 }

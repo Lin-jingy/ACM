@@ -5,7 +5,7 @@
 template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tree<_KEY,__gnu_pbds::null_type,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template<class _KEY,class _VALUE,class _Compare=std::less<_KEY>>using pbds_map=__gnu_pbds::tree<_KEY,_VALUE,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;
 #endif
 
-// #define int long long
+#define int long long
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
 #define pb(x)push_back(x)
@@ -25,25 +25,30 @@ signed main() {
     return 0;
 }
 
-constexpr int mod = 1e9 + 7;
-constexpr int N = 1e5 + 5;
-int dp[N][1 << 5];
+constexpr int N = 105;
+int dp[N][N][N];
 
 void solve() {
-    int n, m, k;
-    std::cin >> n >> m >> k;
-    int M = 1 << m;
-    int ans = 0;
-    for(int k = 0; k < M; ++k) {
-        memset(dp, 0, sizeof(0));
-        dp[0][k] = 1;
-        for(int i = 1; i <= n; ++i) {
-            for(int j = 0; j < M; ++j) {
-                if(__builtin_popcount(j) <= k) dp[i][j] = (dp[i - 1][j << 1 | 1] + dp[i - 1][j << 1]) % mod;
+    int len1, len2, len3;
+    std::cin >> len1 >> len2 >> len3;
+    vec<vec<int>> a(3);
+    a[0].assign(len1, {});
+    a[1].assign(len2, {});
+    a[2].assign(len3, {});
+    std::cin >> a;
+    for(int i = 0; i < 3; ++i) a[i].pb(0), std::ranges::reverse(a[i]);
+
+    // for(int i = 0; i < N; ++i) for(int j = 0; j < N; ++j) for(int k = 0; k < N; ++k) dp[i][j][k] = inf;
+    // dp[0][0][0] = 0;
+    for(int i = 0; i <= len1; ++i) {
+        for(int j = 0; j <= len2; ++j) {
+            for(int k = 0; k <= len3; ++k) {
+                int num = i + j + k;
+                if(i != 0) dp[i][j][k] = std::max(dp[i][j][k], dp[i - 1][j][k] + a[0][i] * num);
+                if(j != 0) dp[i][j][k] = std::max(dp[i][j][k], dp[i][j - 1][k] + a[1][j] * num);
+                if(k != 0) dp[i][j][k] = std::max(dp[i][j][k], dp[i][j][k - 1] + a[2][k] * num);
             }
         }
-        ans = (ans + dp[n][k]) % mod;
     }
-    
-    std::cout << ans << '\n';
+    std::cout << dp[len1][len2][len3] << '\n';
 }

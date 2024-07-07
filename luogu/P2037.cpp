@@ -25,25 +25,65 @@ signed main() {
     return 0;
 }
 
-constexpr int mod = 1e9 + 7;
-constexpr int N = 1e5 + 5;
-int dp[N][1 << 5];
+int ch(char x) {
+    switch(x) {
+        case 'A' : return 2;
+        case 'B' : return 2;
+        case 'C' : return 2;
+        case 'D' : return 3;
+        case 'E' : return 3;
+        case 'F' : return 3;
+        case 'G' : return 4;
+        case 'H' : return 4;
+        case 'I' : return 4;
+        case 'J' : return 5;
+        case 'K' : return 5;
+        case 'L' : return 5;
+        case 'M' : return 6;
+        case 'N' : return 6;
+        case 'O' : return 6;
+        case 'P' : return 7;
+        case 'R' : return 7;
+        case 'S' : return 7;
+        case 'T' : return 8;
+        case 'U' : return 8;
+        case 'V' : return 8;
+        case 'W' : return 9;
+        case 'X' : return 9;
+        case 'Y' : return 9;
+    }
+    return 0;
+}
+str fmts(str &s) {
+    str x;
+    for(auto i:s) {
+        if(i >= 'A' and i <= 'Z') x += ch(i) + '0';
+        else if(i >= '0' and i <= '9') x += i;
+    }
+    return x;
+}
 
 void solve() {
-    int n, m, k;
-    std::cin >> n >> m >> k;
-    int M = 1 << m;
-    int ans = 0;
-    for(int k = 0; k < M; ++k) {
-        memset(dp, 0, sizeof(0));
-        dp[0][k] = 1;
-        for(int i = 1; i <= n; ++i) {
-            for(int j = 0; j < M; ++j) {
-                if(__builtin_popcount(j) <= k) dp[i][j] = (dp[i - 1][j << 1 | 1] + dp[i - 1][j << 1]) % mod;
-            }
-        }
-        ans = (ans + dp[n][k]) % mod;
+    int n;
+    std::cin >> n;
+    std::map<str, int> mp;
+    while(n--) {
+        str x;
+        std::cin >> x;
+        // logs(fmts(x));
+        mp[fmts(x)]++;
     }
-    
-    std::cout << ans << '\n';
+    bool f = 0;
+    for(auto &[st, nums]:mp) {
+        if(nums == 1) continue;
+        f = 1;
+        str x1, x2;
+        for(int i = 0; i < 3; ++i) x1 += st[i];
+        for(int i = 3; i < 7; ++i) x2 += st[i];
+
+        std::cout << x1 << "-" << x2 << " " << nums << '\n';
+    }
+    if(!f) {
+        std::cout << "No duplicates.\n";
+    }
 }

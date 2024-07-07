@@ -25,25 +25,30 @@ signed main() {
     return 0;
 }
 
-constexpr int mod = 1e9 + 7;
-constexpr int N = 1e5 + 5;
-int dp[N][1 << 5];
+class DSU {
+private:
+    std::vector<int> f, siz;
+public:
+    DSU(int n):f(n+1),siz(n+1){for(int i=1;i<=n;i++)siz[i]=1,f[i]=i;}
+    int find(int x){return x==f[x]?x:f[x]=find(f[x]);}
+    bool same(int x,int y){return find(x)==find(y);}
+    void merge(int x,int y) {if(!same(x,y))siz[find(y)]+=siz[find(x)],f[find(x)]=find(y);}
+    int qsz(int x){return siz[find(x)];}
+};
 
 void solve() {
-    int n, m, k;
-    std::cin >> n >> m >> k;
-    int M = 1 << m;
-    int ans = 0;
-    for(int k = 0; k < M; ++k) {
-        memset(dp, 0, sizeof(0));
-        dp[0][k] = 1;
-        for(int i = 1; i <= n; ++i) {
-            for(int j = 0; j < M; ++j) {
-                if(__builtin_popcount(j) <= k) dp[i][j] = (dp[i - 1][j << 1 | 1] + dp[i - 1][j << 1]) % mod;
-            }
-        }
-        ans = (ans + dp[n][k]) % mod;
+    int n, m, p, q;
+    std::cin >> n >> m >> p >> q;
+    DSU T(n + 5), S(m + 5);
+    for(int i = 1; i <= p; ++i) {
+        int a, b;
+        std::cin >> a >> b;
+        T.merge(a, b);
     }
-    
-    std::cout << ans << '\n';
+    for(int i = 1; i <= q; ++i) {
+        int a, b;
+        std::cin >> a >> b;
+        S.merge(-a, -b);
+    }
+    std::cout << std::min(T.qsz(1), S.qsz(1)) << '\n';
 }

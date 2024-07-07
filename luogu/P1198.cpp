@@ -5,7 +5,7 @@
 template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tree<_KEY,__gnu_pbds::null_type,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template<class _KEY,class _VALUE,class _Compare=std::less<_KEY>>using pbds_map=__gnu_pbds::tree<_KEY,_VALUE,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;
 #endif
 
-// #define int long long
+#define int long long
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
 #define pb(x)push_back(x)
@@ -25,25 +25,64 @@ signed main() {
     return 0;
 }
 
-constexpr int mod = 1e9 + 7;
-constexpr int N = 1e5 + 5;
-int dp[N][1 << 5];
+class SegmentTree {
+private:
+    struct Treenode { int f, tag; };
+    std::vector<Treenode> v;
+    std::vector<int> *a;
+    int n;
+#define f(x) (v[x].f)
+#define tag(x) (v[x].tag)
+#define ls(x) (x << 1)
+#define rs(x) (x << 1 | 1)
+    void pushUp(int p) {
+        f(p) = std::max(f(ls(p)), f(rs(p)));
+    }
+    void Set(int p, int l, int r, int pos, int d) {
+        if(l == r) {
+            f(p) = d;
+            return ;
+        }
+        int mid = (l + r) >> 1;
+        if(pos <= mid) Set(ls(p), l, mid, pos, d);
+        else Set(rs(p), mid + 1, r, pos, d);
+        pushUp(p);
+    }
+    int Query(int p, int l, int r, int i, int j) {
+        if (i <= l and j >= r) return f(p);
+        int mid = (l + r) >> 1, ans = 0;
+        if (i <= mid) ans = Query(ls(p), l, mid, i, j);
+        if (j > mid) ans = std::max(ans, Query(rs(p), mid + 1, r, i, j));
+        return ans;
+    }
+
+public:
+    SegmentTree(int N) : n(N), v(N << 2){ }
+    void set(int pos, int d) { Set(1, 1, n, pos, d); }
+    int query(int i, int j) { return Query(1, 1, n, i, j); }
+#undef f
+#undef tag
+#undef ls
+#undef rs
+
+};
 
 void solve() {
-    int n, m, k;
-    std::cin >> n >> m >> k;
-    int M = 1 << m;
-    int ans = 0;
-    for(int k = 0; k < M; ++k) {
-        memset(dp, 0, sizeof(0));
-        dp[0][k] = 1;
-        for(int i = 1; i <= n; ++i) {
-            for(int j = 0; j < M; ++j) {
-                if(__builtin_popcount(j) <= k) dp[i][j] = (dp[i - 1][j << 1 | 1] + dp[i - 1][j << 1]) % mod;
-            }
+    int m, mod;
+    std::cin >> m >> mod;
+    SegmentTree T(m + 1);
+    int t = 0;
+    int len = 1;
+    while(m--) {
+        char op;
+        int x;
+        std::cin >> op >> x;
+        if(op == 'Q') {
+            t = T.query(len - x + 1, len);
+            std::cout << t << '\n';
+        } else {
+            ++len;
+            T.set(len, (x + t) % mod);
         }
-        ans = (ans + dp[n][k]) % mod;
     }
-    
-    std::cout << ans << '\n';
 }

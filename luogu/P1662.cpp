@@ -24,26 +24,47 @@ signed main() {
     while (T--) solve();
     return 0;
 }
-
-constexpr int mod = 1e9 + 7;
-constexpr int N = 1e5 + 5;
-int dp[N][1 << 5];
-
-void solve() {
-    int n, m, k;
-    std::cin >> n >> m >> k;
-    int M = 1 << m;
-    int ans = 0;
-    for(int k = 0; k < M; ++k) {
-        memset(dp, 0, sizeof(0));
-        dp[0][k] = 1;
-        for(int i = 1; i <= n; ++i) {
-            for(int j = 0; j < M; ++j) {
-                if(__builtin_popcount(j) <= k) dp[i][j] = (dp[i - 1][j << 1 | 1] + dp[i - 1][j << 1]) % mod;
-            }
-        }
-        ans = (ans + dp[n][k]) % mod;
+constexpr int N = 1337;
+constexpr bool check(int x) {
+    if(x % 7 == 0) return true;
+    while(x) {
+        if(x % 10 == 7) return true;
+        x /= 10;
     }
-    
-    std::cout << ans << '\n';
+    return false;
+}
+Pii pm[] = {{144, 1}};
+Pii p[15] = {{1, 1}, {548, 1}, {866, 0}, {892, 0}, {64, 1}, {1303, 1}, {97, 0}, {1278, 0}, {1278, 0}, {960, 1}};
+void solve() {
+    int n;
+    std::cin >> n;
+    vec<int> l(N);
+    for(int i = 1; i <= N; ++i) l[i - 1] = i;
+    int k = n / (int)1e8;
+    auto it = l.begin() + p[k].first - 1;
+    bool op = p[k].second;
+    int begin = k * (int)1e8 + 1;
+    if(n >= 800000000 and n < 900000000) {
+        begin = 850000001;
+        op = 1;
+        it = l.begin() + pm[0].first - 1;
+    }
+    auto sub = [&]() {
+        if(it == l.begin()) it = --l.end();
+        else --it;
+    };
+    auto add = [&]() {
+        ++it;
+        if(it == l.end()) it = l.begin();
+    };
+    if(k != 0) {
+        if(op == 1) add();
+        else sub();
+    }
+    for(int i = begin; i < n; ++i) {
+        if(check(i)) op = !op;
+        if(op == 1) add();
+        else sub();
+    }
+    std::cout << *it << '\n';
 }

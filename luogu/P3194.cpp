@@ -25,25 +25,42 @@ signed main() {
     return 0;
 }
 
-constexpr int mod = 1e9 + 7;
-constexpr int N = 1e5 + 5;
-int dp[N][1 << 5];
+#define double long double
 
 void solve() {
-    int n, m, k;
-    std::cin >> n >> m >> k;
-    int M = 1 << m;
-    int ans = 0;
-    for(int k = 0; k < M; ++k) {
-        memset(dp, 0, sizeof(0));
-        dp[0][k] = 1;
-        for(int i = 1; i <= n; ++i) {
-            for(int j = 0; j < M; ++j) {
-                if(__builtin_popcount(j) <= k) dp[i][j] = (dp[i - 1][j << 1 | 1] + dp[i - 1][j << 1]) % mod;
-            }
+    int n;
+    std::cin >> n;
+    vec<arr<int, 3>> v(n);
+    for(int i = 0; i < n; ++i) std::cin >> v[i][0] >> v[i][1], v[i][2] = i;
+
+    std::ranges::sort(v, std::greater<>());
+
+    vec<arr<int, 3>> s;
+    s.pb(v.front());
+    int f = 1;
+    for(; f < n; ++f) {
+        if(v[f][0] != v[0][0]) {
+            s.pb(v[f]);
+            break;
         }
-        ans = (ans + dp[n][k]) % mod;
     }
-    
-    std::cout << ans << '\n';
+    for(int i = f + 1; i < n; ++i) {
+        while(s.size() >= 2) {
+            auto &it1 = s.back(), &it2 = s[s.size() - 2];
+            if(v[i][0] == it2[0]) goto A;
+            double lastx = (double)(it1[1] - it2[1]) / (it2[0] - it1[0]);
+            double nowx = (double)(it2[1] - v[i][1]) / (v[i][0] - it2[0]);
+            if(nowx > lastx - 1e-12) s.pop_back();
+            else break;
+        }
+        s.push_back(v[i]);
+        A:;
+    }
+    vec<int> ans;
+    for(auto i:s) {
+        ans.pb(i[2]);
+    }
+    std::ranges::sort(ans);
+    for(auto i:ans) std::cout << i + 1 << ' ';
+
 }

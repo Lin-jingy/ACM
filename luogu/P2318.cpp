@@ -25,25 +25,29 @@ signed main() {
     return 0;
 }
 
-constexpr int mod = 1e9 + 7;
-constexpr int N = 1e5 + 5;
-int dp[N][1 << 5];
-
 void solve() {
-    int n, m, k;
-    std::cin >> n >> m >> k;
-    int M = 1 << m;
+    int n, m;
+    std::cin >> n >> m;
     int ans = 0;
-    for(int k = 0; k < M; ++k) {
-        memset(dp, 0, sizeof(0));
-        dp[0][k] = 1;
-        for(int i = 1; i <= n; ++i) {
-            for(int j = 0; j < M; ++j) {
-                if(__builtin_popcount(j) <= k) dp[i][j] = (dp[i - 1][j << 1 | 1] + dp[i - 1][j << 1]) % mod;
-            }
+    umap<int, Pii> mp;
+    std::set<arr<int, 3>> q;
+    for(int i = 1; i <= m; ++i) {
+        int x;
+        std::cin >> x;
+        if(mp.count(x)) {
+            q.erase(arr<int, 3>{mp[x].first, mp[x].second, x});
+            mp[x].first++;
+            q.insert(arr<int, 3>{mp[x].first, mp[x].second, x});
+            ++ans;
+            continue;
         }
-        ans = (ans + dp[n][k]) % mod;
+        if(mp.size() < n) mp[x] = {0, i}, q.insert(arr<int, 3>{0, i, x});
+        else {
+            mp.erase((*q.begin())[2]);
+            q.erase(q.begin());
+            mp[x] = {0, i};
+            q.insert(arr<int, 3>{0, i, x});
+        }
     }
-    
     std::cout << ans << '\n';
 }
