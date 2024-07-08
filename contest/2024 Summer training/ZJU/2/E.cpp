@@ -5,24 +5,20 @@
 void solve() {
     int n, k;
     std::cin >> n >> k;
-    std::vector<int> a(n), v;
-    for(int i = 0; i < n; ++i) std::cin >> a[i];
-    std::ranges::sort(a);
-    v = a;
-    k -= std::accumulate(a.begin(), a.end(), 0LL);
-    std::vector<int> num;
-    while(k > 0) {
-        while(k < v.back()) v.pop_back();
-        num.push_back(v.back());
-        k -= v.back();
-    } 
-    std::ranges::reverse(num);
-    for(int i = a.size() - 2; i >= 0; --i) {
-        if(num.empty()) break;
-        if(a[i] < num.back()) a[i] = num.back(), num.pop_back();
+    std::set<int> set;
+    for(int i = 0, x; i < n; ++i) std::cin >> x, set.insert(x);
+    int mx = *set.rbegin();
+    for(auto i:set) k -= i;
+    set.erase(--set.end());
+    std::cout << mx << ' ';
+    for(int i = 1; i < n; ++i) {
+        if(k) {
+            int mn = std::min(k, mx);
+            std::cout << mn << ' ';
+            if(!set.count(mn)) k -= mn;
+            else set.erase(mn);
+        } else std::cout << 0 << ' ';
     }
-    
-    for(int i = 0; i < n; ++i) std::cout << a[i] << ' ';
     std::cout << '\n';
 }
 

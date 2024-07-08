@@ -1,90 +1,57 @@
 #include <bits/stdc++.h>
 
-int N;
-
 void print(std::vector<std::vector<int>> &v) {
     for(int i = 1; i < v.size(); ++i) {
         for(int j = 1; j < v[i].size(); ++j) {
-            // std::cout << v[i][j] << ' ';
-            printf("%4d", v[i][j]);
+            std::cout << v[i][j] << ' ';
         }
-        // std::cout << '\n';
-        printf("\n");
+        std::cout << '\n';
     }
 }
-void dfs(std::vector<std::vector<int>> &v, int n) {
-    if(n == 2) {
-        v[1][1] = 1;
-        v[1][2] = 3;
-        v[2][1] = 4;
-        v[2][2] = 2;
-        return ;
+void check(std::vector<std::vector<int>> &v) {
+    for(int i = 1; i < v.size(); ++i) {
+        std::set<int> s1;
+        std::set<int> s2;
+        for(int j = 1; j < v.front().size(); ++j) 
+            s1.insert(v[i][j]),
+            s2.insert(v[j][i]);
+        assert(s1.size() == v.size() - 1);
+        assert(s2.size() == v.size() - 1);
     }
-    dfs(v, n / 2);
-    int k = n / 2;
-    int rk = k / 2;
-    if(n != N) {
-        for(int i = k + 1; i <= n; ++i) 
-            for(int j = 1; j <= k; ++j) 
-                v[i][j] = v[i - k][j] + n;
-        for(int i = 1; i <= k; ++i) 
-            for(int j = k + 1; j <= n; ++j) 
-                v[i][j] = v[n - i + 1][j - k];
-        for(int i = k + 1; i <= n; ++i) 
-            for(int j = k + 1; j <= n; ++j) 
-                v[i][j] = v[k - (i - k) + 1][j - k];
-    } else {
-        //右下
-        for(int i = k + 1; i <= n; ++i) 
-            for(int j = k + 1; j <= n; ++j)
-                v[i][j] = v[i - k][j - k];
-        for(int i = k + 1; i <= rk; ++i) 
-            for(int j = k + 1; j <= n; ++j)
-                std::swap(v[i][j], v[i + rk][j]);
-        //左下
-        for(int i = k + 1; i <= n; ++i) 
-            for(int j = 1; j <= n; ++j) 
-                v[i][j] = v[i - k][j];
-        for(int i = k + 1; i <= rk; ++i)
-            for(int j = 1; j <= k; ++j)
-                std::swap(v[i][j], v[i + rk][j]);
-        for(int i = k + 1; i <= n; ++i) 
-            for(int j = 1; j <= rk; ++j)
-                std::swap(v[i][j], v[i][j + rk]);
-
-        //右上
-        for(int i = 1; i <= k; ++i)
-            for(int j = k + 1; j <= n; ++j)
-                v[i][j] = v[i][j - k];
-        for(int i = 1; i <= k; i += rk)
-            for(int j = k + 1; j <= k; ++j)
-                std::swap(v[i][j], v[i + rk][j]);
-        for(int i = 1; i <= k; ++i)
-            for(int j = k; j <= k + rk; ++j)
-                std::swap(v[i][j], v[i][j + rk]);
-    }
-    
 }
-
 void solve() {
-    freopen("1.out", "w", stdout);
     int n;
     std::cin >> n;
-    N = n;
-    std::vector<std::vector<int>> v(n + 1, std::vector<int>(n + 1));
-    if(n % 2 == 1) {
-        for(int i = 1; i <= n; ++i) {
-            for(int j = i; j <= n; ++j) v[i][j - i + 1] = j;
-            for(int j = n - i + 2; j <= n; ++j) v[i][j] = j - (n - i + 2) + 1;
-        }
-        print(v);
-    } else {
-        if(n % 4 != 0) std::cout << -1 << '\n';
-        else {
-            dfs(v, n);
-            print(v);
-        }
+    if(n == 2) {
+        std::cout << -1 << '\n';
+        return ;
     }
+    std::vector<std::vector<int>> v(n + 1, std::vector<int>(n + 1));
+    int N = n;
+    if(n % 2 == 0) --N;
+    for(int i = 1; i <= N; ++i) {
+        for(int j = i; j <= N; ++j) v[i][j - i + 1] = j;
+        for(int j = N - i + 2; j <= N; ++j) v[i][j] = j - (N - i + 2) + 1;
+    }
+    if(n % 2 == 0) {
+        for(int i = 2; i <= N; ++i) v[i][i - 1] = n;
+        v[1][N] = n;
+        for(int i = 1; i <= N; ++i) {
+            std::set<int> s;
+            for(int j = 1; j <= n; ++j) s.insert(j);
+            for(int j = 1; j <= N; ++j) s.erase(v[i][j]);
+            v[i][n] = *s.begin();
+        }
+        for(int i = 1; i <= N; ++i) {
+            std::set<int> s;
+            for(int j = 1; j <= n; ++j) s.insert(j);
+            for(int j = 1; j <= N; ++j) s.erase(v[j][i]);
+            v[n][i] = *s.begin();
+        }
+        v[n][n] = n;
+    }
+    // check(v);
+    print(v);
 }
 
 signed main() {
