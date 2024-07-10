@@ -5,11 +5,14 @@
 
 #ifndef _ARRAY_
 #define _ARRAY_
-
+#include <yvals_core.h>
+#if _STL_COMPILER_PREPROCESSOR
+#include <xutility>
 
 #pragma pack(push, _CRT_PACKING)
 #pragma warning(push, _STL_WARNING_LEVEL)
 #pragma warning(disable : _STL_DISABLED_WARNINGS)
+_STL_DISABLE_CLANG_WARNINGS
 #pragma push_macro("new")
 #undef new
 

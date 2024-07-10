@@ -1,51 +1,38 @@
 #include <bits/stdc++.h>
 
-template<class T, size_t size>
-class array {
-private:
-    T m_data[size];
+template <class T, std::size_t N>
+class Array {
 public:
-    array() = default;
-    ~array() = default;
+    using value_type = T;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using reference = value_type&;
+    using const_reference = const value_type&;
+    using pointer = value_type*;
+    using const_pointer = const value_type*;
 
-    //Element access
-    constexpr T& at(size_t pos) {
-        if(pos < 0 or pos >= size) throw std::out_of_range("err=>at()");
+    Array() = default;
+    Array(const Array<T, N> &other) {
+        memcpy(m_data, other.m_data, sizeof(m_data));
+    }
+    ~Array() = default;
+    [[nodiscard]] constexpr reference at(size_type pos) {
+        if(pos >= N or pos < 0) throw std::out_of_range("");
         return m_data[pos];
     }
-    constexpr const T& at(size_t pos) const {
-        if(pos < 0 or pos >= size) throw std::out_of_range("err=>at()");
+    [[nodiscard]] constexpr const_reference at(size_type pos) const {
+        if(pos >= N or pos < 0) throw std::out_of_range("");
         return m_data[pos];
     }
-    constexpr T& operator[](size_t pos) noexcept {
-        return m_data[pos];
-    }
-    constexpr const T& operator[](size_t pos) const noexcept {
-        return m_data[pos];
-    }
-    constexpr T& front() noexcept {
-        return m_data[0];
-    }
-    constexpr const T& front() const noexcept {
-        return m_data[0];
-    }
-    constexpr T& back() noexcept {
-        return m_data[size - 1];
-    }
-    constexpr const T& back() const noexcept {
-        return m_data[size - 1];
-    }
-    constexpr T* data() noexcept {
-        return m_data;
-    }
-    constexpr const T* data() const noexcept {
-        return m_data;
-    }
-    
-    //Iterators
+    [[nodiscard]] constexpr reference operator[] (size_type pos) { return m_data[pos]; }
+    [[nodiscard]] constexpr const_reference operator[] (size_type pos) const { return m_data[pos]; }
+    [[nodiscard]] constexpr reference front() { return m_data[0]; }
+    [[nodiscard]] constexpr const_reference front() const{ return m_data[0]; }
+    [[nodiscard]] constexpr reference back() { return m_data[N - 1]; }
+    [[nodiscard]] constexpr const_reference back() const{ return m_data[N - 1]; }
+    [[nodiscard]] constexpr pointer data() noexcept { return m_data; }
+    [[nodiscard]] constexpr const_pointer data() const noexcept { return m_data; }
     class iterator {
-    private:
-        T *m_ptr;
     public:
         iterator() = default;
         ~iterator() = default;
@@ -102,6 +89,8 @@ public:
         friend bool operator!=(const iterator a, const iterator b) {
             return a.m_ptr != b.m_ptr;
         }
+    private:
+        T *m_ptr;
     };
     class const_iterator : public iterator {
         T& operator*() const noexcept = delete;
@@ -137,32 +126,51 @@ public:
         T& operator*() const noexcept = delete;
         T* operator->() const noexcept = delete;
     };
-    iterator begin() noexcept {
-        return iterator(m_data);
+    
+    [[nodiscard]] constexpr iterator begin() noexcept { return iterator(m_data); }
+    [[nodiscard]] constexpr const_iterator begin() const noexcept { return const_iterator(m_data); }
+    [[nodiscard]] constexpr const_iterator cbegin() const noexcept { return const_iterator(m_data); }
+    [[nodiscard]] constexpr iterator end() noexcept { return iterator(m_data + N); }
+    [[nodiscard]] constexpr const_iterator end() const noexcept { return const_iterator(m_data + N); }
+    [[nodiscard]] constexpr const_iterator cend() const noexcept { return const_iterator(m_data + N); }
+    [[nodiscard]] constexpr reverse_iterator rbegin() noexcept { return reverse_iterator(m_data + N - 1); }
+    [[nodiscard]] constexpr const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator(m_data + N - 1); }
+    [[nodiscard]] constexpr const_reverse_iterator crbegin() const noexcept { return rbegin(); }
+    [[nodiscard]] constexpr reverse_iterator rend() noexcept { return reverse_iterator(m_data - 1); }
+    [[nodiscard]] constexpr const_reverse_iterator rend() const noexcept { return const_reverse_iterator(m_data - 1); }
+    [[nodiscard]] constexpr const_reverse_iterator crend() const noexcept { return const_reverse_iterator(m_data - 1); }
+    [[nodiscard]] constexpr bool empty() const noexcept { return N == 0; }
+    [[nodiscard]] constexpr size_type size() const noexcept { return N; }
+    constexpr void fill(const_reference value) { 
+        for(auto it = begin(); it != end(); ++it) *it = value;
     }
-    const_iterator begin() const noexcept {
-        return const_iterator(m_data);
+    constexpr void swap(Array& other) noexcept {
+        for(int i = 0; i < N; ++i) std::swap(m_data[i], other.m_data[i]);
     }
-    iterator end() noexcept {
-        return iterator(m_data + size);
+    constexpr bool operator== (const Array &other) const noexcept {
+        for(int i = 0; i < N; ++i) if(m_data[i] != other.m_data[i]) return false;
+        return true;
     }
-    const_iterator end() const noexcept {
-        return const_iterator(m_data + size);
+    constexpr auto operator<=> (const Array &other) const noexcept {
+        for(int i = 0; i < N; ++i) {
+            if(m_data[i] > other.m_data[i]) return 1;
+            else if(m_data[i] < other.m_data[i]) return -1;
+        }
+        return 0;
     }
-    reverse_iterator rbegin() noexcept {
-        return reverse_iterator(m_data + size - 1);
+    constexpr Array& operator= (const Array &other) noexcept {
+        memcpy(m_data, other.m_data, sizeof(m_data));
     }
-    const_reverse_iterator rbegin() const noexcept {
-        return const_reverse_iterator(m_data + size - 1);
-    }
-    reverse_iterator rend() noexcept {
-        return reverse_iterator(m_data - 1);
-    }
-    const_reverse_iterator rend() const noexcept {
-        return const_reverse_iterator(m_data - 1);
-    }
+
+private:
+    T m_data[N];
 };
 
 int main() {
-    
+    std::array<int, 3> a;
+    Array<int, 3> b;
+    a.fill(10);
+    b.fill(10);
+    const auto it = a.crbegin();
+    const auto it1 = b.crbegin();
 }

@@ -8,16 +8,10 @@ private:
 public:
     iterator() = default;
     ~iterator() = default;
-    iterator(const iterator &ptr): m_ptr(ptr){}
-    T& operator*() const noexcept {
-        return *m_ptr;
-    }
-    T* operator->() const noexcept {
-        return m_ptr;
-    }
-    iterator& operator=(const iterator &ptr) {
-        m_ptr = ptr;
-    }
+    iterator(const iterator &ptr): m_ptr(ptr.m_ptr){}
+    T& operator*() const noexcept { return *m_ptr; }
+    T* operator->() const noexcept { return m_ptr; }
+    iterator& operator=(const iterator &ptr) { m_ptr = ptr; }
     iterator& operator++() noexcept {
         ++m_ptr;
         return *this;
