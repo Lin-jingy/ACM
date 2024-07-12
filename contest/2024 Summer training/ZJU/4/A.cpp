@@ -1,77 +1,63 @@
 #include <bits/stdc++.h>
 
-using Pii = std::pair<int, int>;
+constexpr int N = 1005;
+int v[N][N];
+std::pair<int, int> graph[N][N];
+bool vis[N][N];
+int n, m;
+int x1, y1, x2, y2;
 int px[] = {0, 0, 1, -1};
 int py[] = {1, -1, 0, 0};
+
+void dij() {
+    std::priority_queue<std::array<int, 3>> q;
+    q.push({INT_MAX, x1, y1});
+    vis[x1][y1] = 1;
+    while(!q.empty()) {
+        auto [val, x, y] = q.top();
+        q.pop();
+        if(x == x2 and y == y2) return ;
+        for(int i = 0; i < 4; ++i) {
+            int rx = x + px[i];
+            int ry = y + py[i];
+            if(rx >= 1 and rx <= n and ry >= 1 and ry <= m and !vis[rx][ry]) {
+                vis[rx][ry] = 1;
+                graph[rx][ry] = {x, y};
+                q.push({v[rx][ry], rx, ry});
+            }
+        }
+    }
+}
+
+void dfs(int x, int y) {
+    if(x == 0 and y == 0) return ;
+    vis[x][y] = 1;
+    dfs(graph[x][y].first, graph[x][y].second);
+}
+
 
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     
-    int n, m;
     std::cin >> n >> m;
-    int x1, y1, x2, y2;
     std::cin >> x1 >> y1 >> x2 >> y2;
-    std::vector<std::vector<bool>> v(n + 1, std::vector<bool>(m + 1));
-    std::vector<Pii> list;
-    std::vector<std::vector<int>> V(n + 1, std::vector<int>(m + 1, INT_MAX));
-    bool ok = 0;
-    std::set<Pii> s;
-    auto dfs = [&](auto self, int x, int y, int val)->void {
-        if(x == x2 and y == y2) {
-            s.clear();
-            for(auto i:list) s.insert(i);
-            ok = 1;
-            return ;
-        }
-        if(V[x][y] <= val) return ;
-        V[x][y] = val;
-        for(int i = 0; i < 4; ++i) {
-            int rx = x + px[i];
-            int ry = y + py[i];
-            if(rx >= 1 and rx <= n and ry >= 1 and ry <= m and v[rx][ry] == 0) {
-                list.emplace_back(rx, ry);
-                self(self, rx, ry, val + 1);
-                list.pop_back();         
-            } 
-        }
-    };
-    for(int i = 1; i < std::min(n, m); ++i) {
+    for(int i = 1; i <= n * m; ++i) {
         int x, y;
         std::cin >> x >> y;
-        if(x == x1 and y == y1) continue;
-        if(x == x2 and y == y2) continue;
-        v[x][y] = 1;
+        v[x][y] = i;
     }
-    dfs(dfs, x1, y1, 0);
-    bool FF = 1;
-    for(int i = std::min(n, m); i <= n * m; ++i) {
-        int x, y;
-        std::cin >> x >> y;
-        if(x == x1 and y == y1) continue;
-        if(x == x2 and y == y2) continue;
-        if(!s.count({x, y})) v[x][y] = 1;
-        else {
-            if(!FF) continue;
-            for(int i = 1; i <= n; ++i) {
-                for(int j = 1; j <= m; ++j) V[i][j] = INT_MAX;
-            }
-            ok = 0;
-            v[x][y] = 1;
-            dfs(dfs, x1, y1, 0);
-            if(ok == 0) {
-                FF = 0;
-                v[x][y] = 0;
-                continue;
-            }
-        }
-    }
+    dij();
+    memset(vis, 0, sizeof(vis));
+    dfs(x2, y2);
+
     for(int i = 1; i <= n; ++i) {
         for(int j = 1; j <= m; ++j) {
-            if(v[i][j]) std::cout << '#';
-            else std::cout << '.';
+            if(vis[i][j]) std::cout << '.';
+            else std::cout << '#';
         }
         std::cout << '\n';
     }
+    
     return 0;
 }

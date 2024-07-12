@@ -1,10 +1,9 @@
 #include <bits/stdc++.h>
 
-// #define constexpr inline
-
 template<const int T>
 struct ModInt {
-	constexpr ModInt(int x = 0) : x(x % T) {}
+	int x;
+	ModInt(int x = 0) : x(x % T) {}
 	constexpr int val() { return x; }
 	constexpr ModInt operator+ (const ModInt &a) const { int x0 = x + a.x; return ModInt(x0 < T ? x0 : x0 - T); }
 	constexpr ModInt operator- (const ModInt &a) const { int x0 = x - a.x; return ModInt(x0 < 0 ? x0 + T : x0); }
@@ -22,6 +21,7 @@ struct ModInt {
 	constexpr friend ModInt operator/ (int y, const ModInt &a){ return ModInt(y) / a;}
 	constexpr friend std::ostream &operator<< (std::ostream &os, const ModInt &a) { return os << a.x;}
 	constexpr friend std::istream &operator>> (std::istream &is, ModInt &t){return is >> t.x;}						
+				
 	constexpr ModInt operator^ (long long n) const {
         ModInt res(1), mul(x);
         while(n){
@@ -31,9 +31,7 @@ struct ModInt {
         }
         return res;
 	}
-private:
-	int x;
-	constexpr ModInt inv() const {
+	constexpr ModInt operator~ () const {
 		int a = x, b = T, u = 1, v = 0;
 		while (b) {
 			int t = a / b;
@@ -44,5 +42,25 @@ private:
 		return u;
 	}
 };
-constexpr int mod = 998244353;
+constexpr int mod = 1e9 + 7;
 using Mint = ModInt<mod>;
+Mint q = ~Mint(1000000);
+
+signed main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    
+    int n, m;
+    std::cin >> n >> m;
+    Mint ans = 0;
+    for(int i = 1; i <= m; ++i) {
+        Mint x;
+        std::cin >> x;
+        x *= q;
+        ans += x * ~(x + 1);
+    }
+    ans = ~(1 - ans) - 1;
+    std::cout << ans * n << '\n';
+
+    return 0;
+}

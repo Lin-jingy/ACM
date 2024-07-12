@@ -71,7 +71,7 @@ constexpr static bool isPrime(const int n) {
 /** 
  * @brief 求一个数的因子
  * @param 这个数
- * @note O(sqrt(x))
+ * @note O(sqrt(x)) 
  * @return 包含这个数所有因子的vec
  */
 constexpr static std::vector<int> get_factor(const int x) {
@@ -83,12 +83,13 @@ constexpr static std::vector<int> get_factor(const int x) {
         }
     }
     return factor;
+
 }
 
 /** 
  * @brief 求一个数的质因子
  * @param 这个数
- * @note O(sqrt(x))
+ * @note O(sqrt(x)) 当x=1时，返回空vector
  * @return 包含这个数所有质因子的vec
  */
 constexpr static std::vector<int> get_prime_factor(int x) {

@@ -62,7 +62,6 @@ public:
 #undef tag
 #undef ls
 #undef rs
-
 };
 
 //区间最值
