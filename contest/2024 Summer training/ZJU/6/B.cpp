@@ -1,140 +1,88 @@
 #include <bits/stdc++.h>
+#define int long long
+using namespace std;
 
-int n, m, a, b, c, xa, xb, xc;
-std::vector<std::array<int, 4>> ans;
-
-std::pair<int, int> calc(int x, int y) {
-    return {(x - 1) * 1000, (y - 1) * 1000};
-}
-
-void init1() {
-    ans.push_back({0, 1, 1, 1001});
-    ans.push_back({1000, 0, 1001, 1000});
-    ans.push_back({0, 0, 1000, 1});
-    ans.push_back({1, 1000, 1001, 1001});
-    xb -= 4;
-}
-
-void init2() {
-    ans.push_back({0, 0, 1, 1001});
-    ans.push_back({1000, 0, 1001, 1001});
-    ans.push_back({1, 0, 1000, 1});
-    ans.push_back({1, 1000, 1000, 1001});
-    xa -= 2;
-    xc -= 2;
-}
-
-void init3() {
-    ans.push_back({0, 1, 1, 1001});
-    ans.push_back({1000, 1, 1001, 1000});
-    ans.push_back({0, 0, 1001, 1});
-    ans.push_back({1, 1000, 1001, 1001});
-    xa--, xb -= 2, xc--;
-}
-
-void build_left() {
-    for(int i = 2; i <= n; ++i) {
-        auto [bx, by] = calc(i, 1);
-        if(xc) {
-            ans.push_back({bx + 1, by, bx + 1000, by + 1});
-            ans.push_back({bx + 1, by + 1000, bx + 1000, by + 1001});
-            ans.push_back({bx + 1000, by, bx + 1001, by + 1001});
-            xa -= 2;
-            xc--;
-        } else {
-            ans.push_back({bx + 1, by, bx + 1001, by + 1});
-            ans.push_back({bx + 1, by + 1000, bx + 1001, by + 1001});
-            ans.push_back({bx + 1000, by + 1, bx + 1001, by + 1000});
-            xa--;
-            xb -= 2;
-        } 
-    }
-}
-
-void build_right() {
-    for(int i = 2; i <= m; ++i) {
-        auto [bx, by] = calc(1, i);
-        if(xc) {
-            ans.push_back({bx, by + 1, bx + 1, by + 1000});
-            ans.push_back({bx + 1000, by + 1, bx + 1001, by + 1000});
-            ans.push_back({bx, by + 1000, bx + 1001, by + 1001});
-            xa -= 2;
-            xc--;
-        } else {
-            ans.push_back({bx, by + 1, bx + 1, by + 1001});
-            ans.push_back({bx + 1000, by + 1, bx + 1001, by + 1001});
-            ans.push_back({bx + 1, by + 1000, bx + 1000, by + 1001});
-            xa--;
-            xb -= 2;
+int dx[] = {-1, -1, 1, 1};
+int dy[] = {-1, 1, -1, 1};
+void solve() {
+    int n, m, a, b, c;
+    cin >> n >> m >> a >> b >> c;
+    int d = a + b + c;
+    vector<array<int, 4>> ans;
+    map<pair<int, int>, int> vis;
+    map<array<int, 4>, int> edge;
+    int nx = 1, ny = 1;
+    int cnt = (n + 1) * ((m + 1) / 2);
+    for (int i = 1; i <= min(cnt, c); i++) {
+        vis[{nx, ny}] = 1;
+        vis[{nx, ny + 2000}] = 1;
+        edge[{nx, ny, nx, ny + 2000}] = 1;
+        ans.push_back({nx + dx[0], ny + dy[0], nx + dx[3], ny + 2000 + dy[3]});
+        nx += 2000;
+        if (nx > 2000 * n + 1) {
+        nx = 1;
+        ny += 4000;
         }
     }
-}
-
-void build_other() {
-    for(int i = 2; i <= n; ++i) {
-        for(int j = 2; j <= m; ++j) {
-            auto [bx, by] = calc(i, j);
-            ans.push_back({bx + 1000, by + 1, bx + 1001, by + 1000});
-            ans.push_back({bx + 1, by + 1000, bx + 1001, by + 1001});
-            --xa, --xb;
+    for (int i = cnt + 1; i <= c; i++) {
+        vis[{nx, ny}] = 1;
+        vis[{nx + 2000, ny}] = 1;
+        edge[{nx, ny, nx + 2000, ny}] = 1;
+        ans.push_back({nx + dx[0], ny + dy[0], nx + 2000 + dx[3], ny + dy[3]});
+        nx += 4000;
+    }
+    int res = ans.size();
+    assert(res == c);
+    if (!vis.count({1, 1})) {
+        vis[{1, 1}] = 1;
+        edge[{1, 1, 1, 2001}] = 1;
+        ans.push_back({0, 0, 2, 2000});
+        vis[{1, 2001}] = 1;
+        edge[{1, 2001, 2001, 2001}] = 1;
+        ans.push_back({0, 2000, 2000, 2002});
+    }
+    for (int i = 2001; i <= n * 2000 + 1; i += 2000) {
+        if (!vis.count({i, 1})) {
+        vis[{i, 1}] = 1;
+        edge[{i - 2000, 1, i, 1}] = 1;
+        ans.push_back({i - 2000 + dx[2], 1 + dy[2], i + dx[3], 1 + dy[3]});
         }
     }
-}
-int maxx, maxy;
-void print() {
-    assert(ans.size() == 2 * n * m + n + m);
-    assert(ans.size() == a + b + c);
-    for(auto [a,b,c,d]:ans) {
-        assert(a <= maxx and b <= maxy and c <= maxx and d <= maxy);
-        std::cout << a << ' ' << b << ' ' << c << ' ' << d << '\n';
+    for (int i = 1; i <= n * 2000 + 1; i += 2000) {
+        for (int j = 2001; j <= m * 2000 + 1; j += 2000) {
+        if (!vis.count({i, j})) {
+            vis[{i, j}] = 1;
+            edge[{i, j - 2000, i, j}] = 1;
+            ans.push_back({i + dx[1], j - 2000 + dy[1], i + dx[3], j + dy[3]});
+        }
+        }
     }
-    // exit(0);
-} 
-
+    int res2 = ans.size();
+    assert(res2 - res == b);
+    for (int i = 1; i <= m * 2000 + 1; i += 2000) {
+        for (int j = 1; j < n * 2000 + 1; j += 2000) {
+            if (!edge.count({j, i, j + 2000, i})) {
+                ans.push_back({j + dx[2], i + dy[2], j + 2000 + dx[1], i + dy[1]});
+            }
+        }
+    }
+    for (int i = 1; i <= n * 2000 + 1; i += 2000) {
+        for (int j = 1; j < m * 2000 + 1; j += 2000) {
+            if (!edge.count({i, j, i, j + 2000})) {
+                ans.push_back({i + dx[1], j + dy[1], i + dx[2], j + 2000 + dy[2]});
+            }
+        }
+    }
+    assert(d == ans.size());
+    for (auto [x, y, p, q] : ans) {
+        cout << x / 2 << ' ' << y / 2 << ' ' << p / 2 << ' ' << q / 2 << '\n';
+    }
+    return;
+}
 signed main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-    
-    std::cin >> n >> m >> a >> b >> c;
-    maxx = 1000 * n + 1, maxy = 1000 * m + 1;
-
-    xa = a, xb = b, xc = c;
-    ans.clear();
-    init1();
-    build_left();
-    build_right();
-    build_other();
-    if(xa == 0 and xb == 0 and xc == 0) {
-        print();
-        return 0;
-    }
-
-    xa = a, xb = b, xc = c;
-    ans.clear();
-    init2();
-    build_left();
-    build_right();
-    build_other();
-    if(xa == 0 and xb == 0 and xc == 0) {
-        print();
-        return 0;
-    }
-
-
-    xa = a, xb = b, xc = c;
-    ans.clear();
-    init3();
-    build_left();
-    build_right();
-    build_other();
-    if(xa == 0 and xb == 0 and xc == 0) {
-        print();
-        return 0;
-    }
-    
-    assert(0);
-
-
-
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int t = 1; // cin>>t;
+    while (t--) solve();
     return 0;
 }

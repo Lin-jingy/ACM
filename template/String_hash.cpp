@@ -6,6 +6,7 @@ enum OPTION {
     Double,
 };
 class StringHash {
+    #define int long long 
 private:
     std::vector<int> hashcode_1, hashcode_2, p_1, p_2;
     int base_1 = 131; 
@@ -83,4 +84,5 @@ public:
         if(op == Double) return {hashcode_1.back(), hashcode_2.back()};
         else return {hashcode_1.back(), 0};
     }
+    #undef int
 };

@@ -1,8 +1,5 @@
 #include <bits/stdc++.h>
 
-#define int long long
-#define double long double
-using Pii = std::pair<int, int>;
 
 constexpr double eps = 1e-10;
 class Point {
@@ -133,70 +130,3 @@ public:
         return ch;
     }
 };
-
-
-
-const double PI = acos(-1);
-
-double rotate(std::vector<Point> &a, double rad) {
-    double mn = 1e30, mx = -1e30;
-    rad = PI / 2 - rad;
-    for(auto i:a) {
-        Point x = Point::Rotate(i, rad);
-        mn = std::min(x.x, mn);
-        mx = std::max(x.x, mx);
-    }
-    return mx - mn;
-}
-
-
-signed main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-    
-    int n, v0, v1, v2;
-    std::cin >> n >> v0 >> v1 >> v2;
-    std::vector<Point> a(n);
-    for(int i = 0; i < n; ++i) {
-        int x, y;
-        std::cin >> x >> y;
-        a[i] = Point{x, y};
-    }
-    if(n == 1) {
-        printf("%.10Lf\n", (double)0);
-        return 0;
-    }
-    std::sort(a.begin(), a.end());
-
-    auto list = Point::getConvexHull(a);
-    list.push_back(list.front());
-    int mxdis = 1;
-    double l = (double)v0 / v1, r = (double)v0 / v2;
-    if(r < l) std::swap(l, r);
-    double ans = 1e30;
-    if(list.size() == 2) {
-        printf("%.10Lf\n", (double)0);
-        return 0;
-    }
-    if(list.size() <= 2) goto A;
-    for(int i = 1; i < (int)list.size(); ++i) {
-        auto &p1 = list[i], &p2 = list[i - 1];
-        double k = (p1.y - p2.y) / (p1.x - p2.x);
-        while(1) {
-            int next = (mxdis + 1) % (list.size() - 1);
-            if(std::abs(Point::getDistToLine(list[next], list[i], list[i - 1])) <= std::abs(Point::getDistToLine(list[mxdis], list[i], list[i - 1]))) {
-                break;
-            }
-            mxdis = next;
-        }
-        if(!(k >= l and k <= r)) continue;
-        ans = std::min(ans, std::abs(Point::getDistToLine(list[mxdis], list[i], list[i - 1])));
-    }
-    A:;
-    ans = std::min(ans, rotate(a, atan(l))); 
-    ans = std::min(ans, rotate(a, atan(r))); 
-
-    printf("%.10Lf\n", ans);
-
-    return 0;
-}
