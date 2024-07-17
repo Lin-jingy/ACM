@@ -1,7 +1,5 @@
 #include <bits/stdc++.h>
 
-// #define constexpr inline
-
 template<const int T>
 struct ModInt {
     constexpr ModInt() = default;
@@ -46,5 +44,28 @@ private:
         return u;
     }
 };
-constexpr int mod = 998244353;
-using Mint = ModInt<mod>;
+using Mint = ModInt<998244353>;
+
+
+signed main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    
+    int n, m;
+    std::cin >> n >> m;
+    Mint ans = 1;
+    std::vector<Mint> p(n + 1, 0);
+    for(int i = 1; i <= m; ++i) {
+        int k;
+        std::cin >> k;
+        for(int j = 1; j <= k; ++j) {
+            int x;
+            std::cin >> x;
+            p[x] += Mint(1) / Mint(k);
+        }
+    }
+    for(int i = 1; i <= n; ++i) ans *= p[i];
+    for(int i = n; i > 1; --i) ans *= i; 
+    std::cout << ans << '\n';
+    return 0;
+}

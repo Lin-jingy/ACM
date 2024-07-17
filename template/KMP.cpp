@@ -6,6 +6,7 @@ class KMP {
 	void buildNext() {
         static bool first = 0;
         if(first) return ;
+        first = 1;
 		for (int i = 1, j = 0; i < pattern.size(); i++) {
             while (j && pattern[i] != pattern[j]) j = next[j - 1];
             if (pattern[i] == pattern[j]) j++;

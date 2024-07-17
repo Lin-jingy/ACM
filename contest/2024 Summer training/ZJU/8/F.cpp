@@ -1,12 +1,10 @@
 #include <bits/stdc++.h>
 
-// #define constexpr inline
-
 template<const int T>
 struct ModInt {
-    constexpr ModInt() = default;
-    constexpr ModInt(int x) : x(x % T) {}
+    // constexpr ModInt(int x) : x(x % T) {}
     constexpr ModInt(long long x) : x(x % T) {}
+    constexpr ModInt() = default;
     constexpr int val() { return x; }
     constexpr ModInt operator+ (const ModInt a) const { int x0 = x + a.x; return ModInt(x0 < T ? x0 : x0 - T); }
     constexpr ModInt operator- (const ModInt a) const { int x0 = x - a.x; return ModInt(x0 < 0 ? x0 + T : x0); }
@@ -48,3 +46,55 @@ private:
 };
 constexpr int mod = 998244353;
 using Mint = ModInt<mod>;
+
+Mint p[(int)2e6 +5];
+constexpr void init() {
+    p[0] = 1;
+    for(int i = 1; i < 2e6 + 5; ++i) p[i] = p[i - 1] * 10;
+}
+
+signed main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    init();
+    int n;
+    std::cin >> n;
+    std::vector<std::pair<std::string, int>> v;
+    Mint mulK = 1;
+    std::vector<Mint> mul(n + 1);
+    for(int i = 1; i <= n; ++i) {
+        int k;
+        std::cin >> k;
+        mulK *= k;
+        mul[i] = k;
+        for(int j = 0; j < k; ++j) {
+            std::string s;
+            std::cin >> s;
+            v.emplace_back(s, i);
+        }
+    }
+    Mint sumk = mulK;
+    Mint ans = 0;
+    std::sort(v.begin(), v.end(), [](const std::pair<std::string, int> a, const std::pair<std::string, int> b) {
+        return a.first + b.first < b.first + a.first;
+    });
+    int cnt = 0;
+    for(auto [i, pos]:v) {
+        Mint I = 0;
+        for(auto j:i) I = I * 10 + j - '0';
+        
+        if(mul[pos] == 0) cnt--;
+        else mulK /= mul[pos];
+
+        if(cnt == 0) ans += I * mulK;
+
+        mul[pos] += p[i.size()] - 1;
+        if(mul[pos] == 0) cnt++;
+        else mulK *= mul[pos];
+
+    }
+
+    std::cout << ans / sumk << '\n';
+
+    return 0;
+}
