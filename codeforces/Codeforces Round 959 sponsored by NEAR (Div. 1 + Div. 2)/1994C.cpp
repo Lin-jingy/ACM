@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <bits/stdc++.h>
 
 #if __GNUC__&&__has_include(<iconv.h>)
@@ -7,6 +8,7 @@ template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tr
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
 using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}template<class...Args>void print(const std::string_view&fmtStr,Args&&...args){std::cout<<std::vformat(fmtStr,std::make_format_args(args...));}
 #endif
+#define int long long 
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
 #define pb(x)push_back(x)
@@ -22,11 +24,27 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
 void solve() {
-    print("{}", (bool)std::bitset<20>(1)[0]);
+    int n, x;
+    std::cin >> n >> x;
+
+    vec<int> a(n + 1);
+    for(int i = 1; i <= n; ++i) std::cin >> a[i];
+
+    int ans = 0;
+    vec<int> pre(n + 1), dp(n + 10);
+    for(int i = 1; i <= n; ++i) pre[i] = pre[i - 1] + a[i];
+
+    for(int i = n; i >= 1; --i) {
+        auto it = std::upper_bound(pre.begin() + 1, pre.end(), x + pre[i - 1]) - pre.begin();
+        dp[i] = it - i + dp[it + 1];
+        ans += dp[i];
+    }
+    
+    print("{}\n", ans);
 }

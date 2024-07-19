@@ -22,11 +22,33 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
 void solve() {
-    print("{}", (bool)std::bitset<20>(1)[0]);
+    int n;
+    std::cin >> n;
+    str a, b;
+    std::cin >> a >> b;
+    if(a == b) print("YES\n");
+    else {
+        if(a.front() == '0') {
+            for(int i = 0; i < n; ++i) {
+                if(a[i] == '1') {
+                    print("YES\n");
+                    return ;
+                }
+                if(a[i] != b[i]) {
+                    print("NO\n");
+                    return ;
+                }
+            }
+        }
+        print("YES\n");
+    }
+
+
+
 }

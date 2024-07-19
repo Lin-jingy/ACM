@@ -22,11 +22,33 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
 void solve() {
-    print("{}", (bool)std::bitset<20>(1)[0]);
+    int n, m;
+    std::cin >> n >> m;
+    vec<vec<int>> v(n + 1, vec<int>(m + 1));
+    for(int i = 1; i <= n; ++i) for(int j = 1; j <= m; ++j) std::cin >> v[i][j];
+
+    if(n == 1 and m == 1) {
+        print("-1\n");
+        return ;
+    }
+    if(n != 1) {
+        for(int i = 2; i <= n; ++i) {
+            for(int j = 1; j <= m; ++j) print("{} ", v[i][j]);
+            print("\n");
+        }
+        for(int j = 1; j <= m; ++j) print("{} ", v[1][j]);
+        print("\n");
+    } else {
+        for(int i = 1; i <= n; ++i) {
+            for(int j = 2; j <= m; ++j) print("{} ", v[i][j]);
+            print("{} \n", v[i][1]);
+        }
+    }
+
 }

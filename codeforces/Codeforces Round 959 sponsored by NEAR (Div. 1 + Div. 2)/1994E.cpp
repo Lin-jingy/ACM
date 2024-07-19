@@ -22,11 +22,33 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
 void solve() {
-    print("{}", (bool)std::bitset<20>(1)[0]);
+    int k;
+    std::cin >> k;
+    vec<int> a(k);
+    for(int i : std::ranges::views::iota(0, k)) {
+        int n;
+        std::cin >> n;
+        a[i] = n;
+        for(int j : std::ranges::views::iota(1, n)) std::cin >> n;
+    }
+
+    std::ranges::sort(a);
+    std::bitset<20> bit;
+    while(!a.empty()) {
+        for(int i : std::ranges::views::iota(0, 21) | std::ranges::views::reverse) {
+            if(bit[i]) continue;
+            if(a.back() >= (1 << i)) {
+                a.back() -= 1 << i;
+                bit.set(i);
+            }
+        }
+        a.pop_back();
+    }
+    print("{}\n", bit.to_ulong());
 }

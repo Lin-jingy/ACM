@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <bits/stdc++.h>
 
 #if __GNUC__&&__has_include(<iconv.h>)
@@ -7,6 +8,7 @@ template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tr
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
 using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}template<class...Args>void print(const std::string_view&fmtStr,Args&&...args){std::cout<<std::vformat(fmtStr,std::make_format_args(args...));}
 #endif
+#define int long long 
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
 #define pb(x)push_back(x)
@@ -22,11 +24,45 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
+class DSU {
+private:
+    std::vector<int> f, siz;
+public:
+    DSU(int n):f(n+1),siz(n+1){for(int i=1;i<=n;i++)siz[i]=1,f[i]=i;}
+    int find(int x){return x==f[x]?x:f[x]=find(f[x]);}
+    bool same(int x,int y){return find(x)==find(y);}
+    void merge(int x,int y) {if(!same(x,y))siz[find(y)]+=siz[find(x)],f[find(x)]=find(y);}
+    int qsz(int x){return siz[find(x)];}
+};
+
 void solve() {
-    print("{}", (bool)std::bitset<20>(1)[0]);
+    int n;
+    std::cin >> n;
+    vec<int> a(n + 1);
+    for(int i = 1; i <= n; ++i) std::cin >> a[i];
+    DSU T(n + 1);
+    vec<Pii> ans(n);
+    int num = 0;
+    for(int i = n - 1; i >= 1; --i) {
+        std::map<int, int> mp;
+        for(int j = 1; j <= n; ++j) {
+            if(mp.count(a[j] % i) and !T.same(mp[a[j] % i], j)) {
+                T.merge(mp[a[j] % i], j);
+                ans[i] = {mp[a[j] % i], j};
+                ++num;
+                goto A;
+            }
+            mp[a[j] % i] = j;
+        }
+        A:;
+    }
+    if(num == n - 1) {
+        print("YES\n");
+        for(int i = 1; i < n; ++i) print("{} {}\n", ans[i].first, ans[i].second);
+    }else print("NO\n");
 }
