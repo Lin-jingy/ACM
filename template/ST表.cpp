@@ -6,10 +6,9 @@ template <class T>
 class sparseTable {
 private:
     std::vector<std::vector<T>> ST;
-    using func = std::function<T(const T&, const T&)>;
-    func _func;
+    std::function<T(const T, const T)> _func;
 public:
-    sparseTable(const std::vector<T> &v, auto func) {
+    sparseTable(const std::vector<T> &&v, auto func) {
         _func = func;
         int len = v.size();
         int L1 = std::__lg(len);
@@ -23,7 +22,7 @@ public:
             }
         }
     }
-    T query(int l, int r) {
+    T operator() (int l, int r) {
         int q = std::__lg(r - l + 1) - 1;
         return _func(ST[l][q], ST[r - (1 << q) + 1][q]);
     }

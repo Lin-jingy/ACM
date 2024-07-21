@@ -22,12 +22,22 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
 void solve() {
-
+    int n, m;
+    std::cin >> n >> m;
+    int ans = 0;
+    for(int i = 1; i * i <= n; ++i) {
+        for(int j = 1; j * j <= m; ++j) {
+            if(std::__gcd(i, j) == 1) {
+                ans += std::min(n / i, m / j) / (i + j); 
+            }
+        }
+    }
+    print("{}\n", ans);
 
 }
