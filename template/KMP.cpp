@@ -21,7 +21,7 @@ public:
             while (j && txt[i] != pattern[j]) j = next[j - 1];
             if (txt[i] == pattern[j]) j++;
             if (j == pattern.size()){
-				p.emplace_back(i - pattern.size() + 1);
+				p.emplace_back(i - pattern.size() + 2);
                 j = next[j - 1];
             }
         }

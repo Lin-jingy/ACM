@@ -48,28 +48,3 @@ public:
         return ans;
     }
 };
-
-int main(){
-    int n;
-    while(std::cin >> n) {
-        if(n == 0) return 0;
-        Automaton T(1e6 + 5);
-        std::vector<std::string> s(n + 1);
-        for(int i = 1; i <= n; ++i) {
-            std::cin >> s[i];
-            T.insert(s[i], i);
-        }
-        T.build();
-        std::string t;
-        std::cin >> t;
-        std::vector<int> cnt(n + 1);
-        // auto it = T.query(t);
-        for(auto i:T.query(t)) cnt[i]++;
-        int mx = *std::max_element(cnt.begin() + 1, cnt.end());
-        std::cout << mx << '\n';
-        for(int i = 1; i <= n; ++i) {
-            if(cnt[i] == mx) std::cout << s[i] << '\n';
-        }
-    }
-    return 0;
-}
