@@ -31,15 +31,25 @@ signed main() {
 void solve() {
     int n;
     std::cin >> n;
-    vec<int> a(n + 1);
-    for(int i = 1; i <= n; ++i) std::cin >> a[i];
-    std::stack<int> s;
-    vec<int> ans(n + 1);
-    for(int i = n; i >= 1; --i) {
-        while(!s.empty() and a[s.top()] <= a[i]) s.pop();
-        if(s.empty()) ans[i] = 0;
-        else ans[i] = s.top();
-        s.push(i);
+    vec<std::bitset<105>> v(n + 1);
+    for(int i = 1; i <= n; ++i) {
+        for(int j = 1; j <= n; ++j) {
+            bool x;
+            std::cin >> x;
+            v[i][j] = x;
+        }
     }
-    for(int i = 1; i <= n; ++i) std::cout << ans[i] << ' ';
+    for(int i = 1; i <= n; ++i) {
+        for(int j = 1; j <= n; ++j) {
+            if(v[j][i])
+                v[j] |= v[i];
+        }
+    }
+    for(int i = 1; i <= n; ++i) {
+        for(int j = 1; j <= n; ++j) {
+            if(v[i][j]) std::cout << 1 << ' ';
+            else std::cout << 0 << ' ';
+        }
+        std::cout << '\n';
+    }
 }

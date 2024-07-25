@@ -3,13 +3,13 @@
 template <size_t base = 26>
 class Automaton {
 private:
-    int sum = 0, tot = 0;
     std::array<std::vector<int>, base> tr;
     std::vector<int> count;
     std::vector<int> fail;
+    int tot = 0;
 public:
-    Automaton(int Sum):sum(Sum),count(Sum),fail(Sum){
-        for(int i = 0; i < base; ++i) tr[i].resize(Sum);
+    Automaton(int maxsize):count(maxsize),fail(maxsize){
+        for(int i = 0; i < base; ++i) tr[i].resize(maxsize);
     }
     void insert(const std::string &s, int id) {
         int u = 0;
@@ -20,7 +20,6 @@ public:
         }
         count[u] = id;
     }
-
     void build() {
         std::queue<int>q;
         for(int i = 0; i < base; i++) if(tr[i][0]) q.push(tr[i][0]);

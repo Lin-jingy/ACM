@@ -1,91 +1,84 @@
-// #pragma GCC optimize(3)
 #include <bits/stdc++.h>
-#include <unordered_map>
-#include <unordered_set>
-#include <chrono>
-#include<fstream>
+#include <functional>
+#include <type_traits>
 
-#define int long long
-using PII = std::pair<int, int>;
-using PSI = std::pair<std::string, int>;
-using PIS = std::pair<int, std::string>;
-#define ALL(x) x.begin(), x.end()
-#define INF LONG_LONG_MAX
-#define inf INT_MAX
-#define yes std::cout << "Yes\n"
-#define no std::cout << "No\n"
+#if __GNUC__&&__has_include(<iconv.h>)
+#include<bits/extc++.h>
+template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tree<_KEY,__gnu_pbds::null_type,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template<class _KEY,class _VALUE,class _Compare=std::less<_KEY>>using pbds_map=__gnu_pbds::tree<_KEY,_VALUE,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;
+#endif
+#if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
+using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}template<class...Args>void print(const std::string_view&fmtStr,Args&&...args){std::cout<<std::vformat(fmtStr,std::make_format_args(args...));}
+#endif
+// #define int long long 
+#define RETURN(x)do{return x,void();}while(0)
+#define All(x)x.begin(),x.end()
+#define pb(x)push_back(x)
+#define eb(x...)emplace_back(x)
+#define fmt(x...)std::format(x)
+#define logs(x...)Print_log(#x" ::",x)<<std::endl
+#define ensure(x)if(!(x)){std::cerr<<"ensure error:("<<#x<<")->at line:"<<__LINE__<<std::endl;exit(-1);}
+constexpr int inf=INT_MAX;constexpr long long INF=LONG_LONG_MAX;template<class T>using vec=std::vector<T>;using str=std::string;template<class K,class V>using umap=std::unordered_map<K,V>;template<class T>using uset=std::unordered_set<T>;using Pii=std::pair<int,int>;template<class T>using vvec=std::vector<std::vector<T>>;template<class T>using min_heap=std::priority_queue<T,std::vector<T>,std::greater<T>>;template<class T>using max_heap=std::priority_queue<T>;template<class T,size_t S>using arr=std::array<T,S>;template<class K,class V>std::istream&operator>>(std::istream&in,std::pair<K,V>&v){in>>v.first>>v.second;return in;}template<class K,class V>std::ostream&operator<<(std::ostream&out,const std::pair<K,V>&v){out<<'{'<<v.first<<","<<v.second<<'}';return out;}template<class T>std::istream&operator>>(std::istream&in,std::vector<T>&v){for(auto&i:v)in>>i;return in;}template<class T>std::ostream&operator<<(std::ostream&out,const std::vector<T>&v){for(auto i=v.begin();i!=v.end();++i)out<<*i<<" \n"[i==v.end()];return out;}template<class T>std::ostream&operator<<(std::ostream&out,const std::set<T>&s){out<<"\nsize:"<<s.size()<<'\n';for(auto i=s.begin();i!=s.end();++i)out<<*i<<" \n"[i==s.end()];return out;}template<class K,class V>std::ostream&operator<<(std::ostream&out,const std::map<K,V>&mp){out<<"\nsize:"<<mp.size()<<'\n';for(auto i=mp.begin();i!=mp.end();++i)out<<'{'<<i->first<<","<<i->second<<"}\n";return out;}template<class K,class V>struct std::hash<std::pair<K,V>>{size_t operator()(const std::pair<K,V>&p)const{return std::hash<K>{}(p.first)^std::hash<V>{}(p.second);}};template<bool print=false>class Timer{private:std::chrono::system_clock::time_point begin;public:Timer(){begin=std::chrono::system_clock::now();}~Timer(){if constexpr(print){auto end=std::chrono::system_clock::now();auto time=std::chrono::duration<double,std::nano>(end-begin).count();std::clog<<"\nThe program takes: "<<time/1e9<<" s\n";}}double get(){auto end=std::chrono::system_clock::now();auto time=std::chrono::duration<double,std::nano>(end-begin).count();return time/1e9;}};template<class...Ts>auto&Print_log(Ts...ts){return((std::clog<<ts<<" "),...);}
+void solve();
 
-class node{
+signed main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    int T = 1;
+    std::cin >> T;
+    while (T--) solve();
+    return 0;
+}
+
+template <size_t base = 26>
+class tril {
+    using Func = std::function<int(const char)>;
+private:
+    std::vector<std::array<int, base>> next;
+    std::vector<int> exist;
+    Func func;
+    static int ch(const char x) { return x - 'a'; }
 public:
-    char x;
-    int size;
-    std::unordered_map<int, node*>mp;
-};
-
-std::unordered_map<char, node*>top;
-std::unordered_map<char, int>mp;
-
-void insert(std::string &s){
-    node *p;
-    mp[s.front()]++;
-    if(top.count(s.front())) p = top[s.front()];
-    else{
-        p = new(node);
-        p->size = 0;
-        top[s.front()] = p; 
+    tril(Func function = ch):next(1), exist(1) {
+        func = function;
     }
-    int len(s.size());
-    for(size_t i(0); i < len; ++i) {
-        p->x = s[i];
-        p->size++;
-        if(i == len - 1) break;
-        if(p->mp.count(s[i + 1])){
-            p = p->mp[s[i + 1]];
-        }else{
-            node *mid(new(node));
-            mid->size = 0;
-            p->mp[s[i + 1]] = mid;
-            p = mid;
+
+    void insert(const std::string &s) {
+        int p = 0;
+        exist[p]++;
+        for(auto i:s) {
+            int c = func(i);
+            if(!next[p][c]) next[p][c] = next.size(), next.emplace_back(), exist.emplace_back();
+            p = next[p][c];
+            exist[p]++;
         }
     }
-}
-
-int dosum(std::string &s){
-    node *p;
-    int sum(mp[s.front()]);
-    if(top.count(s.front())) p = top[s.front()];
-    else return 0;
-    int len(s.size());
-    for(size_t i(0); i < len; ++i){
-        sum = std::min(sum, p->size);
-        if(i == len - 1) break;
-        if(p->mp.count(s[i + 1])) p = p->mp[s[i + 1]];
-        else return 0;
+    int find(const std::string &s) {
+        int p = 0;
+        for(auto i:s) {
+            int c = func(i);
+            if(!next[p][c]) return 0;
+            p = next[p][c];
+        }
+        return exist[p];
     }
-    return sum;
-}
-
-void solve(){
-    top.clear();
-    mp.clear();
+};
+void solve() {
     int n, q;
     std::cin >> n >> q;
-    while(n--){
-        std::string a;
-        std::cin >> a;
-        insert(a);
+    tril<62> T([](char x) {
+        if(x >= 'a' and x <= 'z') return x - 'a';
+        else if(x >= 'A' and x <= 'Z') return x - 'A' + 26;
+        return x - '0' + 52;
+    });
+    for(int i = 1; i <= n; ++i) {
+        str x;
+        std::cin >> x;
+        T.insert(x);
     }
-    while(q--){
-        std::string a;
-        std::cin >> a;
-        std::cout << dosum(a) << '\n';
+    while(q--) {
+        str x;
+        std::cin >> x;
+        std::cout << T.find(x) << '\n';
     }
-}
 
-signed main(){
-    std::ios::sync_with_stdio(0), std::cin.tie(0);
-    int _ = 1;
-    std::cin >> _;
-    while (_--) solve();
-    return 0;
 }

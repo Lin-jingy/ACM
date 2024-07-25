@@ -1,15 +1,12 @@
 #include <bits/stdc++.h>
 
-
-
 template <class T>
 class sparseTable {
 private:
     std::vector<std::vector<T>> ST;
     std::function<T(const T, const T)> _func;
-    static T default_func(const T t1, const T t2) { return std::max(t1, t2); }
 public:
-    sparseTable(const std::vector<T> &v, auto func = default_func) {
+    sparseTable(const std::vector<T> &v, auto func) {
         _func = func;
         int len = v.size();
         int L1 = std::__lg(len) + 1;
@@ -28,3 +25,23 @@ public:
         return _func(ST[l][q], ST[r - (1 << q) + 1][q]);
     }
 };
+
+signed main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    
+    int n, m;
+    std::cin >> n >> m;
+    std::vector<int> a(n + 1);
+    for(int i = 1; i <= n; ++i) std::cin >> a[i];
+    sparseTable<int> T(a, [](const int a, const int b) {
+        return std::max(a, b);
+    });
+    while(m--) {
+        int l, r;
+        std::cin >> l >> r;
+        std::cout << T(l, r) << '\n';
+    }
+
+    return 0;
+}

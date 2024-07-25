@@ -1,5 +1,5 @@
+#include <algorithm>
 #include <bits/stdc++.h>
-
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
@@ -9,6 +9,7 @@ template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tr
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
 using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}template<class...Args>void print(const std::string_view&fmtStr,Args&&...args){std::cout<<std::vformat(fmtStr,std::make_format_args(args...));}
 #endif
+#define int long long
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
 #define pb(x)push_back(x)
@@ -27,19 +28,51 @@ signed main() {
     while (T--) solve();
     return 0;
 }
-
 void solve() {
     int n;
     std::cin >> n;
     vec<int> a(n + 1);
     for(int i = 1; i <= n; ++i) std::cin >> a[i];
-    std::stack<int> s;
-    vec<int> ans(n + 1);
-    for(int i = n; i >= 1; --i) {
-        while(!s.empty() and a[s.top()] <= a[i]) s.pop();
-        if(s.empty()) ans[i] = 0;
-        else ans[i] = s.top();
-        s.push(i);
+    vec<vec<int>> v(n + 1);
+    for(int i = 1; i < n; ++i) {
+        int x, y;
+        std::cin >> x >> y;
+        v[x].pb(y);
+        v[y].pb(x);
     }
-    for(int i = 1; i <= n; ++i) std::cout << ans[i] << ' ';
+    vec<int> weight(n + 1);
+    {
+        vec<int> size(n + 1);
+        auto dfs = [&](auto self, int p, int fa) ->void {
+            size[p]++;
+            for(int i:v[p]) {
+                if(i == fa) continue;
+                self(self, i, p);
+                size[p] += size[i];
+                if(size[i] > size[weight[p]]) weight[p] = i;
+            }
+        };
+        dfs(dfs, 1, 0);
+    }
+    std::vector<Pii> ans(n + 1);
+    auto add = [&](int p, int val, int num, std::unordered_map<int, int> &now) {
+        now[val] += num;
+        if(now[val] > ans[p].first) ans[p] = {now[val], val};
+        else if(now[val] == ans[p].first) ans[p].second += val;
+    };
+    auto dfs = [&](auto self, int p, int fa) ->std::unordered_map<int, int>{
+        std::unordered_map<int, int> now;
+        if(weight[p]) now = self(self, weight[p], p);
+        ans[p] = ans[weight[p]];
+        add(p, a[p], 1, now);
+        for(int i: v[p]) {
+            if(i == fa or i == weight[p]) continue;
+            for(auto [x,y]:self(self, i, p)) {
+                add(p, x, y, now);
+            }
+        }
+        return now;
+    };
+    dfs(dfs, 1, 0);
+    for(int i = 1; i <= n; ++i) std::cout << ans[i].second << ' ';
 }

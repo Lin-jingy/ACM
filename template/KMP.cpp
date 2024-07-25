@@ -14,14 +14,14 @@ class KMP {
 		}
 	}
 public:
-	std::vector<int> kmp(std::string txt) {
+	std::vector<int> find(const std::string &txt) {
         buildNext();
-		std::vector<int>p;
+		std::vector<int> p;
 		for (int i = 0, j = 0; i < txt.size(); i++){
             while (j && txt[i] != pattern[j]) j = next[j - 1];
             if (txt[i] == pattern[j]) j++;
             if (j == pattern.size()){
-				p.emplace_back(i - pattern.size() + 2);
+				p.emplace_back(i - pattern.size() + 1);
                 j = next[j - 1];
             }
         }

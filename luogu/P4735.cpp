@@ -1,14 +1,13 @@
 #include <bits/stdc++.h>
 
-#if __GNUC__
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/priority_queue.hpp>
-template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tree<_KEY,__gnu_pbds::null_type,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template<class _KEY,class _VALUE,class _Compare=std::less<_KEY>>using pbds_map=__gnu_pbds::tree<_KEY,_VALUE,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template <class T, class Comp = std::less<T>>using pbds_heap = __gnu_pbds::priority_queue<T, Comp, __gnu_pbds::pairing_heap_tag>;
+#if __GNUC__&&__has_include(<iconv.h>)
+#include<bits/extc++.h>
+template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tree<_KEY,__gnu_pbds::null_type,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template<class _KEY,class _VALUE,class _Compare=std::less<_KEY>>using pbds_map=__gnu_pbds::tree<_KEY,_VALUE,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;
 #endif
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
 using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}template<class...Args>void print(const std::string_view&fmtStr,Args&&...args){std::cout<<std::vformat(fmtStr,std::make_format_args(args...));}
 #endif
+// #define int long long 
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
 #define pb(x)push_back(x)
@@ -28,18 +27,94 @@ signed main() {
     return 0;
 }
 
-void solve() {
-    int n;
-    std::cin >> n;
-    vec<int> a(n + 1);
-    for(int i = 1; i <= n; ++i) std::cin >> a[i];
-    std::stack<int> s;
-    vec<int> ans(n + 1);
-    for(int i = n; i >= 1; --i) {
-        while(!s.empty() and a[s.top()] <= a[i]) s.pop();
-        if(s.empty()) ans[i] = 0;
-        else ans[i] = s.top();
-        s.push(i);
+auto ch(int x) {
+    vec<int> v;
+    while(x) {
+        v.pb(x & 1);
+        x >>= 1;
     }
-    for(int i = 1; i <= n; ++i) std::cout << ans[i] << ' ';
+    while(v.size() < 32) v.pb(0);
+    std::ranges::reverse(v);
+    return v; 
+}
+
+template <size_t base = 26>
+class point_tril {
+private:
+    struct tril_node {
+        int count = 0;
+        std::array<tril_node *, base> next;
+    };
+    std::vector<tril_node*> version;
+public:
+    point_tril():version(1) {
+        version[0] = new tril_node;
+    }
+    ~point_tril() {
+        auto dfs = [&](auto self, tril_node *p) {
+            if(!p) return ;
+            for(int i = 0; i < base; ++i) self(self, p->next[i]);
+            delete p;
+        };
+        for(auto i:version) dfs(dfs, i);
+    }
+    void insert(const int x, int now) {
+        auto p = new tril_node();
+        version.push_back(p);
+        auto lastp = version[now - 1];
+        p->count++;
+        for(auto i:ch(x)) {
+            p->next[i] = new tril_node();
+            if(lastp and lastp->next[i^1]) p->next[i^1] = lastp->next[i^1];
+            else p->next[i^1] = nullptr;
+            p = p->next[i];
+            if(lastp and lastp->next[i]) lastp = lastp->next[i];
+            else lastp = nullptr;
+            p->count++;
+        }
+    }
+    int find(const int x, int last, int now) {
+        auto lastp = version[last];
+        auto p = version[now];
+        auto it = ch(x);
+        int ans = 0;
+        for(int i = 0; i < 32; ++i) {
+            if(p->next[i^1] and (!lastp or lastp->next[i^1] and lastp->next[i^1]->count < p->next[i^1]->count)) {
+                ans |= 1 << (31 - i);
+                p = p->next[i^1];
+                if(lastp and lastp->next[i^1]) lastp = lastp->next[i^1];
+                else lastp = nullptr;
+            } else {
+                p = p->next[i];
+                if(lastp and lastp->next[i]) lastp = lastp->next[i];
+                else lastp = nullptr;
+            }
+        }
+        return ans;
+    }
+};
+
+void solve() {
+    int n, m;
+    std::cin >> n >> m;
+    point_tril<2> T;
+    int pre = 0;
+    for(int i = 1, x; i <= n; ++i) 
+        std::cin >> x, pre ^= x, T.insert(pre, i);
+    while(m--) {
+        char op;
+        std::cin >> op;
+        if(op == 'A') {
+            int x;
+            std::cin >> x;
+            pre ^= x;
+            T.insert(pre, ++n);
+        } else {
+            int l, r, x;
+            std::cin >> l >> r >> x;
+            std::cout << T.find(x ^ pre, l - 1, r) << '\n';
+        }
+    }
+
+
 }

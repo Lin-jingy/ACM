@@ -5,87 +5,90 @@ enum OPTION {
     Single,
     Double,
 };
+template <enum OPTION op, int base1 = 131, int base2 = 133331>
 class StringHash {
-    #define int long long
+    #define int long long 
 private:
-    std::vector<int> hashcode_1, hashcode_2, p_1, p_2;
-    int base_1 = 131; 
-    int base_2 = 133331;
-    OPTION op;
-    int mod_1;
-    int mod_2;
-    constexpr bool isprime(int n) {
+    std::vector<int> hash1, hash2, p1, p2;
+    int mod1;
+    int mod2;
+    bool isprime(int n) {
         if (n <= 1) return false;
         for (int i = 2; i * i <= n; i++) if (n % i == 0) return false;
         return true;
     }
-    constexpr int findPrime(int n) {
+    int findPrime(int n) {
         while (!isprime(n)) n++;
         return n;
     }
     void init_nature(const std::string &s) {
-        p_1[0] = hashcode_1[0] = 1;
+        p1[0] = hash1[0] = 1;
         for(int i = 1; i <= s.size(); ++i) {
-            hashcode_1[i] = hashcode_1[i - 1] * base_1 + s[i - 1];
-            p_1[i] = p_1[i - 1] * base_1;
+            hash1[i] = hash1[i - 1] * base1 + s[i - 1];
+            p1[i] = p1[i - 1] * base1;
         }
     }
     void init_single(const std::string &s) {
-        p_1[0] = hashcode_1[0] = 1;
+        p1[0] = hash1[0] = 1;
         for(int i = 1; i <= s.size(); ++i) {
-            hashcode_1[i] = (1LL * hashcode_1[i - 1] * base_1 + s[i - 1]) % mod_1;
-            p_1[i] = 1LL * p_1[i - 1] * base_1 % mod_1;
+            hash1[i] = (1LL * hash1[i - 1] * base1 + s[i - 1]) % mod1;
+            p1[i] = 1LL * p1[i - 1] * base1 % mod1;
         }
     }
     void init_double(const std::string &s) {
-        hashcode_2.assign(s.size() + 1, {});
-        p_2.assign(s.size() + 1, {});
-        p_1[0] = p_2[0] = hashcode_1[0] = hashcode_2[0] = 1;
+        hash2.resize(s.size() + 1);
+        p2.resize(s.size() + 1);
+        p1[0] = p2[0] = hash1[0] = hash2[0] = 1;
         for(int i = 1; i <= s.size(); ++i) {
-            hashcode_1[i] = (1LL * hashcode_1[i - 1] * base_1 + s[i - 1]) % mod_1;
-            hashcode_2[i] = (1LL * hashcode_2[i - 1] * base_2 + s[i - 1]) % mod_2;
-            p_1[i] = 1LL * p_1[i - 1] * base_1 % mod_1;
-            p_2[i] = 1LL * p_2[i - 1] * base_2 % mod_2;
+            hash1[i] = (1LL * hash1[i - 1] * base1 + s[i - 1]) % mod1;
+            hash2[i] = (1LL * hash2[i - 1] * base2 + s[i - 1]) % mod2;
+            p1[i] = 1LL * p1[i - 1] * base1 % mod1;
+            p2[i] = 1LL * p2[i - 1] * base2 % mod2;
         }
     }
-    std::pair<int, int> get_nature(int l, int r) {
-        return {hashcode_1[r] - hashcode_1[l - 1] * p_1[r - l + 1], 0LL};
-    }
-    std::pair<int, int> get_single(int l, int r) {
-        return {(hashcode_1[r] + (mod_1 - hashcode_1[l - 1]) * p_1[r - l + 1]) % mod_1, 0LL};
-    }
-    std::pair<int, int> get_double(int l, int r) {
-        return {(hashcode_1[r] + 1LL * (mod_1 - hashcode_1[l - 1]) * p_1[r - l + 1]) % mod_1,
-        (hashcode_2[r] + 1LL * (mod_2 - hashcode_2[l - 1]) * p_2[r - l + 1]) % mod_2};
+    void init_mod() {
+        static int MOD1 = 0, MOD2 = 0;
+        if(!MOD1) {
+            std::mt19937_64 rnd(time(0));
+            MOD1 = findPrime(rnd() % 900'000'000 + 100'000'000);
+            MOD2 = findPrime(rnd() % 900'000'000 + 100'000'000);
+        }
+        mod1 = MOD1; mod2 = MOD2;
     }
 public:
-    StringHash(const std::string &s, OPTION option) : op(option), hashcode_1(s.size() + 1), p_1(s.size() + 1){
-        static int MOD_1;
-        static int MOD_2;
-        if(!MOD_1) {
-            std::mt19937_64 rnd(time(0));
-            MOD_1 = findPrime(rnd() % 900000000 + 100000000);
-            MOD_2 = findPrime(rnd() % 900000000 + 100000000);
-        }
-        mod_1 = MOD_1;
-        mod_2 = MOD_2;
-        if(op == Nature) init_nature(s);
-        else if(op == Single) init_single(s);
-        else if(op == Double) init_double(s);
+    StringHash(const std::string &s): hash1(s.size() + 1), p1(s.size() + 1){
+        init_mod();
+        if constexpr (op == Nature) init_nature(s);
+        if constexpr (op == Single) init_single(s);
+        if constexpr (op == Double) init_double(s);
     }
-    std::pair<int, int> get(int l, int r) {
+    template <enum OPTION O = op>
+    std::enable_if_t<O == Nature, int> get(int l, int r) {
         ++l, ++r;
-        if(op == Nature) return get_nature(l, r);
-        else if(op == Single) return get_single(l, r);
-        else if(op == Double) return get_double(l, r);
-        return {0, 0};
+        return hash1[r] - hash1[l - 1] * p1[r - l + 1];
     }
-    std::pair<int, int> getAll() {
-        if(op == Double) return {hashcode_1.back(), hashcode_2.back()};
-        else return {hashcode_1.back(), 0};
+    template <enum OPTION O = op>
+    std::enable_if_t<O == Single, int> get(int l, int r) {
+        ++l, ++r;
+        return (hash1[r] + (mod1 - hash1[l - 1]) * p1[r - l + 1]) % mod1;
+    }
+    template <enum OPTION O = op>
+    std::enable_if_t<O == Double, std::pair<int, int>> get(int l, int r) {
+        ++l, ++r;
+        return {(hash1[r] + 1LL * (mod1 - hash1[l - 1]) * p1[r - l + 1]) % mod1,
+        (hash2[r] + 1LL * (mod2 - hash2[l - 1]) * p2[r - l + 1]) % mod2};
+    }
+    template <enum OPTION O = op>
+    std::enable_if_t<O == Nature || O == Single, int> getAll() {
+        return hash1.back();
+    }
+    template <enum OPTION O = op>
+    std::enable_if_t<O == Double, std::pair<int, int>> getAll() {
+        return {hash1.back(), hash2.back()};
     }
     #undef int
 };
+
 
 template<const int T>
 struct ModInt {
@@ -140,7 +143,7 @@ void solve() {
     rs = s;
     std::reverse(rs.begin(), rs.end());
     Mint ans = 0;
-    StringHash X(s, Single), Y(rs, Single);
+    StringHash<Single> X(s), Y(rs);
     Mint last = 0;
     for(int i = 0; i < n; ++i) {
         

@@ -16,10 +16,8 @@ constexpr static std::pair<int, int> get_centroid
         }
         if (size - sum > size / 2) flag = false;
         if (flag) {
-            if (ans.first == -1)
-                ans.first = p;
-            else
-                ans.second = p;
+            if (ans.first == -1) ans.first = p;
+            else ans.second = p;
         }
         return sum;
     };

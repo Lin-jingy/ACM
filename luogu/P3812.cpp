@@ -9,6 +9,7 @@ template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tr
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
 using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}template<class...Args>void print(const std::string_view&fmtStr,Args&&...args){std::cout<<std::vformat(fmtStr,std::make_format_args(args...));}
 #endif
+#define int long long 
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
 #define pb(x)push_back(x)
@@ -31,15 +32,26 @@ signed main() {
 void solve() {
     int n;
     std::cin >> n;
-    vec<int> a(n + 1);
-    for(int i = 1; i <= n; ++i) std::cin >> a[i];
-    std::stack<int> s;
-    vec<int> ans(n + 1);
-    for(int i = n; i >= 1; --i) {
-        while(!s.empty() and a[s.top()] <= a[i]) s.pop();
-        if(s.empty()) ans[i] = 0;
-        else ans[i] = s.top();
-        s.push(i);
+    vec<int> p(51);
+    auto insert = [&](int x) {
+        for(int i = 50; i >= 0; --i) {
+            if((x >> i) & 1) {
+                if(p[i]) x ^= p[i];
+                else {
+                    p[i] = x;
+                    return ;
+                }
+            }
+        }
+    };
+    for(int i = 1; i <= n; ++i) {
+        int x;
+        std::cin >> x;
+        insert(x);
     }
-    for(int i = 1; i <= n; ++i) std::cout << ans[i] << ' ';
+    int ans = 0;
+    for(int i = 50; i >= 0; --i) {
+        if((p[i] ^ ans) > ans) ans ^= p[i];
+    }
+    std::cout << ans << '\n';
 }

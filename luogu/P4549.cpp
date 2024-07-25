@@ -31,15 +31,11 @@ signed main() {
 void solve() {
     int n;
     std::cin >> n;
-    vec<int> a(n + 1);
-    for(int i = 1; i <= n; ++i) std::cin >> a[i];
-    std::stack<int> s;
-    vec<int> ans(n + 1);
-    for(int i = n; i >= 1; --i) {
-        while(!s.empty() and a[s.top()] <= a[i]) s.pop();
-        if(s.empty()) ans[i] = 0;
-        else ans[i] = s.top();
-        s.push(i);
+    int ans = 0;
+    for(int i = 0; i < n; ++i) {
+        int x;
+        std::cin >> x;
+        ans = std::gcd(ans, std::abs(x));
     }
-    for(int i = 1; i <= n; ++i) std::cout << ans[i] << ' ';
+    std::cout << ans << '\n';
 }

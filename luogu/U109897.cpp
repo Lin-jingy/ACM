@@ -1,14 +1,13 @@
 #include <bits/stdc++.h>
 
-#if __GNUC__
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/priority_queue.hpp>
-template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tree<_KEY,__gnu_pbds::null_type,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template<class _KEY,class _VALUE,class _Compare=std::less<_KEY>>using pbds_map=__gnu_pbds::tree<_KEY,_VALUE,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template <class T, class Comp = std::less<T>>using pbds_heap = __gnu_pbds::priority_queue<T, Comp, __gnu_pbds::pairing_heap_tag>;
+#if __GNUC__&&__has_include(<iconv.h>)
+#include<bits/extc++.h>
+template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tree<_KEY,__gnu_pbds::null_type,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template<class _KEY,class _VALUE,class _Compare=std::less<_KEY>>using pbds_map=__gnu_pbds::tree<_KEY,_VALUE,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;
 #endif
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
 using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}template<class...Args>void print(const std::string_view&fmtStr,Args&&...args){std::cout<<std::vformat(fmtStr,std::make_format_args(args...));}
 #endif
+// #define int long long 
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
 #define pb(x)push_back(x)
@@ -28,18 +27,91 @@ signed main() {
     return 0;
 }
 
+auto ch(int x) {
+    vec<int> v;
+    while(x) {
+        v.pb(x & 1);
+        x >>= 1;
+    }
+    while(v.size() < 32) v.pb(0);
+    std::ranges::reverse(v);
+    return v;
+}
+
+template <size_t base = 26>
+class point_tril {
+private:
+    struct tril_node {
+        int cnt;
+        std::array<tril_node *, base> next;
+    };
+    tril_node *root; 
+public:
+    point_tril() {
+        int cnt = 0;
+        root = new tril_node();
+    }
+    ~point_tril() {
+        auto dfs = [&](auto self, tril_node *p) {
+            if(!p) return ;
+            for(int i = 0; i < base; ++i) self(self, p->next[i]);
+            delete p;
+        };
+        dfs(dfs, root);
+    }
+    void insert(int x) {
+        auto p = root;
+        p->cnt++;
+        for(auto i:ch(x)) {
+            if(!p->next[i]) p->next[i] = new tril_node();
+            p = p->next[i];
+            p->cnt++;
+        }
+    }
+    void del(int x) {
+        auto p = root;
+        p->cnt--;
+        for(auto i:ch(x)) {
+            p->next[i]->cnt--;
+            if(p->next[i]->cnt == 0) {
+                auto dfs = [&](auto self, tril_node *p) {
+                    if(!p) return ;
+                    for(int i = 0; i < base; ++i) self(self, p->next[i]);
+                    delete p;
+                };
+                dfs(dfs, p->next[i]);
+                p->next[i] = nullptr;
+                return ;
+            }
+            p = p->next[i];
+        }
+    }
+    int find(int x) {
+        auto p = root;
+        int ans = 0;
+        auto it = ch(x);
+        for(int i = 0; i < 32; ++i) {
+            if(p->next[it[i]^1]) p = p->next[it[i]^1], ans |= 1 << (31 - i);
+            else p = p->next[it[i]];
+        }
+        return ans;
+    }
+};
+
 void solve() {
     int n;
     std::cin >> n;
-    vec<int> a(n + 1);
-    for(int i = 1; i <= n; ++i) std::cin >> a[i];
-    std::stack<int> s;
-    vec<int> ans(n + 1);
-    for(int i = n; i >= 1; --i) {
-        while(!s.empty() and a[s.top()] <= a[i]) s.pop();
-        if(s.empty()) ans[i] = 0;
-        else ans[i] = s.top();
-        s.push(i);
+    vec<int> a(n);
+    std::cin >> a;
+    point_tril<2> T;
+    for(auto i:a) T.insert(i);
+    int ans = 0;
+    for(int i = 0; i < n; ++i) {
+        for(int j = 0; j < i; ++j) {
+            T.del(a[i]), T.del(a[j]);
+            ans = std::max(ans, T.find(a[i] + a[j]));
+            T.insert(a[i]), T.insert(a[j]);
+        }
     }
-    for(int i = 1; i <= n; ++i) std::cout << ans[i] << ' ';
+    std::cout << ans << '\n';
 }

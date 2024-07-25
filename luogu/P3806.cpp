@@ -1,4 +1,6 @@
+#include <bit>
 #include <bits/stdc++.h>
+#include <setjmp.h>
 
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
@@ -28,18 +30,46 @@ signed main() {
     return 0;
 }
 
+static int get_centroid
+(const std::vector<std::vector<Pii>> &v) {
+    static jmp_buf buf;
+    int size = v.size() - 1;
+    int ans = 0;
+    auto dfs = [&](auto dfs, int p, int fa) -> int {
+        bool flag = true;
+        int sum = 1;
+        for (auto i : v[p]) {
+            if (i.first == fa) continue;
+            int s = dfs(dfs, i.first, p);
+            if (s > size / 2) flag = false;
+            sum += s;
+        }
+        if (size - sum > size / 2) flag = false;
+        if (flag) {
+            ans = p;
+            longjmp(buf, 1);
+        }
+        return sum;
+    };
+    dfs(dfs, 1, 0);
+    setjmp(buf);
+    return ans;
+}
+
 void solve() {
-    int n;
-    std::cin >> n;
-    vec<int> a(n + 1);
-    for(int i = 1; i <= n; ++i) std::cin >> a[i];
-    std::stack<int> s;
-    vec<int> ans(n + 1);
-    for(int i = n; i >= 1; --i) {
-        while(!s.empty() and a[s.top()] <= a[i]) s.pop();
-        if(s.empty()) ans[i] = 0;
-        else ans[i] = s.top();
-        s.push(i);
+    int n, m;
+    std::cin >> n >> m;
+    vec<vec<Pii>> v(n + 1);
+    for(int i = 1; i < n; ++i) {
+        int a, b, c;
+        std::cin >> a >> b >> c;
+        v[a].eb(b, c);
+        v[b].eb(a, c);
     }
-    for(int i = 1; i <= n; ++i) std::cout << ans[i] << ' ';
+    int weight = get_centroid(v);
+    auto dfs = [&](auto self, int p, int fa)->void {
+
+    };
+    
+    
 }
