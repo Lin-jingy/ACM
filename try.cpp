@@ -29,5 +29,5 @@ signed main() {
 }
 
 void solve() {
-    int n;
+    
 }
