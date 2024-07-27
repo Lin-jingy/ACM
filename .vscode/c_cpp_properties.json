@@ -16,7 +16,6 @@
             ],
             "windowsSdkVersion": "10.0.22000.0",
             "compilerPath": "C:/Users/123/Desktop/programming/LLVM/bin/gcc.exe",
-            //"compilerPath": "C:/Users/sugon/Desktop/vscode/mingw64/bin/gcc.exe",
             "cStandard": "c23",
             "cppStandard": "c++23",
             "intelliSenseMode": "gcc-x64"

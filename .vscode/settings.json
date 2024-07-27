@@ -2,7 +2,7 @@
   "cph.general.defaultLanguage": "cpp",
   "cph.general.defaultLanguageTemplateFileLocation": "C:\\Users\\123\\Desktop\\programming\\VScode\\mycode\\代码框架.cpp", // 这是你的模板文件路径
   "cph.general.firstTime": false,
-  "cph.language.cpp.SubmissionCompiler": "GNU G++20 11.2.0 (64 bit, winlibs)", // 使用 C++17 标准
+  "cph.language.cpp.SubmissionCompiler": "GNU G++20 13.2 (64 bit, winlibs)", // 使用 C++17 标准
   "cph.language.cpp.Args": "-std=c++2a -O2", // -O2
   "code-runner.runInTerminal": true,
   "files.associations": {
