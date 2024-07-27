@@ -1,5 +1,5 @@
-#include <algorithm>
 #include <bits/stdc++.h>
+#include <math.h>
 
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
@@ -10,7 +10,7 @@ template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tr
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
 using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}template<class...Args>void print(const std::string_view&fmtStr,Args&&...args){std::cout<<std::vformat(fmtStr,std::make_format_args(args...));}
 #endif
-#define int long long
+#define int long long 
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
 #define pb(x)push_back(x)
@@ -30,94 +30,27 @@ signed main() {
     return 0;
 }
 
-static std::vector<std::vector<int>> 
-Tarjan(std::vector<std::vector<int>> &v) {
-    int cnt = 0;
-    std::vector<std::vector<int>> component;
-    std::vector<int> dfn(v.size()), low(v.size());
-    std::vector<bool> instack(v.size());
-    std::stack<int> s;
-    auto tarjan = [&](auto self, int p) ->void {
-        dfn[p] = low[p] = ++cnt;
-        s.push(p);
-        instack[p] = true;
-        for (auto i:v[p]) {
-            if (!dfn[i]) {
-                self(self, i);
-                low[p] = std::min(low[p], low[i]);
-            } else if (instack[i]) {
-                low[p] = std::min(low[p], dfn[i]);
-            }
-        }
-        if (dfn[p] == low[p]) {
-            component.push_back({});
-            int node;
-            do {
-                node = s.top();
-                s.pop();
-                instack[node] = false;
-                component.back().push_back(node);
-            } while (node != p);
-        }
-    };
-    tarjan(tarjan, 1);
-    return component;
-}
-
-class DSU {
-private:
-    std::vector<int> f, siz;
-public:
-    DSU(int n):f(n + 1),siz(n + 1, 1) {
-        for(int i = 1; i <= n; i++) f[i] = i;
-    }
-    int find(int x){ return x == f[x] ? x : f[x] = find(f[x]); }
-    bool same(int x,int y){ return find(x) == find(y); }
-    void merge(int x,int y) {
-        if(!same(x, y)) siz[find(y)] += siz[find(x)], f[find(x)] = find(y);
-    }
-    int qsz(int x){ return siz[find(x)]; }
-};
-
 void solve() {
-    int n, m;
-    std::cin >> n >> m;
+    int n;
+    std::cin >> n;
     vec<int> a(n + 1);
     for(int i = 1; i <= n; ++i) std::cin >> a[i];
-    vec<vec<int>> v(n + 1);
-    for(int i = 1; i <= m; ++i) {
-        int a, b;
-        std::cin >> a >> b;
-        v[a].pb(b);
-    }
-    auto it = Tarjan(v);
-    // for(auto i:it) logs(i);
-    DSU T(n + 1);
-    for(int i = 0; i < it.size(); ++i) {
-        int val = 0;
-        for(auto j:it[i]) val += a[j], T.merge(j, it[i].front());
-        for(auto j:it[i]) a[j] = val;
-    }
-    // logs(a);
-    vec<vec<int>> G(n + 1);
-    vec<int> du(n + 1);
+
+    vec<int> s(n + 10);
+    int top = 0;
+    vec<Pii> v(n + 1);
     for(int i = 1; i <= n; ++i) {
-        for(auto j:v[i]) {
-            if(!T.same(i, j)) G[T.find(i)].pb(T.find(j)), du[T.find(j)]++;
-        }
+        int k = top;
+        while(k > 0 and a[s[k]] > a[i]) --k;
+        if(k) v[s[k]].second = i;
+        if(k < top) v[i].first = s[k + 1];
+        s[++k] = i;
+        top = k;
     }
-    vec<int> ans(n + 1);
-    std::queue<int> q;
-    for(int i = 1; i <= n; ++i) if(du[i] == 0) q.push(i);
-    while(!q.empty()) {
-        auto it = q.front();
-        q.pop();
-        ans[it] += a[it];
-        for(auto i:G[it]) {
-            ans[i] = std::max(ans[i], ans[it]);
-            du[i]--;
-            if(du[i] == 0) q.push(i);
-        }
+    int ans1 = 0, ans2 = 0;
+    for(int i = 1; i <= n; ++i) {
+        ans1 ^= i * (v[i].first + 1);
+        ans2 ^= i * (v[i].second + 1);
     }
-    print("{}", std::max(*std::max_element(ans.begin() + 1, ans.end()), *std::max_element(a.begin() + 1, a.end())));
+    print("{} {}", ans1, ans2);
 }

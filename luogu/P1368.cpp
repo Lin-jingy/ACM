@@ -9,7 +9,7 @@ template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tr
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
 using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}template<class...Args>void print(const std::string_view&fmtStr,Args&&...args){std::cout<<std::vformat(fmtStr,std::make_format_args(args...));}
 #endif
-#define int long long 
+// #define int long long 
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
 #define pb(x)push_back(x)
@@ -36,25 +36,23 @@ void solve() {
     for(int i = 1; i <= n; ++i) std::cin >> a[i];
     for(int i = n + 1; i <= 2 * n; ++i) a[i] = a[i - n];
     vec<int> hash(2 * n + 1), p(2 * n + 1);
+    p[0] = 1;
     for(int i = 1; i <= 2 * n; ++i) {
-        p[i] = p[i - i] * 13331;
-        hash[i] = hash[i - 1] * 13331 + a[i];
+        p[i] = p[i - 1] * 1231;
+        hash[i] = hash[i - 1] * 1231 + a[i];
     }
     auto get = [&](int l, int r) ->int {
         return hash[r] - hash[l - 1] * p[r - l + 1]; 
     };
     int begin = 1;
     for(int i = 2; i <= n; ++i) {
-        int l = 0, r = n - 1, ans = -1;
-        auto check = [&](int mid)->bool {
-            return get(begin, begin + mid - 1) == get(i, i + mid - 1);
-        };  
+        int l = 1, r = n, ans = 0;
         while(l <= r) {
             int mid = (l + r)  >> 1;
-            if(check(mid)) l = mid + 1, ans = mid;
+            if(get(begin, begin + mid - 1) == get(i, i + mid - 1)) l = mid + 1, ans = mid;
             else r = mid - 1;
         }
-        if(a[begin + ans + 1] > a[i + ans + 1]) begin = i;
+        if(a[begin + ans] > a[i + ans]) begin = i;
     }
     for(int i = begin; i < begin + n; ++i) {
         std::cout << a[i] << ' ';

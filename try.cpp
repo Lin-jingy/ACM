@@ -29,5 +29,6 @@ signed main() {
 }
 
 void solve() {
+    vec<int> a(10);
     
 }
