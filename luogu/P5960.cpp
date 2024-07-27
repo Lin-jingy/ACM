@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <bits/stdc++.h>
 
 #if __GNUC__
@@ -29,58 +30,43 @@ signed main() {
     return 0;
 }
 
-void solve() {
-    int n;
-    std::cin >> n;
-    vec<arr<int, 4>> v;
-    std::map<int, int> get;
-    for(int i = 0; i < n; ++i) {
-        int x1, y1, x2, y2;
-        std::cin >> x1 >> y1 >> x2 >> y2;
-        get.try_emplace(y1, 1);
-        get.try_emplace(y2, 1);
-        if(y1 > y2) std::swap(y1, y2);
-        v.push_back({std::min(x1, x2), y1, y2, 1});
-        v.push_back({std::max(x1, x2), y1, y2, -1});
-    }
-    vec<int> mp(get.size() + 1);
-    {
-        int f = 0;
-        for(auto &[i, j]:get) j = ++f, mp[j] = i;
-    }
-    
-    
-    vec<int> f((get.size() + 1) << 2), cnt((get.size() + 1) << 2);
-    auto pushUp = [&](int p, int l, int r)->void {
-        if(cnt[p]) f[p] = mp[r] - mp[l];
-        else if(l + 1 == r) f[p] = 0;
-        else f[p] = f[p << 1] + f[p << 1 | 1];
-    };
-    auto update = [&](auto self, int p, int l, int r, int i, int j, int d)->void {
-        if(i <= l and j >= r) {
-            cnt[p] += d;
-            pushUp(p, l, r);
-            return ;
+static std::optional<std::vector<int>> 
+SPFA(const std::vector<std::vector<std::pair<int, int>>> &v, const int begin) {
+    std::vector<int> dis(v.size(), LONG_LONG_MAX), cnt(v.size());
+    std::vector<bool> vis(v.size());
+    std::queue<int> q;
+    dis[begin] = 0, vis[begin] = 1;
+    q.push(begin);
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop(), vis[u] = 0;
+        for (auto [p, w] : v[u]) {
+            if (dis[p] > dis[u] + w) {
+                dis[p] = dis[u] + w;
+                cnt[p] = cnt[u] + 1;  // 记录最短路经过的边数
+                if (cnt[p] >= v.size()) return std::nullopt;//! ERROR
+                // 在不经过负环的情况下，最短路至多经过 n - 1 条边
+                // 因此如果经过了多于 n 条边，一定说明经过了负环
+                if (!vis[p]) q.push(p), vis[p] = 1;
+            }
         }
-        if(l + 1 == r) return ;
-        int mid = (l + r) >> 1;
-        if(i <= mid) self(self, p << 1, l, mid, i, j, d);
-        if(j > mid) self(self, p << 1 | 1, mid, r, i, j, d);
-        pushUp(p, l, r);
-    };
-
-    std::ranges::sort(v);
-
-    int ans = 0;
-
-    update(update, 1, 1, get.size(), get[v[0][1]], get[v[0][2]], v[0][3]);
-    for(int i = 1; i < v.size(); ++i) {
-        ans += (v[i][0] - v[i - 1][0]) * f[1];
-        update(update, 1, 1, get.size(), get[v[i][1]], get[v[i][2]], v[i][3]);
     }
+    return dis;
+}
 
-    std::cout << ans << '\n';
-
-
-
+void solve() {
+    int n, m;
+    std::cin >> n >> m;
+    vec<vec<Pii>> v(n + 2);
+    for(int i = 1; i <= m; ++i) {
+        int a, b, c;
+        std::cin >> a >> b >> c;
+        v[b].eb(a, c);
+    }
+    for(int i = 1; i <= n; ++i) {
+        v[n + 1].eb(i, 0);
+    }
+    auto it = SPFA(v, n + 1);
+    if(!it) std::cout << "NO\n";
+    else for(int i = 1; i <= n; ++i) std::cout << it->at(i) << ' '; 
 }
