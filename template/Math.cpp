@@ -177,7 +177,7 @@ constexpr static int C(int a, int b, int p) {
 /** 
  * @brief 求C(n, m) % p
  * @param 
- * @note O(logn)
+ * @note O(logn) 卢卡斯定理
  * @return C(n, m) % p的结果
  */
 constexpr static long long Lucas(long long n, long long m, long long p) {
@@ -206,7 +206,7 @@ constexpr static int factmod(int n, int p) {
 /** 
  * @brief 求ax+by=m
  * @param 
- * @note O(log(a+b))
+ * @note O(log(a+b)) 裴蜀定理
  * @return gcd(a,b)的结果
  */
 constexpr static int Exgcd(const int a, const int b, int &x, int &y) {
@@ -235,4 +235,8 @@ constexpr static long long CRT(const std::vector<int> &a, const std::vector<int>
     }
     return (ans % n + n) % n;
 }
+
+
+
+
 };  // namespace Math

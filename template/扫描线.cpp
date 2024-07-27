@@ -9,7 +9,7 @@ template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tr
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
 using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}template<class...Args>void print(const std::string_view&fmtStr,Args&&...args){std::cout<<std::vformat(fmtStr,std::make_format_args(args...));}
 #endif
-#define int long long 
+#define int long long
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
 #define pb(x)push_back(x)
@@ -24,19 +24,64 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    std::cin >> T;
+    // std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
 void solve() {
-    int n, x;
-    std::cin >> n >> x;
-    int ans = 0;
-    for(int a = 1; a <= n; ++a) {
-        for(int b = 1; a * b <= n and a + b <= x; ++b) {
-            for(int c = 1; a * b + a * c + b * c <= n and a + b + c <= x; ++c) ++ans;
-        }
+    int n;
+    std::cin >> n;
+    vec<arr<int, 4>> v;
+    std::map<int, int> get;
+    for(int i = 0; i < n; ++i) {
+        int x1, y1, x2, y2;
+        std::cin >> x1 >> y1 >> x2 >> y2;
+        get.try_emplace(y1, 1);
+        get.try_emplace(y2, 1);
+        if(y1 > y2) std::swap(y1, y2);
+        v.push_back({std::min(x1, x2), y1, y2, 1});
+        v.push_back({std::max(x1, x2), y1, y2, -1});
     }
+    vec<int> mp(get.size() + 1);
+    {
+        int f = 0;
+        for(auto &[i, j]:get) j = ++f, mp[j] = i;
+    }
+    
+    
+    vec<int> f((get.size() + 1) << 2), cnt((get.size() + 1) << 2);
+    auto pushUp = [&](int p, int l, int r)->void {
+        if(cnt[p]) f[p] = mp[r] - mp[l];
+        else if(l + 1 == r) f[p] = 0;
+        else f[p] = f[p << 1] + f[p << 1 | 1];
+    };
+    auto update = [&](auto self, int p, int l, int r, int i, int j, int d)->void {
+        if(i <= l and j >= r) {
+            cnt[p] += d;
+            pushUp(p, l, r);
+            return ;
+        }
+        if(l + 1 == r) return ;
+        int mid = (l + r) >> 1;
+        if(i <= mid) self(self, p << 1, l, mid, i, j, d);
+        if(j > mid) self(self, p << 1 | 1, mid, r, i, j, d);
+        pushUp(p, l, r);
+    };
+
+    std::ranges::sort(v);
+
+    int ans = 0;
+
+    update(update, 1, 1, get.size(), get[v[0][1]], get[v[0][2]], v[0][3]);
+    for(int i = 1; i < v.size(); ++i) {
+        ans += (v[i][0] - v[i - 1][0]) * f[1];
+        // logs()
+        update(update, 1, 1, get.size(), get[v[i][1]], get[v[i][2]], v[i][3]);
+    }
+
     std::cout << ans << '\n';
+
+
+
 }
