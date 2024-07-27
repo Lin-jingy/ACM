@@ -24,11 +24,29 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
 void solve() {
-    
+    int n, k;
+    std::cin >> n >> k;
+    vvec<char> a(n + 1, vec<char>(n + 1));
+    for(int i = 1; i <= n; ++i) {
+        for(int j = 1; j <= n; ++j) {
+            std::cin >> a[i][j];
+        }
+    }
+    vvec<char> ans;
+    for(int i = 1; i <= n; i += k) {
+        ans.pb({});
+        for(int j = 1; j <= n; j += k) {
+            ans.back().pb(a[i][j]);
+        }
+    }
+    for(auto &i:ans) {
+        for(auto &j:i) std::cout << j;
+        std::cout << '\n';
+    }
 }

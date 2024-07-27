@@ -9,6 +9,7 @@ template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tr
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
 using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}template<class...Args>void print(const std::string_view&fmtStr,Args&&...args){std::cout<<std::vformat(fmtStr,std::make_format_args(args...));}
 #endif
+#define int long long 
 template<class T,class A=std::allocator<T>>class vector:public std::vector<T,A>{public:constexpr vector()noexcept(noexcept(A())):std::vector<T,A>(){}constexpr explicit vector(const A&alloc)noexcept:std::vector<T,A>(alloc){}constexpr vector(size_t count,const T&value=T(),const A&alloc=A()):std::vector<T,A>(count,value,alloc){}template<class InputIt>constexpr vector(InputIt first,InputIt last,const A&alloc=A()):std::vector<T,A>(first,last,alloc){}constexpr vector(const vector&other,const A&alloc=A()):std::vector<T,A>(other,alloc){}constexpr vector(vector&&other,const A&alloc=A()):std::vector<T,A>(other,alloc){}constexpr vector(std::initializer_list<T>init,const A&alloc=A()):std::vector<T,A>(init,alloc){}T&operator[](size_t pos){return this->at(pos);}};
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
@@ -24,11 +25,19 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
 void solve() {
-    
+    int n, x;
+    std::cin >> n >> x;
+    int ans = 0;
+    for(int a = 1; a <= n; ++ a) {
+        for(int b = 1; a * b <= n and a + b <= x; ++b) {
+            ans += std::min((n - a * b) / (a + b), x - a - b);
+        }
+    }
+    std::cout << ans << '\n';
 }

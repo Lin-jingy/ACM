@@ -24,11 +24,57 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
+int size;
+struct Query {
+    int l, r, id;
+    friend bool operator< (const Query &x, const Query &y) {
+        if(x.l / size != y.l / size) return x.l < y.l;
+        if((x.l / size) & 1) return x.r < y.r;
+        return x.r > y.r;
+    }
+};
+
+str a, b;
+int n, q;
+arr<int, 26> st;
+void add(int val) {
+    st[a[val] - 'a']++;
+    st[b[val] - 'a']--;
+}
+void del(int val) {
+    st[a[val] - 'a']--;
+    st[b[val] - 'a']++;
+}
+
 void solve() {
-    
+    std::cin >> n >> q;
+    size = std::sqrt(n);
+    st.fill(0);
+    std::cin >> a >> b;
+    a = ' ' + a;
+    b = ' ' + b;
+    vec<Query> Q(q);
+    for(int i = 1; i <= q; ++i) {
+        int l, r;
+        std::cin >> l >> r;
+        Q[i - 1] = {l, r, i};
+    }
+    std::sort(Q.begin(), Q.end());
+    int L = 1, R = 0;
+    vec<int> ans(q + 1);
+    for(auto [l, r, id] : Q) {
+        while(L > l) add(--L);
+        while(R < r) add(++R);
+        while(L < l) del(L++);
+        while(R > r) del(R--);
+        for(int i = 0; i < 26; ++i) ans[id] += std::abs(st[i]);
+    }
+    for(int i = 1; i <= q; ++i) {
+        std::cout << ans[i] / 2 << '\n';
+    }
 }

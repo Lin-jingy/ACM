@@ -24,11 +24,13 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
 void solve() {
-    
+    int n;
+    std::cin >> n;
+    print("{}\n", n / 4 + (n % 4 == 2));    
 }
