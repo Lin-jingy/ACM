@@ -9,7 +9,8 @@ template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tr
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
 using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}template<class...Args>void print(const std::string_view&fmtStr,Args&&...args){std::cout<<std::vformat(fmtStr,std::make_format_args(args...));}
 #endif
-template<class T,class A=std::allocator<T>>class vector:public std::vector<T,A>{public:constexpr vector()noexcept(noexcept(A())):std::vector<T,A>(){}constexpr explicit vector(const A&alloc)noexcept:std::vector<T,A>(alloc){}constexpr vector(size_t count,const T&value=T(),const A&alloc=A()):std::vector<T,A>(count,value,alloc){}template<class InputIt>constexpr vector(InputIt first,InputIt last,const A&alloc=A()):std::vector<T,A>(first,last,alloc){}constexpr vector(const vector&other,const A&alloc=A()):std::vector<T,A>(other,alloc){}constexpr vector(vector&&other,const A&alloc=A()):std::vector<T,A>(other,alloc){}constexpr vector(std::initializer_list<T>init,const A&alloc=A()):std::vector<T,A>(init,alloc){}T&operator[](size_t pos){return this->at(pos);}};
+template<class T,class A=std::allocator<T>>class vector:public std::vector<T,A>{public:constexpr vector()noexcept(noexcept(A())):std::vector<T,A>(){}constexpr explicit vector(const A&alloc)noexcept:std::vector<T,A>(alloc){}constexpr vector(size_t count,const T&value=T(),const A&alloc=A()):std::vector<T,A>(count,value,alloc){}template<class InputIt>constexpr vector(InputIt first,InputIt last,const A&alloc=A()):std::vector<T,A>(first,last,alloc){}constexpr vector(const vector&other,const A&alloc=A()):std::vector<T,A>(other,alloc){}constexpr vector(vector&&other,const A&alloc=A()):std::vector<T,A>(other,alloc){}constexpr vector(std::initializer_list<T>init,const A&alloc=A()):std::vector<T,A>(init,alloc){}T&operator[](size_t pos){return this->at(pos);}const T&operator[](size_t pos)const{return this->at(pos);}};
+#define int long long
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
 #define pb(x)push_back(x)
@@ -29,52 +30,42 @@ signed main() {
     return 0;
 }
 
-int size;
-struct Query {
-    int l, r, id;
-    friend bool operator< (const Query &x, const Query &y) {
-        if(x.l / size != y.l / size) return x.l < y.l;
-        if((x.l / size) & 1) return x.r < y.r;
-        return x.r > y.r;
+static std::optional<std::vector<int>> 
+SPFA(const vvec<Pii> &v, const int begin) {
+    vector<int> dis(v.size(), LONG_LONG_MAX), cnt(v.size());
+    std::vector<bool> vis(v.size());
+    std::queue<int> q;
+    dis[begin] = 0, vis[begin] = 1;
+    q.push(begin);
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop(), vis[u] = 0;
+        for (auto [p, w] : v[u]) {
+            if (dis[p] > dis[u] + w) {
+                dis[p] = dis[u] + w;
+                cnt[p] = cnt[u] + 1;  // 记录最短路经过的边数
+                if (cnt[p] >= v.size()) return std::nullopt;//! ERROR
+                // 在不经过负环的情况下，最短路至多经过 n - 1 条边
+                // 因此如果经过了多于 n 条边，一定说明经过了负环
+                if (!vis[p]) q.push(p), vis[p] = 1;
+            }
+        }
     }
-};
-
-str a, b;
-int n, q;
-arr<int, 26> st;
-void add(int val) {
-    st[a[val] - 'a']++;
-    st[b[val] - 'a']--;
-}
-void del(int val) {
-    st[a[val] - 'a']--;
-    st[b[val] - 'a']++;
+    return dis;
 }
 
 void solve() {
-    std::cin >> n >> q;
-    size = std::sqrt(n);
-    st.fill(0);
-    std::cin >> a >> b;
-    a = ' ' + a;
-    b = ' ' + b;
-    std::vector<Query> Q(q);
-    for(int i = 1; i <= q; ++i) {
-        int l, r;
-        std::cin >> l >> r;
-        Q[i - 1] = {l, r, i};
+    int n, m;
+    std::cin >> n >> m;
+    vvec<Pii> v(n + 1);
+    for(int i = 1; i <= m; ++i) {
+        int a, b, c;
+        std::cin >> a >> b >> c;
+        if(c >= 0) v[b].eb(a, c);
+        v[a].eb(b, c);
     }
-    std::sort(Q.begin(), Q.end());
-    int L = 1, R = 0;
-    std::vector<int> ans(q + 1);
-    for(auto [l, r, id] : Q) {
-        while(L > l) add(--L);
-        while(R < r) add(++R);
-        while(L < l) del(L++);
-        while(R > r) del(R--);
-        for(int i = 0; i < 26; ++i) ans[id] += std::abs(st[i]);
-    }
-    for(int i = 1; i <= q; ++i) {
-        std::cout << ans[i] / 2 << '\n';
-    }
+    auto it = SPFA(v, 1);
+    if(it) std::cout << "NO\n";
+    else std::cout << "YES\n";
+    
 }

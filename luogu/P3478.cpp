@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <bits/stdc++.h>
 
 #if __GNUC__
@@ -9,6 +10,7 @@ template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tr
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
 using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}template<class...Args>void print(const std::string_view&fmtStr,Args&&...args){std::cout<<std::vformat(fmtStr,std::make_format_args(args...));}
 #endif
+#define int long long 
 template<class T,class A=std::allocator<T>>class vector:public std::vector<T,A>{public:constexpr vector()noexcept(noexcept(A())):std::vector<T,A>(){}constexpr explicit vector(const A&alloc)noexcept:std::vector<T,A>(alloc){}constexpr vector(size_t count,const T&value=T(),const A&alloc=A()):std::vector<T,A>(count,value,alloc){}template<class InputIt>constexpr vector(InputIt first,InputIt last,const A&alloc=A()):std::vector<T,A>(first,last,alloc){}constexpr vector(const vector&other,const A&alloc=A()):std::vector<T,A>(other,alloc){}constexpr vector(vector&&other,const A&alloc=A()):std::vector<T,A>(other,alloc){}constexpr vector(std::initializer_list<T>init,const A&alloc=A()):std::vector<T,A>(init,alloc){}T&operator[](size_t pos){return this->at(pos);}};
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
@@ -24,57 +26,47 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    std::cin >> T;
+    // std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
-int size;
-struct Query {
-    int l, r, id;
-    friend bool operator< (const Query &x, const Query &y) {
-        if(x.l / size != y.l / size) return x.l < y.l;
-        if((x.l / size) & 1) return x.r < y.r;
-        return x.r > y.r;
-    }
-};
+vvec<int> v;
+vec<int> size, dp;
+int n;
 
-str a, b;
-int n, q;
-arr<int, 26> st;
-void add(int val) {
-    st[a[val] - 'a']++;
-    st[b[val] - 'a']--;
+int dfs(int p, int fa) {
+    int sum = 0;
+    for(int i : v[p]) {
+        if(i == fa) continue;
+        sum += dfs(i, p); 
+        size[p] += size[i];
+    }
+    size[p]++;
+    return sum + size[p];
 }
-void del(int val) {
-    st[a[val] - 'a']--;
-    st[b[val] - 'a']++;
+
+void dfs1(int p, int fa) {
+    for(int i : v[p]) {
+        if(i == fa) continue;
+        dp[i] = dp[p] - size[i] + n - size[i];
+        dfs1(i, p);
+    }
 }
 
 void solve() {
-    std::cin >> n >> q;
-    size = std::sqrt(n);
-    st.fill(0);
-    std::cin >> a >> b;
-    a = ' ' + a;
-    b = ' ' + b;
-    std::vector<Query> Q(q);
-    for(int i = 1; i <= q; ++i) {
-        int l, r;
-        std::cin >> l >> r;
-        Q[i - 1] = {l, r, i};
+    std::cin >> n;
+    v.resize(n + 1);
+    size.resize(n + 1);
+    dp.resize(n + 1);
+    for(int i = 1; i < n; ++i) {
+        int a, b;
+        std::cin >> a >> b;
+        v[a].pb(b);
+        v[b].pb(a);
     }
-    std::sort(Q.begin(), Q.end());
-    int L = 1, R = 0;
-    std::vector<int> ans(q + 1);
-    for(auto [l, r, id] : Q) {
-        while(L > l) add(--L);
-        while(R < r) add(++R);
-        while(L < l) del(L++);
-        while(R > r) del(R--);
-        for(int i = 0; i < 26; ++i) ans[id] += std::abs(st[i]);
-    }
-    for(int i = 1; i <= q; ++i) {
-        std::cout << ans[i] / 2 << '\n';
-    }
+    dp[1] = dfs(1, 0) - size[1];
+    dfs1(1, 0);
+    int mx = std::max_element(dp.begin() + 1, dp.end()) - dp.begin();
+    std::cout << mx << '\n';
 }
