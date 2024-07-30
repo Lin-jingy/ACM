@@ -29,44 +29,5 @@ signed main() {
 }
 
 void solve() {
-    int n;
-    std::cin >> n;
-    vec<int> a(n + 1);
-    for(int i = 1; i <= n; ++i) std::cin >> a[i];
-    vec<vec<int>> v(n + 1);
-    for(int i = 1; i < n; ++i) {
-        int x, y;
-        std::cin >> x >> y;
-        v[x].pb(y);
-        v[y].pb(x);
-    }
-    std::vector<int> ans(n + 1);
-    auto dfs = [&](auto self, int p, int fa) ->pbds_map<int, int>{
-        pbds_map<int, int> now;
-        vec<pbds_map<int, int>> mid;
-        now[a[p]]++;
-        mid.pb(std::move(now));
-        for(int i:v[p]) {
-            if(i == fa) continue;
-            mid.push_back(self(self, i, p));
-        }
-        std::ranges::sort(mid, [](const pbds_map<int, int> &a, const pbds_map<int, int> &b) {
-            return a.size() < b.size();
-        });
-        for(int i = 0; i < (int)mid.size() - 1; ++i) {
-            for(auto j:mid[i]) {
-                mid.back()[j.first] += j.second;                
-            }
-        }
-        int mx = 0;
-        for(auto i:mid.back()) {
-            mx = std::max(mx, i.second);
-        }
-        for(auto i:mid.back()) {
-            if(i.second == mx) ans[p] += i.first;
-        }
-        return mid.back();
-    };
-    dfs(dfs, 1, 0);
-    for(int i = 1; i <= n; ++i) std::cout << ans[i] << ' ';
+    std::cout << -6 % 10;
 }
