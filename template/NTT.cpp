@@ -77,19 +77,3 @@ public:
         return result;
     }
 };
-
-signed main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-    
-    int n, m;
-    std::cin >> n >> m;
-    std::vector<int> a(n + 1), b(m + 1);
-    for(int i = 0; i <= n; ++i) std::cin >> a[i];
-    for(int i = 0; i <= m; ++i) std::cin >> b[i];
-
-    auto x = NTT<>::mul(a, b);
-    for(auto i:x) std::cout << i << ' ';
-
-    return 0;
-}

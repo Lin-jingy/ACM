@@ -2,12 +2,13 @@
 
 template<class T = long long, size_t MOD = LONG_LONG_MAX>
 class Martix {
+    using M = std::vector<std::vector<T>>;
 public:
     int n, m;
-	std::vector<std::vector<T>> a;
+	M a;
     Martix() = default;
     Martix(int N, int M): n(N), m(M), a(N + 1, std::vector<T>(M + 1)) {}
-    Martix(std::vector<std::vector<T>> &other): 
+    Martix(M &other): 
         n(other.size() - 1), m(other.front().size() - 1), a(other) {}
 	Martix operator* (const Martix &other) const {
         if(m != other.n) 
@@ -20,7 +21,7 @@ public:
 		return res;
 	}
     Martix& operator= (const Martix &other) { n = other.n, m = other.m, a = other.a; return *this; }
-    Martix& operator= (std::vector<std::vector<T>> &other) { return *this = Martix(other); }
+    Martix& operator= (M &other) { return *this = Martix(other); }
 	Martix operator^ (T x) const {
         if(n != m) throw std::domain_error("Columns and rows are not equal and cannot be multiplied");
 		Martix res(n, n);
