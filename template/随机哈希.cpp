@@ -13,3 +13,11 @@ struct custom_hash {
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+
+struct hashPair {
+    template<class T>
+    size_t operator()(std::pair<T, T> x) const {
+        return std::hash<T>(x.first) ^ std::hash<T>(x.second);
+    }
+};
+

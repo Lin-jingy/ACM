@@ -1,95 +1,148 @@
-#include <bits/stdc++.h>
+/* 游戏 */
+#include<bits/stdc++.h>
 
-template <long long mod = 998244353>
-class NTT {
-    using i64 = long long;
+using namespace std;
+
+class Timer {
 private:
-    using vcp = std::vector<std::complex<double>>;
-    constexpr static double Pi = std::numbers::pi;
-    constexpr static i64 qpow(i64 a, i64 b = mod - 2) {
-        i64 ans = 1;
-        while(b) {
-            if(b & 1) ans = ans * a % mod;
-            a = a * a % mod;
-            b >>= 1;
-        }
-        return ans;
-    }
-    constexpr static int generator() {
-        std::vector<i64> fact;
-        i64 phi = mod - 1, n = phi;
-        for (i64 i = 2; i * i <= n; ++i) {
-            if (n % i == 0) {
-                fact.push_back(i);
-                while (n % i == 0) n /= i;
-            }
-        }
-        if (n > 1) fact.push_back(n);
-        for (i64 res = 2; res <= mod; ++res) {
-            bool ok = true;
-            for (i64 factor : fact) {
-                if (qpow(res, phi / factor) == 1) {
-                    ok = false;
-                    break;
-                }
-            }
-            if (ok) return res;
-        }
-        assert(0);
-        return -1;
-    }
-    constexpr static i64 G = generator();
-    constexpr static i64 invG = qpow(G, mod - 2);
-    constexpr static void dft(std::vector<i64> &f, bool flag, const std::vector<i64> &tr) {
-        int n = f.size();
-        for (int i = 0; i < n; i++)
-            if (i < tr[i]) std::swap(f[i], f[tr[i]]);
-        for(int p = 2; p <= n; p <<= 1){
-            int len=p >> 1;
-            i64 tG = qpow(flag ? G : invG, (mod - 1) / p);
-            for(int k = 0; k < n; k += p){
-                i64 buf = 1;
-                for(int l = k; l < k + len; l++){
-                    int tt = buf * f[len + l] % mod;
-                    f[len + l] = f[l] - tt;
-                    if (f[len + l] < 0) f[len + l] += mod;
-                    f[l] = f[l] + tt;
-                    if (f[l] > mod) f[l] -= mod;
-                    buf = (buf * tG) % mod;
-                }
-            }
-        }
-}
+    std::chrono::system_clock::time_point begin;
 public:
-    constexpr static std::vector<int> mul(const std::vector<int> &a, const std::vector<int> &b) {
-        int lena = a.size(), lenb = b.size(), size;
-        for(size = 1; size <= lena + lenb - 2; size <<= 1);
-        std::vector<i64> fa(size), fb(size), tr(size);
-        for(int i = 0; i < size; i++) tr[i] = (tr[i >> 1] >> 1) | ((i & 1) ? size >> 1 : 0);
-        std::copy(a.begin(), a.end(), fa.begin());
-        std::copy(b.begin(), b.end(), fb.begin());
-        dft(fa, 1, tr), dft(fb, 1, tr);
-        for(int i = 0; i < size; ++i) fa[i] = fa[i] * fb[i] % mod;
-        dft(fa, 0, tr);
-        std::vector<int> result(lena + lenb - 1);
-        int invn = qpow(size);
-        for(int i = 0; i <= lena + lenb - 2; ++i) result[i] = (fa[i] * invn) % mod;
-        return result;
+    Timer() { begin = std::chrono::system_clock::now(); }
+    ~Timer() {
+        auto end = std::chrono::system_clock::now();
+        auto time = std::chrono::duration<double, std::nano>(end - begin).count();
+        std::clog << "\nThe program takes: " << time / 1e9 << " s\n";
+    }
+    double get() {
+        auto end = std::chrono::system_clock::now();
+        auto time = std::chrono::duration<double, std::nano>(end - begin).count();
+        return time / 1e9;
     }
 };
+#define IOS ios::sync_with_stdio(false);cin.tie(nullptr);cout.tie(nullptr)
+// #define int long long
+using pii = pair<int,int>;
+//#define endl "\n"
+#define dbg(x...) do{cout<<#x<<" -> ";err(x);}while(0)
+
+void err() { cout << '\n'; }
+
+template<class T, class... Ts>
+void err(T arg, Ts... args) {
+    cout << arg << ' ';
+    err(args...);
+}
+
+using vi = vector<int>;
+constexpr int P = 998244353, G = 3, N = 4e6 + 5, M = 1e6 + 1, NT = 1e7+5;
+
+namespace PolyNTT {
+    vi w, rev;
+
+    int qpow(int x, int r ) {
+        int re = 1;
+        while(r) {
+            if(r & 1) re = (int) (1ll*re*x%P);
+            x = (int) (1ll*x*x%P), r>>=1;
+        }
+        return re;
+    }
+
+    int ck(int x) { return x >= P ? x-P : x; }
+    int ck_(int x) { return x < 0 ? x+P : x; }
+
+    void print(vi f) {
+        int sz = (int) f.size();
+        for(int i = 0; i < sz; i++) cout << f[i] << " \n"[i == sz - 1];
+    }
+
+    void pre(int k) {
+        int lim = (1<<k);
+        w.resize(lim), rev.resize(lim);
+        for(int i = 0; i < lim; i++) rev[i] = (rev[i>>1]>>1)|((i&1)<<(k-1));
+        for(int l = 1; l < lim; l<<=1) {
+            int p = qpow(G, (P-1)/(l<<1)); w[l] = 1;
+            for(int i = 1; i < l; i++) w[l+i] = (int) (1ll*w[l+i-1]*p%P);
+        }
+    }
+
+    void NTT(vi &f) {
+        int lim = (int) f.size();
+        for(int i = 0; i < lim; i++) if(i < rev[i]) swap(f[i], f[rev[i]]);
+        for(int l = 1; l < lim; l<<=1)
+            for(int i = 0; i < lim; i+=(l<<1))
+                for(int j = 0; j < l; j++) {
+                    int x = f[i+j], y = (int) (1ll*f[i+j+l]*w[j+l]%P);
+                    f[i+j] = ck(x+y), f[i+j+l] = ck_(x-y);
+                }
+    }
+
+    vi operator* (vi f, vi g) {
+        int n = (int) (f.size() + g.size() - 1), k = 0, lim = 1;
+        while(lim < n) lim <<= 1, k++;
+        f.resize(lim), g.resize(lim);
+        pre(k);        NTT(f); NTT(g);
+        for(int i = 0; i < lim; i++) f[i] = (int) (1ll*f[i]*g[i]%P);
+        NTT(f); reverse(f.begin()+1, f.end());
+        int Inv = qpow(lim, P-2); f.resize(n);
+        for(int i = 0; i < n; i++) f[i] = (int) (1ll*f[i]*Inv%P);
+        return f;
+    }
+
+}
+using namespace PolyNTT;
+
+int cnt[M], a[NT], inv[NT];
+
+void mainPre() {
+    inv[0] = inv[1] = 1;
+    for(int i = 2; i <= NT-5; i++) inv[i] = 1ll*(P-P/i)*inv[P%i]%P;
+}
+
+void solve() {
+    int n, t;
+    cin >> n >> t;
+    vector<int> f(M), g(M);
+    for(int i = 1; i <= n; i++) {
+        int x;
+        cin >> x;
+        cnt[x]++;
+    }
+    int fm = 0, P_2 = qpow(2, P-2);
+    for(int i = 1; i <= M; i++) {
+        f[i] = cnt[i], g[i] = cnt[M-i];
+        fm +=  2ll * cnt[i]*(cnt[i]-1)%P*P_2%P;
+       if(fm >= P) fm -= P;
+    }
+    f = f*g;
+
+    f[M] = fm;
+    cout << "?\n";
+/*
+    int Cn2 = 1ll*n*(n-1)%P*P_2%P, p3 = qpow(Cn2, P-2);
+    int p1 = 1ll*(n-2)*p3%P, p2 = 1ll*(n-2)*p3%P, p2_ = qpow(p2, P-2);
+    
+    a[0] = qpow(p2, t);
+    a[1] = 1ll * qpow(p2, t-1) * p3%P * t%P;
+    for(int i = 1; i <= t; i++) {
+        a[i+1] = (1ll*(t-i)*p3%P*a[i]%P + 1ll*(2*t-i+1)*p1%P*a[i-1]%P + P)%P;
+        a[i] = 1ll*a[i]*p2_%P*inv[i+1]%P;
+    }
+    int ans = 0;
+    for(int i = 0; i < M; i++) {
+        if(t-i < 0) break;
+        ans += 1ll*f[i+M]*a[t-i]%P;
+        if(ans >= P) ans -= P;
+    }
+    cout << ans << endl;*/
+}
 
 signed main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-    
-    int n, m;
-    std::cin >> n >> m;
-    std::vector<int> a(n + 1), b(m + 1);
-    for(int i = 0; i <= n; ++i) std::cin >> a[i];
-    for(int i = 0; i <= m; ++i) std::cin >> b[i];
-
-    auto x = NTT<>::mul(a, b);
-    for(auto i:x) std::cout << i << ' ';
-
+    Timer _;
+    mainPre();
+    IOS;
+    int T = 1;
+//    cin >> T;
+    // while(T--) solve();
     return 0;
 }

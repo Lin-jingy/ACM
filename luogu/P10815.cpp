@@ -30,5 +30,10 @@ signed main() {
 }
 
 void solve() {
-    
+    int n;
+    std::cin >> n;
+    long long ans = 0;
+    int x;
+    for(int i = 1; i <= n; ++i) std::cin >> x, ans += (long long) x;
+    std::cout << ans; 
 }

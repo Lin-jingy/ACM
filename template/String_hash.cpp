@@ -20,21 +20,21 @@ private:
         while (!isprime(n)) n++;
         return n;
     }
-    void init_nature(const std::string &s) {
+    void init_nature(std::string_view s) {
         p1[0] = hash1[0] = 1;
         for(int i = 1; i <= s.size(); ++i) {
             hash1[i] = hash1[i - 1] * base1 + s[i - 1];
             p1[i] = p1[i - 1] * base1;
         }
     }
-    void init_single(const std::string &s) {
+    void init_single(std::string_view s) {
         p1[0] = hash1[0] = 1;
         for(int i = 1; i <= s.size(); ++i) {
             hash1[i] = (1LL * hash1[i - 1] * base1 + s[i - 1]) % mod1;
             p1[i] = 1LL * p1[i - 1] * base1 % mod1;
         }
     }
-    void init_double(const std::string &s) {
+    void init_double(std::string_view s) {
         hash2.resize(s.size() + 1);
         p2.resize(s.size() + 1);
         p1[0] = p2[0] = hash1[0] = hash2[0] = 1;
@@ -55,7 +55,7 @@ private:
         mod1 = MOD1; mod2 = MOD2;
     }
 public:
-    StringHash(const std::string &s): hash1(s.size() + 1), p1(s.size() + 1){
+    StringHash(std::string_view s): hash1(s.size() + 1), p1(s.size() + 1){
         init_mod();
         if constexpr (op == Nature) init_nature(s);
         if constexpr (op == Single) init_single(s);

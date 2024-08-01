@@ -11,7 +11,7 @@ public:
     Automaton(int maxsize):count(maxsize),fail(maxsize){
         for(int i = 0; i < base; ++i) tr[i].resize(maxsize);
     }
-    void insert(const std::string &s, int id) {
+    void insert(std::string_view s, int id) {
         int u = 0;
         for(int i = 0; i < s.size(); i++) {
             int c = s[i] - 'a';
@@ -35,7 +35,7 @@ public:
         }
     }
 
-    std::vector<int> query(const std::string &t) {
+    std::vector<int> query(std::string_view t) {
         int u = 0;
         std::vector<int> ans;
         for(int i = 0; i < t.size(); i++) {

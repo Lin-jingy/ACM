@@ -19,7 +19,7 @@ public:
         for(int j = 1; j < L1; ++j) {
             int pj = (1 << (j - 1));
             for(int i = 0; i + pj < len; ++i) {
-                ST[i][j] = func(ST[i][j - 1], ST[i + (1 << (j - 1))][j - 1]);
+                ST[i][j] = func(ST[i][j - 1], ST[i + (1 << (j -  1))][j - 1]);
             }
         }
     }

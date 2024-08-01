@@ -1,10 +1,10 @@
 # 申明
 ```c++
-template <typename T>
+template <class T>
 using set = __gnu_pbds::tree<T, __gnu_pbds::null_type, std::less<T>,
                              __gnu_pbds::rb_tree_tag,
                              __gnu_pbds::tree_order_statistics_node_update>;
-template <typename T, typename Z>
+template <class T, class Z>
 using map = __gnu_pbds::tree<T, Z, std::less<T>,
                              __gnu_pbds::rb_tree_tag,
                              __gnu_pbds::tree_order_statistics_node_update>;
