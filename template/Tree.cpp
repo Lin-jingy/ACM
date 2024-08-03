@@ -1,8 +1,8 @@
 #include <bits/stdc++.h>
-namespace Tree{
+namespace Tree {
 // 获取树的重心
-constexpr static std::pair<int, int> get_centroid
-(const std::vector<std::vector<int>> &v) {
+constexpr static std::pair<int, int> get_centroid(
+    const std::vector<std::vector<int>> &v) {
     size_t size = v.size() - 1;
     std::pair<int, int> ans = {-1, -1};
     auto dfs = [&](auto dfs, int p, int fa) -> int {
@@ -17,7 +17,8 @@ constexpr static std::pair<int, int> get_centroid
         if (size - sum > size / 2) flag = false;
         if (flag) {
             if (ans.first == -1) ans.first = p;
-            else ans.second = p;
+            else
+                ans.second = p;
         }
         return sum;
     };
@@ -25,8 +26,8 @@ constexpr static std::pair<int, int> get_centroid
     return ans;
 }
 // 获取树的直径长
-constexpr static int get_diameter_length
-(const std::vector<std::vector<std::pair<int, int>>> &v) {
+constexpr static int get_diameter_length(
+    const std::vector<std::vector<std::pair<int, int>>> &v) {
     size_t size = v.size() - 1;
     std::vector<int> dp1(size + 1), dp2(size + 1);
     int ans = 0;
@@ -35,8 +36,7 @@ constexpr static int get_diameter_length
             if (i == fa) continue;
             dfs(dfs, i, p);
             int t = dp1[i] + j;
-            if (t > dp1[p])
-                dp2[p] = dp1[p], dp1[p] = t;
+            if (t > dp1[p]) dp2[p] = dp1[p], dp1[p] = t;
             else if (t > dp2[p])
                 dp2[p] = t;
         }
@@ -46,8 +46,8 @@ constexpr static int get_diameter_length
     return ans;
 }
 // 获取树的直径的两端点
-constexpr static std::pair<int, int> get_diameter_point
-(const std::vector<std::vector<std::pair<int, int>>> &v) {
+constexpr static std::pair<int, int> get_diameter_point(
+    const std::vector<std::vector<std::pair<int, int>>> &v) {
     size_t size = v.size() - 1;
     std::pair<int, int> ans;
     int c = 1;
@@ -67,4 +67,4 @@ constexpr static std::pair<int, int> get_diameter_point
     ans.second = c;
     return ans;
 }
-}
+}  // namespace Tree

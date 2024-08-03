@@ -76,15 +76,14 @@ class deque {
             operator--();
             return tmp;
         }
-        iterator& operator+=(size_t pos) {
-            
-        }
+        iterator& operator+=(size_t pos) {}
     };
     class const_iterator : public iterator {
         T& operator*() const noexcept = delete;
         T* operator->() const noexcept = delete;
     };
     iterator begin() { return m_data.begin() + m_begin; }
+    iterator end() { return m_data.begin() + m_end; }
 
     //  修改
     void clear() {
