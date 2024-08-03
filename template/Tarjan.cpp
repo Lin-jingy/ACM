@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 
-/** 
+/**
  * @brief 求强连通分量
  * @param v 图
  * @note  O(n) 针对有向图
@@ -35,7 +35,7 @@ static std::vector<int> Tarjan(std::vector<std::vector<int>> &v) {
     return belong;
 }
 
-/** 
+/**
  * @brief 求割点
  * @param v 图
  * @param n 点数
@@ -64,7 +64,7 @@ static std::vector<int> Tarjan(std::vector<std::vector<int>> &v, int n) {
         if (isG) result.push_back(p);
     };
     for (int i = 1; i <= n; ++i) {
-        if(!dfn[i]) root = i, tarjan(tarjan, i);
+        if (!dfn[i]) root = i, tarjan(tarjan, i);
     }
     return result;
 }
