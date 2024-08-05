@@ -4,6 +4,7 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
+
 template <class _KEY, class _Compare = std::less<_KEY>>
 using pbds_set =
     __gnu_pbds::tree<_KEY, __gnu_pbds::null_type, _Compare,
@@ -67,8 +68,8 @@ class vector : public std::vector<T, A> {
         : std::vector<T, A>(other, alloc) {}
     constexpr vector(std::initializer_list<T> init, const A &alloc = A())
         : std::vector<T, A>(init, alloc) {}
-    T &operator[](size_t pos) { return this->at(pos); }
-    const T &operator[](size_t pos) const { return this->at(pos); }
+    constexpr T &operator[](size_t pos) { return this->at(pos); }
+    constexpr const T &operator[](size_t pos) const { return this->at(pos); }
 };
 #define RETURN(x)         \
     do {                  \
@@ -176,36 +177,107 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    std::cin >> T;
+    // std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
-int ask(int x, int y) {
-    print("? {} {}", x, y);
-    std::cout << std::endl;
-    std::cin >> x;
-    return x;
-}
-int ask(Pii x) { return ask(x.first, x.second); }
+template <const int T>
+struct ModInt {
+    constexpr ModInt() = default;
+    constexpr ModInt(int x) : x(x % T) {}
+    constexpr ModInt(long long x) : x(x % T) {}
+    constexpr int val() { return x; }
+    constexpr ModInt operator+(const ModInt a) const {
+        int x0 = x + a.x;
+        return ModInt(x0 < T ? x0 : x0 - T);
+    }
+    constexpr ModInt operator-(const ModInt a) const {
+        int x0 = x - a.x;
+        return ModInt(x0 < 0 ? x0 + T : x0);
+    }
+    constexpr ModInt operator*(const ModInt a) const {
+        return ModInt(1LL * x * a.x % T);
+    }
+    constexpr ModInt operator/(const ModInt a) const { return *this * a.inv(); }
+    constexpr bool operator==(const ModInt a) const { return x == a.x; };
+    constexpr bool operator!=(const ModInt a) const { return x != a.x; };
+    constexpr ModInt operator+=(const ModInt a) {
+        x += a.x;
+        if (x >= T) x -= T;
+        return *this;
+    }
+    constexpr ModInt operator-=(const ModInt a) {
+        x -= a.x;
+        if (x < 0) x += T;
+        return *this;
+    }
+    constexpr ModInt operator*=(const ModInt a) {
+        x = 1LL * x * a.x % T;
+        return *this;
+    }
+    constexpr ModInt operator/=(const ModInt a) {
+        *this = *this / a;
+        return *this;
+    }
+    constexpr friend ModInt operator+(int y, const ModInt a) {
+        int x0 = y + a.x;
+        return ModInt(x0 < T ? x0 : x0 - T);
+    }
+    constexpr friend ModInt operator-(int y, const ModInt a) {
+        int x0 = y - a.x;
+        return ModInt(x0 < 0 ? x0 + T : x0);
+    }
+    constexpr friend ModInt operator*(int y, const ModInt a) {
+        return ModInt(1LL * y * a.x % T);
+    }
+    constexpr friend ModInt operator/(int y, const ModInt a) {
+        return ModInt(y) / a;
+    }
+    constexpr friend std::ostream &operator<<(std::ostream &os,
+                                              const ModInt a) {
+        return os << a.x;
+    }
+    constexpr friend std::istream &operator>>(std::istream &is, ModInt t) {
+        return is >> t.x;
+    }
+    constexpr ModInt operator^(long long n) const {
+        ModInt res(1), mul(x);
+        while (n) {
+            if (n & 1) res *= mul;
+            mul *= mul;
+            n >>= 1;
+        }
+        return res;
+    }
+
+   private:
+    int x = 0;
+    constexpr ModInt inv() const {
+        int a = x, b = T, u = 1, v = 0;
+        while (b) {
+            int t = a / b;
+            a -= t * b;
+            std::swap(a, b);
+            u -= t * v;
+            std::swap(u, v);
+        }
+        if (u < 0) u += T;
+        return u;
+    }
+};
+constexpr int mod = 19260817;
+using Mint = ModInt<mod>;
 
 void solve() {
-    int n, m;
-    std::cin >> n >> m;
-    int dis = ask(1, 1);
-    dis += 2;
-    Pii x1, x2;
-    if (dis <= n + 1) x1 = {dis - 1, 1};
-    else
-        x1 = {n, dis - n};
-    if (dis <= m + 1) x2 = {1, dis - 1};
-    else
-        x2 = {dis - m, m};
-    int ans1 = ask(x1), ans2 = ask(x2);
-    Pii k1 = {x1.first - ans1 / 2, x1.second + ans1 / 2};
-    Pii k2 = {x2.first + ans2 / 2, x2.second - ans2 / 2};
-    if (ask(k1) == 0) print("! {} {}", k1.first, k1.second);
-    else
-        print("! {} {}", k2.first, k2.second);
-    std::cout << std::endl;
+    str a, b;
+    std::cin >> a >> b;
+    if (b == "0") {
+        std::cout << "Angry!";
+        return;
+    }
+    Mint A, B;
+    for (auto i : a) A = A * 10 + Mint(i - '0');
+    for (auto i : b) B = B * 10 + Mint(i - '0');
+    std::cout << A / B;
 }
