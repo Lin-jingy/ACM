@@ -3,9 +3,9 @@
 template <long long mod = 998244353>
 class NTT {
     using i64 = long long;
+    using vcp = std::vector<std::complex<double>>;
 
    private:
-    using vcp = std::vector<std::complex<double>>;
     constexpr static double Pi = std::numbers::pi;
     constexpr static i64 qpow(i64 a, i64 b = mod - 2) {
         i64 ans = 1;
@@ -83,33 +83,4 @@ class NTT {
             result[i] = (fa[i] * invn) % mod;
         return result;
     }
-    // constexpr static std::vector<int> inv(const std::vector<int> f) {
-    //     int n;
-    //     for (n = 1; n < f.size(); n <<= 1)
-    //         ;
-    //     std::vector<i64> tr(n);
-    //     for (int i = 0; i < n; i++)
-    //         tr[i] = (tr[i >> 1] >> 1) | ((i & 1) ? n >> 1 : 0);
-
-    //     std::vector<i64> r(n << 1), sav(n << 1);
-    //     std::vector<int> w(n << 1);
-    //     w[0] = qpow(f[0]);
-    //     for (int len = 2; len <= n; len <<= 1) {
-    //         for (int i = 0; i < (len >> 1); i++) r[i] = w[i];
-    //         std::copy(f.begin(), f.begin() + len, sav.begin());
-    //         dft(sav, 1, tr);
-    //         dft(r, 1, tr);
-    //         for (int i = 0; i < len; ++i) r[i] = r[i] * sav[i] % mod;
-    //         dft(r, 0, tr);
-    //         std::fill(r.begin(), r.begin() + (len >> 1), 0);
-    //         std::copy(w.begin(), w.begin() + len, sav.begin());
-    //         dft(sav, 1, tr);
-    //         dft(r, 1, tr);
-    //         for (int i = 0; i < len; ++i) r[i] = r[i] * sav[i] % mod;
-    //         dft(r, 0, tr);
-    //         for (int i = len >> 1; i < len; i++)
-    //             w[i] = (w[i] * 2ll - r[i] + mod) % mod;
-    //     }
-    //     return w;
-    // }
 };
