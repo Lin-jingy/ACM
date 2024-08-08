@@ -61,7 +61,7 @@ constexpr static bool isPrime(const int n) {
         int s = 0;
         for (; s < t; ++s) {
             if (v == n - 1) break;
-            v = (long long)v * v % n;
+            v = (__int128)v * v % n;
         }
         if (s == t) return false;
     }

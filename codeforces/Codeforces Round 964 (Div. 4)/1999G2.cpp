@@ -177,175 +177,34 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
+int ask(int x, int y) {
+    std::cout << "? " << x << ' ' << y << std::endl;
+    std::cin >> x;
+    return x;
+}
+
 void solve() {
-    int n, m;
-    std::cin >> n >> m;
-    vec<int> a(n + 1);
-    for (int i = 1; i <= n; ++i) std::cin >> a[i];
-    vec<int> fl0(n << 2), fl1(n << 2), fr0(n << 2), fr1(n << 2);
-    vec<int> f0(n << 2), f1(n << 2);
-    vec<int> c0(n << 2), c1(n << 2), tag(n << 2);
-#define ls (p << 1)
-#define rs (p << 1 | 1)
-    auto pushUp = [&](int p) {
-        if (c1[ls] == 0) fl0[p] = fl0[ls] + fl0[rs];
-        else
-            fl0[p] = fl0[ls];
-        if (c1[rs] == 0) fr0[p] = fr0[rs] + fr0[ls];
-        else
-            fr0[p] = fr0[rs];
-
-        if (c0[ls] == 0) fl1[p] = fl1[ls] + fl1[rs];
-        else
-            fl1[p] = fl1[ls];
-        if (c0[rs] == 0) fr1[p] = fr1[rs] + fr1[ls];
-        else
-            fr1[p] = fr1[rs];
-
-        f0[p] = std::max({f0[ls], f0[rs], fr0[ls] + fl0[rs]});
-        f1[p] = std::max({f1[ls], f1[rs], fr1[ls] + fl1[rs]});
-        c0[p] = c0[ls] + c0[rs];
-        c1[p] = c1[ls] + c1[rs];
-    };
-    auto pushDown = [&](int p, int l, int r) {
-        if (!tag[p]) return;
-        int mid = (l + r) >> 1;
-        if (tag[p] == 1) {
-            tag[ls] = tag[rs] = tag[p];
-            fl0[ls] = fr0[ls] = f0[ls] = c0[ls] = 0;
-            fl0[rs] = fr0[rs] = f0[rs] = c0[rs] = 0;
-            fl1[ls] = fr1[ls] = f1[ls] = c1[ls] = mid - l + 1;
-            fl1[rs] = fr1[rs] = f1[rs] = c1[rs] = r - mid;
-        } else if (tag[p] == -1) {
-            tag[ls] = tag[rs] = tag[p];
-            fl0[ls] = fr0[ls] = f0[ls] = c0[ls] = mid - l + 1;
-            fl0[rs] = fr0[rs] = f0[rs] = c0[rs] = r - mid;
-            fl1[ls] = fr1[ls] = f1[ls] = c1[ls] = 0;
-            fl1[rs] = fr1[rs] = f1[rs] = c1[rs] = 0;
-        } else if (tag[p] == 2) {
-            if (tag[ls] == 2) tag[ls] = 0;
-            else if (tag[ls] == 1 or tag[ls] == -1)
-                tag[ls] = -tag[ls];
-            else
-                tag[ls] = 2;
-            if (tag[rs] == 2) tag[rs] = 0;
-            else if (tag[rs] == 1 or tag[rs] == -1)
-                tag[rs] = -tag[rs];
-            else
-                tag[rs] = 2;
-            std::swap(fl0[ls], fl1[ls]);
-            std::swap(fr0[ls], fr1[ls]);
-            std::swap(f0[ls], f1[ls]);
-            std::swap(c0[ls], c1[ls]);
-
-            std::swap(fl0[rs], fl1[rs]);
-            std::swap(fr0[rs], fr1[rs]);
-            std::swap(f0[rs], f1[rs]);
-            std::swap(c0[rs], c1[rs]);
-        }
-        tag[p] = 0;
-    };
-    auto build = [&](auto self, int p, int l, int r) -> void {
-        if (l == r) {
-            if (a[l] == 0) fl0[p] = fr0[p] = f0[p] = c0[p] = 1;
-            else
-                fl1[p] = fr1[p] = f1[p] = c1[p] = 1;
-            return;
-        }
-        int mid = (l + r) >> 1;
-        self(self, ls, l, mid);
-        self(self, rs, mid + 1, r);
-        pushUp(p);
-    };
-    auto set = [&](auto self, int p, int l, int r, int i, int j,
-                   int val) -> void {
-        if (i <= l and j >= r) {
-            if (val == 1) {
-                tag[p] = 1;
-                fl0[p] = fr0[p] = f0[p] = c0[p] = 0;
-                fl1[p] = fr1[p] = f1[p] = c1[p] = r - l + 1;
-            } else {
-                tag[p] = -1;
-                fl0[p] = fr0[p] = f0[p] = c0[p] = r - l + 1;
-                fl1[p] = fr1[p] = f1[p] = c1[p] = 0;
-            }
-            return;
-        }
-        pushDown(p, l, r);
-        int mid = (l + r) >> 1;
-        if (i <= mid) self(self, ls, l, mid, i, j, val);
-        if (j > mid) self(self, rs, mid + 1, r, i, j, val);
-        pushUp(p);
-    };
-    auto reverse = [&](auto self, int p, int l, int r, int i, int j) -> void {
-        if (i <= l and j >= r) {
-            std::swap(fl0[p], fl1[p]);
-            std::swap(fr0[p], fr1[p]);
-            std::swap(f0[p], f1[p]);
-            std::swap(c0[p], c1[p]);
-            if (tag[p] == 2) tag[p] = 0;
-            else if (tag[p] == 1 or tag[p] == -1)
-                tag[p] = -tag[p];
-            else
-                tag[p] = 2;
-            return;
-        }
-        pushDown(p, l, r);
-        int mid = (l + r) >> 1;
-        if (i <= mid) self(self, ls, l, mid, i, j);
-        if (j > mid) self(self, rs, mid + 1, r, i, j);
-        pushUp(p);
-    };
-    auto queryTot = [&](auto self, int p, int l, int r, int i, int j) -> int {
-        if (i <= l and j >= r) return c1[p];
-        pushDown(p, l, r);
-        int mid = (l + r) >> 1;
-        int tot = 0;
-        if (i <= mid) tot += self(self, ls, l, mid, i, j);
-        if (j > mid) tot += self(self, rs, mid + 1, r, i, j);
-        return tot;
-    };
-    auto queryMax = [&](auto self, int p, int l, int r, int i,
-                        int j) -> std::tuple<int, int, int> {
-        if (i <= l and j >= r) return {fl1[p], fr1[p], f1[p]};
-        pushDown(p, l, r);
-        int mid = (l + r) >> 1;
-        std::tuple<int, int, int> lt, rt;
-        if (i <= mid) lt = self(self, ls, l, mid, i, j);
-        if (j > mid) rt = self(self, rs, mid + 1, r, i, j);
-        auto [l_fl1, l_fr1, l_f1] = lt;
-        auto [r_fl1, r_fr1, r_f1] = rt;
-        int tfl1 = 0, tfr1 = 0, tf1 = 0;
-        tf1 = std::max({l_f1, r_f1, l_fr1 + r_fl1});
-        if (l_fl1 == mid - l + 1) tfl1 = l_fl1 + r_fl1;
-        else
-            tfl1 = l_fl1;
-        if (r_fr1 == r - mid) tfr1 = r_fr1 + l_fr1;
-        else
-            tfr1 = r_fr1;
-        return {tfl1, tfr1, tf1};
-    };
-#undef ls
-#undef rs
-    build(build, 1, 1, n);
-    while (m--) {
-        int op, l, r;
-        std::cin >> op >> l >> r;
-        ++l, ++r;
-        if (op == 0) set(set, 1, 1, n, l, r, 0);
-        else if (op == 1)
-            set(set, 1, 1, n, l, r, 1);
-        else if (op == 2)
-            reverse(reverse, 1, 1, n, l, r);
-        else if (op == 3)
-            std::cout << queryTot(queryTot, 1, 1, n, l, r) << '\n';
-        else
-            std::cout << std::get<2>(queryMax(queryMax, 1, 1, n, l, r)) << '\n';
-        // logs(queryTot(queryTot, 1, 1, n, 1, n));
+    int l = 2, r = 1000;
+    while (l < r) {
+        int midl = l + (r - l) / 3, midr = r - (r - l) / 3;
+        int x = ask(midl, midr);
+        if (x == midl * midr) l = midr + 1;
+        else if (x == midl * (midr + 1))
+            l = midl + 1, r = midr;
+        else if (x == (midl + 1) * (midr + 1))
+            r = midl;
     }
+    if (l == r) {
+        std::cout << "! " << l << std::endl;
+        return;
+    }
+    int k = ask(l, r);
+    if (k == l * (r + 1)) std::cout << "! " << r << std::endl;
+    else if (k == (l + 1) * r)
+        std::cout << "! " << l << std::endl;
 }

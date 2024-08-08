@@ -1,11 +1,10 @@
 #include <bits/stdc++.h>
 
-#include <algorithm>
-
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
+
 template <class _KEY, class _Compare = std::less<_KEY>>
 using pbds_set =
     __gnu_pbds::tree<_KEY, __gnu_pbds::null_type, _Compare,
@@ -52,27 +51,6 @@ void print(const std::string_view &fmtStr, Args &&...args) {
     std::cout << std::vformat(fmtStr, std::make_format_args(args...));
 }
 #endif
-// template <class T, class A = std::allocator<T>>
-// class vector : public std::vector<T, A> {
-//    public:
-//     constexpr vector() noexcept(noexcept(A())) : std::vector<T, A>() {}
-//     constexpr explicit vector(const A &alloc) noexcept
-//         : std::vector<T, A>(alloc) {}
-//     constexpr vector(size_t count, const T &value = T(), const A &alloc =
-//     A())
-//         : std::vector<T, A>(count, value, alloc) {}
-//     template <class InputIt>
-//     constexpr vector(InputIt first, InputIt last, const A &alloc = A())
-//         : std::vector<T, A>(first, last, alloc) {}
-//     constexpr vector(const vector &other, const A &alloc = A())
-//         : std::vector<T, A>(other, alloc) {}
-//     constexpr vector(vector &&other, const A &alloc = A())
-//         : std::vector<T, A>(other, alloc) {}
-//     constexpr vector(std::initializer_list<T> init, const A &alloc = A())
-//         : std::vector<T, A>(init, alloc) {}
-//     constexpr T &operator[](size_t pos) { return this->at(pos); }
-//     constexpr const T &operator[](size_t pos) const { return this->at(pos); }
-// };
 #define RETURN(x)         \
     do {                  \
         return x, void(); \
@@ -174,7 +152,7 @@ auto &Print_log(Ts... ts) {
     return ((std::clog << ts << " "), ...);
 }
 void solve();
-
+using namespace std;
 signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
@@ -185,51 +163,44 @@ signed main() {
 }
 
 void solve() {
-    int n;
-    std::cin >> n;
-    vec<int> a(n + 1), next(n + 1, n + 1);
-    std::unordered_map<int, int> mp;
-    for (int i = 1; i <= n; ++i) std::cin >> a[i];
-    for (int i = n; i >= 1; --i) {
-        if (mp.count(a[i])) next[i] = mp[a[i]];
-        mp[a[i]] = i;
-    }
-    vec<int> ls((n << 5) + 100), rs((n << 5) + 100), sum((n << 5) + 100),
-        version(n + 10);
-    int f = 0;
-    auto update = [&](auto self, int last, int l, int r, int pos) -> int {
-        int now = ++f;
-        if (f > (n << 5)) {
-            while (1)
-                ;
+    int n, m;
+    cin >> n >> m;
+    vector<int> a(n + 5);
+    vector<int> num;
+    for (int i = 1; i <= n; i++) a[i] = i;
+    while (1) {
+        int st1 = n / 2, st2 = st1 - 1;
+        for (int i = n; i >= 1; i--) {
+            num.push_back(a[i]);
+            num.push_back(a[st1]);
+            num.push_back(a[st2]);
+            st1++;
+            st2 -= 2;
+            if (st2 == 0) {
+                num.push_back(i - 1);
+                num.push_back(i - 1 - 2);
+                num.push_back(1);
+                num.push_back(i - 2);
+                int now = 3;
+                int cnt = 1;
+                vector<int> b(n + 5);
+                for (int i = 3; i <= n / 2; i += 2) {
+                    b[cnt] = a[i];
+                    cnt++;
+                }
+                n = n / 2 - 1;
+                a = b;
+            } else if (st2 == -1) {
+                num.push_back(i - 1);
+                num.push_back(i - 2);
+                int cnt = 1;
+                vector<int> b(n + 5);
+                for (int i = 2; i <= n / 2; i += 2) {
+                    b[cnt] = a[i];
+                    cnt++;
+                }
+                a = b;
+            }
         }
-        ls[now] = ls[last], rs[now] = rs[last];
-        sum[now] = sum[last] + 1;
-        if (l == r) return now;
-        int mid = (l + r) >> 1;
-        if (pos <= mid) ls[now] = self(self, ls[last], l, mid, pos);
-        else
-            rs[now] = self(self, rs[last], mid + 1, r, pos);
-        return now;
-    };
-    auto query = [&](auto self, int now, int last, int l, int r,
-                     int val) -> int {
-        if (val <= l) return sum[now] - sum[last];
-        int mid = (l + r) >> 1;
-        if (val <= mid)
-            return self(self, ls[now], ls[last], l, mid, val) + sum[rs[now]] -
-                   sum[rs[last]];
-        return self(self, rs[now], rs[last], mid + 1, r, val);
-    };
-    for (int i = 1; i <= n; ++i)
-        version[i] = update(update, version[i - 1], 0, n + 1, next[i]);
-
-    int q;
-    std::cin >> q;
-    while (q--) {
-        int l, r;
-        std::cin >> l >> r;
-        std::cout << query(query, version[r], version[l - 1], 0, n + 1, r + 1)
-                  << '\n';
     }
 }
