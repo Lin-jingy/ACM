@@ -177,9 +177,13 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
-void solve() {}
+void solve() {
+    int a, b, k;
+    std::cin >> a >> b >> k;
+    std::cout << std::min(a, k) * std::min(b, k) << '\n';
+}

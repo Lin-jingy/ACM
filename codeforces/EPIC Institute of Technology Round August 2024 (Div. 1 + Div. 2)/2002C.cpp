@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
 
+#include <algorithm>
+
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
@@ -86,6 +88,7 @@ class vector : public std::vector<T, A> {
                   << std::endl;                                          \
         exit(-1);                                                        \
     }
+#define int long long
 constexpr int inf = INT_MAX;
 constexpr long long INF = LONG_LONG_MAX;
 template <class T>
@@ -177,9 +180,28 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
+int dis(Pii a, Pii b) {
+    return (a.first - b.first) * (a.first - b.first) +
+           (a.second - b.second) * (a.second - b.second);
+}
 
-void solve() {}
+void solve() {
+    int n;
+    std::cin >> n;
+    vec<Pii> v(n);
+    std::cin >> v;
+    Pii begin, end;
+    std::cin >> begin >> end;
+    int k = dis(begin, end);
+    // logs(k);
+    int d = 2e18;
+    for (auto i : v) {
+        d = std::min(d, dis(end, i));
+        // logs(dis(end, i));
+    }
+    std::cout << (k < d ? "YES\n" : "NO\n");
+}

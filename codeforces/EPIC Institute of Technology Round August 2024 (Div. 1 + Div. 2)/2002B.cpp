@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
 
+#include <algorithm>
+
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
@@ -177,9 +179,18 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
-void solve() {}
+void solve() {
+    int n;
+    std::cin >> n;
+    vec<int> a(n), b(n);
+    std::cin >> a >> b;
+    if (a == b or std::equal(a.rbegin(), a.rend(), All(b)))
+        std::cout << "Bob\n";
+    else
+        std::cout << "Alice\n";
+}

@@ -83,21 +83,13 @@ class NTT {
             result[i] = (fa[i] * invn) % mod;
         return result;
     }
-    constexpr static std::vector<int> inv(const std::vector<int> &a) {
-        if (!k) return vi(1, qpow(f[0], P - 2));
-        int lim = (1 << k);
-        f.resize(lim);
-        vi g = INV(f, k - 1), h(lim);
-        f.resize(lim << 1), g.resize(lim << 1);
-        for (int i = 0; i < (lim >> 1); i++) h[i] = ck(2 * g[i]);
-        pre(k + 1);
-        NTT(g), NTT(f);
-        for (int i = 0; i < (lim << 1); i++) g[i] = (int)(1ll * f[i] * g[i] % P * g[i] % P);
-        NTT(g);
-        reverse(g.begin() + 1, g.end());
-        g.resize(lim);
-        int Inv = inv[lim << 1];
-        for (int i = 0; i < lim; i++) h[i] = ck_(h[i] - (int)(1ll * g[i] * Inv % P)) % P;
-        return h;
+    constexpr static std::vector<int> inv(std::vector<int> f) {
+        int n = f.size(), size;
+        for (size = 1; size < n; size <<= 1)
+            ;
+        if (n == 1) return {qpow(f[0])};
+        std::vector<int> h(size);
+        f.resize(size);
+        auto g = inv(f);
     }
 };

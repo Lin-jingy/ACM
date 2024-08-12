@@ -177,9 +177,124 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
-void solve() {}
+class eular_LCA {
+   private:
+    template <class T>
+    class sparseTable {
+       private:
+        std::vector<std::vector<T>> ST;
+        std::function<T(const T, const T)> _func;
+
+       public:
+        void init(const std::vector<T> &v, auto func) {
+            _func = func;
+            int len = v.size();
+            int L1 = std::__lg(len) + 1;
+            ST.assign(len, std::vector<T>(L1));
+            for (int i = 0; i < len; ++i) ST[i][0] = v[i];
+
+            for (int j = 1; j < L1; ++j) {
+                int pj = (1 << (j - 1));
+                for (int i = 0; i + pj < len; ++i) {
+                    ST[i][j] =
+                        func(ST[i][j - 1], ST[i + (1 << (j - 1))][j - 1]);
+                }
+            }
+        }
+        sparseTable() = default;
+        T operator()(int l, int r) {
+            int q = std::__lg(r - l + 1);
+            return _func(ST[l][q], ST[r - (1 << q) + 1][q]);
+        }
+    };
+
+    std::vector<int> pos, id;
+    sparseTable<int> ST;
+
+   public:
+    eular_LCA(std::vector<std::vector<int>> &v, int root) {
+        int len = v.size();
+        pos.resize(len);
+        id.resize(len);
+        std::vector<int> dfn;
+        int cnt = -1;
+        auto dfs = [&](auto self, int p, int fa) -> void {
+            ++cnt;
+            id[cnt] = p;
+            dfn.push_back(cnt);
+            pos[p] = dfn.size() - 1;
+            int copy_cnt = cnt;
+            for (auto i : v[p]) {
+                if (i == fa) continue;
+                self(self, i, p);
+                dfn.push_back(copy_cnt);
+            }
+        };
+        dfs(dfs, root, 0);
+        ST.init(dfn, [](const int a, const int b) { return std::min(a, b); });
+    }
+    int lca(int a, int b) {
+        int x = pos[a], y = pos[b];
+        if (x > y) std::swap(x, y);
+        return id[ST(x, y)];
+    }
+};
+
+void try_erase(std::set<int> &s, int val) {
+    auto it = s.find(val);
+    if (it != s.end()) s.erase(it);
+}
+
+void solve() {
+    int n, q;
+    std::cin >> n >> q;
+    vec<int> p(n + 1), to(n + 1), fa(n + 1);
+    vvec<int> v(n + 1);
+    for (int i = 2; i <= n; ++i) {
+        std::cin >> fa[i];
+        v[fa[i]].pb(i);
+    }
+    for (int i = 1; i <= n; ++i) std::cin >> p[i], to[p[i]] = i;
+    eular_LCA L(v, 1);
+    std::set<int> s;
+    auto check = [&](int point) -> void {
+        if (point == 1) {
+            if (to[point] == 1) try_erase(s, 1);
+            else
+                s.insert(1);
+        } else {
+            int pos = to[point];
+            if (p[pos - 1] == fa[point] or
+                L.lca(fa[point], p[pos - 1]) == fa[point])
+                try_erase(s, point);
+            else
+                s.insert(point);
+        }
+    };
+    auto dfs = [&](auto self, int pos) -> void {
+        for (auto i : v[pos]) {
+            check(i);
+            self(self, i);
+        }
+    };
+    dfs(dfs, 1);
+    if (to[1] != 1) s.insert(1);
+    while (q--) {
+        int a, b;
+        std::cin >> a >> b;
+        std::swap(to[p[a]], to[p[b]]);
+        std::swap(p[a], p[b]);
+        check(p[a]);
+        check(p[a + 1]);
+        check(p[b]);
+        check(p[b + 1]);
+        if (s.empty()) std::cout << "YES\n";
+        else
+            std::cout << "NO\n";
+    }
+}
