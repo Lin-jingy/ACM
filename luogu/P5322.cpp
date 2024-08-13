@@ -1,8 +1,5 @@
 #include <bits/stdc++.h>
 
-#include <iomanip>
-#include <numbers>
-
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
@@ -186,8 +183,10 @@ signed main() {
 }
 
 void solve() {
-    std::cout << std::fixed << std::setprecision(40) << (long double)acosl(-1)
-              << '\n';
-    std::cout << std::fixed << std::setprecision(40)
-              << std::numbers::pi_v<long double> << '\n';
+    int s, n, m;
+    std::cin >> s >> n >> m;
+    vec<int> a(n + 1);
+    for (int i = 1; i <= n; ++i) {
+        
+    }
 }
