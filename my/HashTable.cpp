@@ -15,10 +15,14 @@ class HashTable {
         node *next;
     };
     using nodePoint = node *;
-    nodePoint *bucket;
 
    private:
     int findNextPrime(int x) { return *std::upper_bound(prime, prime + 26, x); }
 
    public:
+    HashTable() = default;
+
+   private:
+    std::vector<nodePoint> m_bucket;
+    size_t m_size;
 };
