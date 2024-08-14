@@ -1,12 +1,9 @@
 #include <bits/stdc++.h>
 
-#include <algorithm>
-
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-
 template <class _KEY, class _Compare = std::less<_KEY>>
 using pbds_set =
     __gnu_pbds::tree<_KEY, __gnu_pbds::null_type, _Compare,
@@ -53,26 +50,7 @@ void print(const std::string_view &fmtStr, Args &&...args) {
     std::cout << std::vformat(fmtStr, std::make_format_args(args...));
 }
 #endif
-template <class T, class A = std::allocator<T>>
-class vector : public std::vector<T, A> {
-   public:
-    constexpr vector() noexcept(noexcept(A())) : std::vector<T, A>() {}
-    constexpr explicit vector(const A &alloc) noexcept
-        : std::vector<T, A>(alloc) {}
-    constexpr vector(size_t count, const T &value = T(), const A &alloc = A())
-        : std::vector<T, A>(count, value, alloc) {}
-    template <class InputIt>
-    constexpr vector(InputIt first, InputIt last, const A &alloc = A())
-        : std::vector<T, A>(first, last, alloc) {}
-    constexpr vector(const vector &other, const A &alloc = A())
-        : std::vector<T, A>(other, alloc) {}
-    constexpr vector(vector &&other, const A &alloc = A())
-        : std::vector<T, A>(other, alloc) {}
-    constexpr vector(std::initializer_list<T> init, const A &alloc = A())
-        : std::vector<T, A>(init, alloc) {}
-    constexpr T &operator[](size_t pos) { return this->at(pos); }
-    constexpr const T &operator[](size_t pos) const { return this->at(pos); }
-};
+#define int long long
 #define RETURN(x)         \
     do {                  \
         return x, void(); \
@@ -185,22 +163,56 @@ signed main() {
 }
 
 void solve() {
-    int s, n, m;
-    std::cin >> s >> n >> m;
-    vvec<int> v(n + 1, vec<int>(s + 1));
-    for (int i = 1; i <= s; ++i)
-        for (int j = 1; j <= n; ++j) std::cin >> v[j][i];
-    for (int i = 1; i <= n; ++i) std::sort(v[i].begin() + 1, v[i].end());
-    vvec<int> dp(n + 1, vec<int>(m + 1));
-    for (int i = 1; i <= n; ++i) {
-        for (int j = m; j >= 0; --j) {
-            dp[i][j] = dp[i - 1][j];
-            for (int k = 1; k <= s; ++k) {
-                if (2 * v[i][k] + j + 1 <= m)
-                    dp[i][j] = std::max(dp[i][j],
-                                        dp[i - 1][j + 2 * v[i][k] + 1] + k * i);
-            }
-        }
+    int n;
+    std::cin >> n;
+    vec<arr<int, 4>> v;
+    std::map<int, int> get;
+    for (int i = 0; i < n; ++i) {
+        int x1, y1, x2, y2;
+        std::cin >> x1 >> y1 >> x2 >> y2;
+        get.try_emplace(y1, 1);
+        get.try_emplace(y2, 1);
+        if (y1 > y2) std::swap(y1, y2);
+        v.push_back({std::min(x1, x2), y1, y2, 1});
+        v.push_back({std::max(x1, x2), y1, y2, -1});
     }
-    std::cout << *std::max_element(dp[n].begin(), dp[n].end()) << '\n';
+    vec<int> mp(get.size() + 1);
+    {
+        int f = 0;
+        for (auto &[i, j] : get) j = ++f, mp[j] = i;
+    }
+
+    vec<int> f((get.size() + 1) << 2), cnt((get.size() + 1) << 2);
+    auto pushUp = [&](int p, int l, int r) -> void {
+        if (cnt[p]) f[p] = mp[r] - mp[l];
+        else if (l + 1 == r)
+            f[p] = 0;
+        else
+            f[p] = f[p << 1] + f[p << 1 | 1];
+    };
+    auto update = [&](auto self, int p, int l, int r, int i, int j,
+                      int d) -> void {
+        if (i <= l and j >= r) {
+            cnt[p] += d;
+            pushUp(p, l, r);
+            return;
+        }
+        if (l + 1 == r) return;
+        int mid = (l + r) >> 1;
+        if (i <= mid) self(self, p << 1, l, mid, i, j, d);
+        if (j > mid) self(self, p << 1 | 1, mid, r, i, j, d);
+        pushUp(p, l, r);
+    };
+
+    std::ranges::sort(v);
+
+    int ans = 0;
+
+    update(update, 1, 1, get.size(), get[v[0][1]], get[v[0][2]], v[0][3]);
+    for (int i = 1; i < v.size(); ++i) {
+        ans += (v[i][0] - v[i - 1][0]) * f[1];
+        update(update, 1, 1, get.size(), get[v[i][1]], get[v[i][2]], v[i][3]);
+    }
+
+    std::cout << ans << '\n';
 }

@@ -1,12 +1,9 @@
 #include <bits/stdc++.h>
 
-#include <algorithm>
-
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-
 template <class _KEY, class _Compare = std::less<_KEY>>
 using pbds_set =
     __gnu_pbds::tree<_KEY, __gnu_pbds::null_type, _Compare,
@@ -20,6 +17,23 @@ template <class T, class Comp = std::less<T>>
 using pbds_heap =
     __gnu_pbds::priority_queue<T, Comp, __gnu_pbds::pairing_heap_tag>;
 #endif
+#define int long long
+template <class K, class V>
+std::istream &operator>>(std::istream &in, std::pair<K, V> &v);
+template <class K, class V>
+std::ostream &operator<<(std::ostream &out, const std::pair<K, V> &v);
+template <class T>
+std::istream &operator>>(std::istream &in, std::vector<T> &v);
+template <class T>
+std::ostream &operator<<(std::ostream &out, const std::vector<T> &v);
+template <class T, size_t size>
+std::istream &operator>>(std::istream &in, std::array<T, size> &v);
+template <class T, size_t size>
+std::ostream &operator<<(std::ostream &out, const std::array<T, size> &v);
+template <class T>
+std::ostream &operator<<(std::ostream &out, const std::set<T> &s);
+template <class K, class V>
+std::ostream &operator<<(std::ostream &out, const std::map<K, V> &mp);
 #if __SIZEOF_POINTER__ == 8 && __GNUC__ && __cplusplus >= 202002L
 using i128 = __int128;
 std::istream &operator>>(std::istream &in, __int128 &value) {
@@ -127,6 +141,17 @@ std::ostream &operator<<(std::ostream &out, const std::vector<T> &v) {
         out << *i << " \n"[i == v.end()];
     return out;
 }
+template <class T, size_t size>
+std::istream &operator>>(std::istream &in, std::array<T, size> &v) {
+    for (auto &i : v) in >> i;
+    return in;
+}
+template <class T, size_t size>
+std::ostream &operator<<(std::ostream &out, const std::array<T, size> &v) {
+    for (auto i = v.begin(); i != v.end(); ++i)
+        out << *i << " \n"[i == v.end()];
+    return out;
+}
 template <class T>
 std::ostream &operator<<(std::ostream &out, const std::set<T> &s) {
     out << "\nsize:" << s.size() << '\n';
@@ -173,6 +198,8 @@ template <class... Ts>
 auto &Print_log(Ts... ts) {
     return ((std::clog << ts << " "), ...);
 }
+using std::map;  // NOLINT(misc-unused-using-decls)
+using std::set;  // NOLINT(misc-unused-using-decls)
 void solve();
 
 signed main() {
@@ -183,24 +210,87 @@ signed main() {
     while (T--) solve();
     return 0;
 }
+using ull = unsigned long long;
+class BIT {
+#define lowb(x) ((-x) & x)
+   private:
+    int n;
+    std::vector<ull> c;
+
+   public:
+    BIT() = default;
+    BIT(int N) : n(N), c(N + 1) {}
+    void add(int i, int z) {
+        for (; i <= n; i += lowb(i)) c[i] += z;
+    }
+    ull pre(int i) {
+        ull sum = 0;
+        for (; i > 0; i -= lowb(i)) sum += c[i];
+        return sum;
+    }
+    int sum(int i, int j) { return pre(j) - pre(i - 1); }
+#undef lowb
+};
 
 void solve() {
-    int s, n, m;
-    std::cin >> s >> n >> m;
-    vvec<int> v(n + 1, vec<int>(s + 1));
-    for (int i = 1; i <= s; ++i)
-        for (int j = 1; j <= n; ++j) std::cin >> v[j][i];
-    for (int i = 1; i <= n; ++i) std::sort(v[i].begin() + 1, v[i].end());
-    vvec<int> dp(n + 1, vec<int>(m + 1));
-    for (int i = 1; i <= n; ++i) {
-        for (int j = m; j >= 0; --j) {
-            dp[i][j] = dp[i - 1][j];
-            for (int k = 1; k <= s; ++k) {
-                if (2 * v[i][k] + j + 1 <= m)
-                    dp[i][j] = std::max(dp[i][j],
-                                        dp[i - 1][j + 2 * v[i][k] + 1] + k * i);
+    int n, m;
+    std::cin >> n >> m;
+    vec<int> a(m + 1), p(n + 1);
+    for (int i = 1; i <= m; ++i) std::cin >> a[i];
+    for (int i = 1; i <= n; ++i) std::cin >> p[i];
+    int k;
+    std::cin >> k;
+    vec<arr<int, 3>> Q(k + 1);
+    for (int i = 1; i <= k; ++i) std::cin >> Q[i];
+    vec<int> ans(n + 1, k + 1);
+    BIT T(m + 2);
+    vec<int> need(n + 1);
+    std::iota(All(need), 0);
+    auto dfs = [&](auto self, int l, int r, int Llim, int Rlim) -> void {
+        if (Llim > Rlim) return;
+        int mid = (l + r) >> 1;
+        for (int i = l; i <= mid; ++i) {
+            auto [l, r, val] = Q[i];
+            if (l <= r) {
+                T.add(l, val);
+                T.add(r + 1, -val);
+            } else {
+                T.add(l, val);
+                T.add(m + 1, -val);
+                T.add(1, val);
+                T.add(r + 1, -val);
             }
         }
+        vec<int> num(n + 1);
+        for (int i = 1; i <= m; ++i) num[a[i]] += T.pre(i);
+        vec<int> L, R;
+        for (int j = Llim; j <= Rlim; ++j) {
+            auto i = need[j];
+            if (num[i] >= p[i]) L.pb(i), ans[i] = std::min(ans[i], mid);
+            else R.pb(i);
+        }
+        for (int i = l; i <= mid; ++i) {
+            auto [l, r, val] = Q[i];
+            if (l <= r) {
+                T.add(l, -val);
+                T.add(r + 1, val);
+            } else {
+                T.add(l, -val);
+                T.add(m + 1, val);
+                T.add(1, -val);
+                T.add(r + 1, val);
+            }
+        }
+        std::copy(All(L), need.begin() + Llim);
+        std::copy(All(R), need.begin() + Llim + L.size());
+        if (l == r) return;
+        if (!L.empty()) self(self, l, mid, Llim, Llim + L.size() - 1);
+        for (auto i : R) p[i] -= num[i];
+        if (!R.empty()) self(self, mid + 1, r, Llim + L.size(), Rlim);
+    };
+    dfs(dfs, 1, k, 1, n);
+    for (int i = 1; i <= n; ++i) {
+        if (ans[i] == k + 1) std::cout << "NIE\n";
+        else std::cout << ans[i] << '\n';
     }
-    std::cout << *std::max_element(dp[n].begin(), dp[n].end()) << '\n';
 }

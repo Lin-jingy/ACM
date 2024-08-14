@@ -1,6 +1,6 @@
 ---
 Language:        Cpp
-# BasedOnStyle:  Google
+BasedOnStyle:  Google
 AccessModifierOffset: -1
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: None
@@ -39,7 +39,7 @@ AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortEnumsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: All
-AllowShortIfStatementsOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
 AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: true
 AlwaysBreakAfterDefinitionReturnType: None

@@ -1,13 +1,9 @@
 #include <bits/stdc++.h>
 
-#include <iomanip>
-#include <numbers>
-
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-
 template <class _KEY, class _Compare = std::less<_KEY>>
 using pbds_set =
     __gnu_pbds::tree<_KEY, __gnu_pbds::null_type, _Compare,
@@ -21,6 +17,22 @@ template <class T, class Comp = std::less<T>>
 using pbds_heap =
     __gnu_pbds::priority_queue<T, Comp, __gnu_pbds::pairing_heap_tag>;
 #endif
+template <class K, class V>
+std::istream &operator>>(std::istream &in, std::pair<K, V> &v);
+template <class K, class V>
+std::ostream &operator<<(std::ostream &out, const std::pair<K, V> &v);
+template <class T>
+std::istream &operator>>(std::istream &in, std::vector<T> &v);
+template <class T>
+std::ostream &operator<<(std::ostream &out, const std::vector<T> &v);
+template <class T, size_t size>
+std::istream &operator>>(std::istream &in, std::array<T, size> &v);
+template <class T, size_t size>
+std::ostream &operator<<(std::ostream &out, const std::array<T, size> &v);
+template <class T>
+std::ostream &operator<<(std::ostream &out, const std::set<T> &s);
+template <class K, class V>
+std::ostream &operator<<(std::ostream &out, const std::map<K, V> &mp);
 #if __SIZEOF_POINTER__ == 8 && __GNUC__ && __cplusplus >= 202002L
 using i128 = __int128;
 std::istream &operator>>(std::istream &in, __int128 &value) {
@@ -128,6 +140,17 @@ std::ostream &operator<<(std::ostream &out, const std::vector<T> &v) {
         out << *i << " \n"[i == v.end()];
     return out;
 }
+template <class T, size_t size>
+std::istream &operator>>(std::istream &in, std::array<T, size> &v) {
+    for (auto &i : v) in >> i;
+    return in;
+}
+template <class T, size_t size>
+std::ostream &operator<<(std::ostream &out, const std::array<T, size> &v) {
+    for (auto i = v.begin(); i != v.end(); ++i)
+        out << *i << " \n"[i == v.end()];
+    return out;
+}
 template <class T>
 std::ostream &operator<<(std::ostream &out, const std::set<T> &s) {
     out << "\nsize:" << s.size() << '\n';
@@ -174,6 +197,8 @@ template <class... Ts>
 auto &Print_log(Ts... ts) {
     return ((std::clog << ts << " "), ...);
 }
+using std::map;  // NOLINT(misc-unused-using-decls)
+using std::set;  // NOLINT(misc-unused-using-decls)
 void solve();
 
 signed main() {
@@ -186,8 +211,8 @@ signed main() {
 }
 
 void solve() {
-    std::cout << std::fixed << std::setprecision(40) << (long double)acosl(-1)
-              << '\n';
-    std::cout << std::fixed << std::setprecision(40)
-              << std::numbers::pi_v<long double> << '\n';
+    std::vector<int> a(10);
+
+    if (1) a[1] = 1;
+    else a[2] = 2;
 }

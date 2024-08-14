@@ -1,7 +1,5 @@
 #include <bits/stdc++.h>
 
-#include <algorithm>
-
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
@@ -185,22 +183,8 @@ signed main() {
 }
 
 void solve() {
-    int s, n, m;
-    std::cin >> s >> n >> m;
-    vvec<int> v(n + 1, vec<int>(s + 1));
-    for (int i = 1; i <= s; ++i)
-        for (int j = 1; j <= n; ++j) std::cin >> v[j][i];
-    for (int i = 1; i <= n; ++i) std::sort(v[i].begin() + 1, v[i].end());
-    vvec<int> dp(n + 1, vec<int>(m + 1));
-    for (int i = 1; i <= n; ++i) {
-        for (int j = m; j >= 0; --j) {
-            dp[i][j] = dp[i - 1][j];
-            for (int k = 1; k <= s; ++k) {
-                if (2 * v[i][k] + j + 1 <= m)
-                    dp[i][j] = std::max(dp[i][j],
-                                        dp[i - 1][j + 2 * v[i][k] + 1] + k * i);
-            }
-        }
-    }
-    std::cout << *std::max_element(dp[n].begin(), dp[n].end()) << '\n';
+    int n, m;
+    std::cin >> n >> m;
+    vec<Pii> v(n);
+    std::cin >> v;
 }
