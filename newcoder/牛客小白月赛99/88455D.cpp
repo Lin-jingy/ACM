@@ -206,32 +206,44 @@ signed main() {
     return 0;
 }
 
-void solve() {
-    int n, m, t;
-    std::cin >> n >> m >> t;
-    vec<int> x(m);
-    std::cin >> x;
-    if (t < n) {
-        std::cout << 0 << '\n';
-        return;
-    }
-    int ans = n;
-    vec<int> v;
-    std::sort(All(x));
-    for (int i = 1; i < m; ++i) {
-        v.pb(x[i] - x[i - 1]);
-    }
-    std::sort(All(v));
-    v.erase(std::unique(All(v)), v.end());
-    vec<bool> vis(t + 1);
-    vis[n] = 1;
-    for (auto i : v) {
-        for (int j = n; j <= t; ++j) {
-            if (vis[j] and j + 2 * i <= t) vis[j + 2 * i] = 1;
+/**
+ * @brief 欧氏筛求素数
+ * @param n 范围
+ * @note O(n)
+ * @return 包含1~n所有质数的vec
+ */
+constexpr static std::vector<int> get_prime(const int n) {  // Euler
+    std::vector<int> prime;
+    std::vector<bool> not_prime(n + 1);
+
+    for (int i = 2; i <= n; ++i) {
+        if (!not_prime[i]) prime.push_back(i);
+        for (int j : prime) {
+            if (i * j > n) break;
+            not_prime[i * j] = true;
+            if (i % j == 0) break;
         }
     }
-    for (int i = t; i >= n; --i) {
-        if (vis[i]) {
+    return prime;
+}
+
+auto prime = get_prime(4e6);
+
+void solve() {
+    int n;
+    std::cin >> n;
+    vec<int> a(n);
+    std::cin >> a;
+    std::sort(All(a));
+    a.erase(std::unique(All(a)), a.end());
+    vec<int> vis(prime[n + 4]);
+    for (auto i : a) {
+        for (int j = 0; j < vis.size(); j += i) {
+            vis[j] = 1;
+        }
+    }
+    for (int i = 2; i < vis.size(); ++i) {
+        if (!vis[i]) {
             std::cout << i << '\n';
             return;
         }

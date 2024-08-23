@@ -201,39 +201,64 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    std::cin >> T;
+    // std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
+constexpr int N = 1005;
+using G = arr<arr<bool, N>, N>;
+G a, b;
+
+int px[] = {1, -1, 0, 0};
+int py[] = {0, 0, 1, -1};
+
 void solve() {
-    int n, m, t;
-    std::cin >> n >> m >> t;
-    vec<int> x(m);
-    std::cin >> x;
-    if (t < n) {
-        std::cout << 0 << '\n';
-        return;
-    }
-    int ans = n;
-    vec<int> v;
-    std::sort(All(x));
-    for (int i = 1; i < m; ++i) {
-        v.pb(x[i] - x[i - 1]);
-    }
-    std::sort(All(v));
-    v.erase(std::unique(All(v)), v.end());
-    vec<bool> vis(t + 1);
-    vis[n] = 1;
-    for (auto i : v) {
-        for (int j = n; j <= t; ++j) {
-            if (vis[j] and j + 2 * i <= t) vis[j + 2 * i] = 1;
+    int n, m;
+    std::cin >> n >> m;
+    vec<vec<char>> v(n + 1, vec<char>(m + 1));
+    Pii begin, end;
+    for (int i = 1; i <= n; ++i) {
+        for (int j = 1; j <= m; ++j) {
+            std::cin >> v[i][j];
+            if (v[i][j] == 'S') begin = {i, j};
+            else if (v[i][j] == 'E') end = {i, j};
         }
     }
-    for (int i = t; i >= n; --i) {
-        if (vis[i]) {
-            std::cout << i << '\n';
-            return;
+    auto bfs = [&](G &p, Pii begin) -> void {
+        std::queue<Pii> q;
+        q.push(begin);
+        while (!q.empty()) {
+            auto [x, y] = q.front();
+            q.pop();
+            if (p[x][y] or v[x][y] == '#') continue;
+            p[x][y] = 1;
+            for (int i = 0; i < 4; ++i) {
+                int xx = x + px[i];
+                int yy = y + py[i];
+                if (xx >= 1 and xx <= n and yy >= 1 and yy <= m and
+                    v[x][y] != '#')
+                    q.emplace(xx, yy);
+            }
+        }
+    };
+    bfs(a, begin);
+    bfs(b, end);
+    vec<int> vx(n + 5), vy(m + 5);
+    for (int i = 1; i <= n; ++i) {
+        for (int j = 1; j <= m; ++j) {
+            if (!b[i][j]) continue;
+            vx[i - 1] = vx[i] = vx[i + 1] = 1;
+            vy[j - 1] = vy[j] = vy[j + 1] = 1;
         }
     }
+    for (int i = 1; i <= n; ++i) {
+        for (int j = 1; j <= m; ++j) {
+            if (a[i][j] and (vx[i] or vy[j])) {
+                std::cout << "YES\n";
+                return;
+            }
+        }
+    }
+    std::cout << "NO\n";
 }

@@ -97,6 +97,7 @@ class vector : public std::vector<T, A> {
                   << std::endl;                                          \
         exit(-1);                                                        \
     }
+#define int long long
 constexpr int inf = INT_MAX;
 constexpr long long INF = LONG_LONG_MAX;
 template <class T>
@@ -205,35 +206,22 @@ signed main() {
     while (T--) solve();
     return 0;
 }
+struct node {
+    int l, r, y;
+};
 
 void solve() {
-    int n, m, t;
-    std::cin >> n >> m >> t;
-    vec<int> x(m);
-    std::cin >> x;
-    if (t < n) {
-        std::cout << 0 << '\n';
-        return;
-    }
-    int ans = n;
-    vec<int> v;
-    std::sort(All(x));
-    for (int i = 1; i < m; ++i) {
-        v.pb(x[i] - x[i - 1]);
-    }
-    std::sort(All(v));
-    v.erase(std::unique(All(v)), v.end());
-    vec<bool> vis(t + 1);
-    vis[n] = 1;
-    for (auto i : v) {
-        for (int j = n; j <= t; ++j) {
-            if (vis[j] and j + 2 * i <= t) vis[j + 2 * i] = 1;
+    int n, x;
+    std::cin >> n >> x;
+    vec<arr<int, 3>> a(n);
+    std::cin >> a;
+    std::sort(All(a));
+    int l = x, r = 3e9, ans = x;
+    auto check = [&](int mid) -> bool {
+        for (int i = 0; i < n; ++i) {
         }
-    }
-    for (int i = t; i >= n; --i) {
-        if (vis[i]) {
-            std::cout << i << '\n';
-            return;
-        }
+    };
+    while (l <= r) {
+        int mid = (l + r) >> 1;
     }
 }

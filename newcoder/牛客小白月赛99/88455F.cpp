@@ -227,7 +227,10 @@ void solve() {
     vis[n] = 1;
     for (auto i : v) {
         for (int j = n; j <= t; ++j) {
-            if (vis[j] and j + 2 * i <= t) vis[j + 2 * i] = 1;
+            if (vis[j]) {
+                if (j + 2 * i <= t) vis[j + 2 * i] = 1;
+                else break;
+            }
         }
     }
     for (int i = t; i >= n; --i) {

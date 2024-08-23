@@ -205,35 +205,9 @@ signed main() {
     while (T--) solve();
     return 0;
 }
-
+#define int long long
 void solve() {
-    int n, m, t;
-    std::cin >> n >> m >> t;
-    vec<int> x(m);
-    std::cin >> x;
-    if (t < n) {
-        std::cout << 0 << '\n';
-        return;
-    }
-    int ans = n;
-    vec<int> v;
-    std::sort(All(x));
-    for (int i = 1; i < m; ++i) {
-        v.pb(x[i] - x[i - 1]);
-    }
-    std::sort(All(v));
-    v.erase(std::unique(All(v)), v.end());
-    vec<bool> vis(t + 1);
-    vis[n] = 1;
-    for (auto i : v) {
-        for (int j = n; j <= t; ++j) {
-            if (vis[j] and j + 2 * i <= t) vis[j + 2 * i] = 1;
-        }
-    }
-    for (int i = t; i >= n; --i) {
-        if (vis[i]) {
-            std::cout << i << '\n';
-            return;
-        }
-    }
+    int a, b, x, y;
+    std::cin >> a >> b >> x >> y;
+    std::cout << std::min(a * x + b * y, (a + b) * y) << '\n';
 }

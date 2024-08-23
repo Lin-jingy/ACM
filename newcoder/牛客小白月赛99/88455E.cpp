@@ -97,6 +97,7 @@ class vector : public std::vector<T, A> {
                   << std::endl;                                          \
         exit(-1);                                                        \
     }
+#define int long long
 constexpr int inf = INT_MAX;
 constexpr long long INF = LONG_LONG_MAX;
 template <class T>
@@ -207,33 +208,31 @@ signed main() {
 }
 
 void solve() {
-    int n, m, t;
-    std::cin >> n >> m >> t;
-    vec<int> x(m);
-    std::cin >> x;
-    if (t < n) {
-        std::cout << 0 << '\n';
-        return;
-    }
-    int ans = n;
-    vec<int> v;
-    std::sort(All(x));
-    for (int i = 1; i < m; ++i) {
-        v.pb(x[i] - x[i - 1]);
-    }
-    std::sort(All(v));
-    v.erase(std::unique(All(v)), v.end());
-    vec<bool> vis(t + 1);
-    vis[n] = 1;
-    for (auto i : v) {
-        for (int j = n; j <= t; ++j) {
-            if (vis[j] and j + 2 * i <= t) vis[j + 2 * i] = 1;
+    int n, m;
+    std::cin >> n >> m;
+    vec<Pii> a(n + 1);
+    for (int i = 1; i <= n; ++i) std::cin >> a[i].first;
+    for (int i = 1; i <= n; ++i) std::cin >> a[i].second;
+    std::sort(All(a), [](Pii x, Pii y) { return x.second < y.second; });
+    max_heap<int> heap;
+
+    int cnt = 0, mx = a[1].first + a[1].second;
+
+    for (int i = 1; i <= n; ++i) {
+        if (a[i].second > mx) {
+            heap.push(cnt);
+            cnt = 0;
         }
+        mx = std::max(mx, a[i].first + a[i].second);
+        ++cnt;
     }
-    for (int i = t; i >= n; --i) {
-        if (vis[i]) {
-            std::cout << i << '\n';
-            return;
-        }
+    if (cnt) heap.push(cnt);
+
+    int ans = 0;
+    while (m and !heap.empty()) {
+        ans += heap.top();
+        heap.pop();
+        --m;
     }
+    std::cout << ans << '\n';
 }

@@ -31,7 +31,28 @@ signed main() {
     while (T--) solve();
     return 0;
 }
-
+#define int long long 
 void solve() {
-
+    int n, k;
+    std::cin >> n >> k;
+    vec<int> a(n + 1), x(n + 1);
+    for(int i = 1; i <= n; ++i) std::cin >> x[i];
+    for(int i = 1; i <= n; ++i) std::cin >> a[i];
+    vvec<int> p(n + 1, vec<int>(100));
+    for(int i = 1; i <= n; ++i) p[i][0] = x[i];
+    for (int j = 1; j <= 60; ++j) 
+        for (int i = 1; i <= n; ++i) p[i][j] = p[p[i][j - 1]][j - 1];
+    vec<int> pos(n + 1);
+    std::iota(All(pos), 0);
+    // logs(pos);
+    for (int i = 60; i >= 0; --i) {
+        if ((1LL << i) <= k) {
+            k -= (1LL << i);
+            vec<int> tmp(n + 1);
+            for (int j = 1; j <= n; ++j) tmp[j] = p[pos[j]][i];
+            pos.swap(tmp);
+        }
+    }
+    // logs(pos);
+    for (int i = 1; i <= n; ++i) std::cout << a[pos[i]] << ' ';
 }
