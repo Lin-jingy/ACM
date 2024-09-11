@@ -1,9 +1,11 @@
+#include <bits/stdc++.h>
 #include <math.h>
 
 #include <stdexcept>
 #include <utility>
 
 #include "iterator.hpp"
+
 
 template <class T, class Allocator = std::allocator<T>>
 class Vector {
@@ -38,8 +40,10 @@ class Vector {
             ++begin;
         }
     }
-    iterator apply(int n) { m_alloc.allocate(n); }
-    iterator apply_all() { m_alloc.allocate(m_end_of_storage - m_begin); }
+    iterator apply(int n) { return m_alloc.allocate(n); }
+    iterator apply_all() {
+        return m_alloc.allocate(m_end_of_storage - m_begin);
+    }
     void release_all() {
         m_alloc.deallocate(m_begin, m_end_of_storage - m_begin);
     }
@@ -521,3 +525,19 @@ void swap(Vector<T, Alloc> &lhs, Vector<T, Alloc> &rhs) noexcept {
     lhs.swap(rhs);
 }
 }  // namespace std
+
+int main() {
+    // 创建含有整数的 vector
+    Vector<int> v = {8, 4, 5, 9};
+
+    // 将两个整数添加到 vector
+    v.push_back(6);
+    v.push_back(9);
+
+    // 覆写位置 2 的元素
+    v[2] = -1;
+
+    // 打印 vector 的值
+    for (int n : v) std::cout << n << ' ';
+    std::cout << '\n';
+}

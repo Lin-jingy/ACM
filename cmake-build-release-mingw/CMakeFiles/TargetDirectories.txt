@@ -1,0 +1,3 @@
+C:/Users/123/Desktop/programming/VScode/ACM/cmake-build-release-mingw/CMakeFiles/ACM.dir
+C:/Users/123/Desktop/programming/VScode/ACM/cmake-build-release-mingw/CMakeFiles/edit_cache.dir
+C:/Users/123/Desktop/programming/VScode/ACM/cmake-build-release-mingw/CMakeFiles/rebuild_cache.dir

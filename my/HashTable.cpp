@@ -14,10 +14,10 @@ class HashTable {
     using list = std::forward_list<pair>;
 
    private:
-    int _findNextPrime(int x) {
+    constexpr int _findNextPrime(int x) {
         return *std::upper_bound(prime, prime + 29, x);
     }
-    auto _find(std::vector<list> &bucket, const _Key &key) {
+    constexpr auto _find(std::vector<list> &bucket, const _Key &key) {
         const size_t hashcode = _Hash{}(key) % bucket.size();
         auto &it = bucket[hashcode];
         for (auto i = it.begin(); i != it.end(); ++i) {
@@ -25,7 +25,7 @@ class HashTable {
         }
         return std::make_pair(it.end(), &it);
     }
-    bool _insert(std::vector<list> &bucket,
+    constexpr bool _insert(std::vector<list> &bucket,
                  const pair &value) {
         auto it = _find(bucket, value.first);
         if (it.first != it.second->end()) return false;
@@ -33,7 +33,7 @@ class HashTable {
         return true;
     }
 
-    bool _expand() {
+    constexpr bool _expand() {
         if (m_size <= (int)m_bucket.size() * 0.75) return false;
         std::vector<list> m_tmp(_findNextPrime(m_bucket.size()));
         for (auto &it : m_bucket)
@@ -43,17 +43,17 @@ class HashTable {
     }
 
    public:
-    HashTable() : m_bucket(3), m_size(0){};
-    bool insert(const pair &value) {
+    constexpr HashTable() : m_bucket(3), m_size(0){};
+    constexpr bool insert(const pair &value) {
         ++m_size;
         _expand();
         return _insert(m_bucket, value);
     }
-    bool count(const _Key &key) {
+    constexpr bool count(const _Key &key) {
         auto it = _find(m_bucket, key);
         return it.first != it.second->end();
     }
-    void erase(const _Key &key) {
+    constexpr void erase(const _Key &key) {
         --m_size;
         auto &it = m_bucket[_Hash{}(key) % m_bucket.size()];
         if (_Equal{}(it.front().first, key)) return it.pop_front(), void();
@@ -63,7 +63,7 @@ class HashTable {
             if (_Equal{}(i->second, key)) return it.erase_after(last), void();
         }
     }
-    _Value &operator[](const _Key &key) {
+    constexpr _Value &operator[](const _Key &key) {
         auto it = _find(m_bucket, key);
         if (it.first == it.second->end()) {
             ++m_size;
@@ -73,8 +73,8 @@ class HashTable {
         }
         return it.first->second;
     }
-    size_t size() { return m_size; }
-    bool empty() { return m_size == 0; }
+    constexpr size_t size() { return m_size; }
+    constexpr bool empty() { return m_size == 0; }
 
    private:
     std::vector<list> m_bucket;

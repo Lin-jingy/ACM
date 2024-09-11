@@ -5,20 +5,12 @@
 template <class T, std::size_t N>
 class Array {
    public:
-    using value_type = T;
-    using size_type = std::size_t;
-    using difference_type = std::ptrdiff_t;
-    using reference = value_type&;
-    using const_reference = const value_type&;
-    using pointer = value_type*;
-    using const_pointer = const value_type*;
-
     constexpr Array() = default;
     constexpr Array(const Array& other) { *this = other; }
     constexpr Array(const std::initializer_list<T>& list) { *this = list; }
     constexpr ~Array() = default;
     constexpr Array& operator=(const Array& other) {
-        for (size_type i = 0; i < N; ++i) m_data[i] = other[i];
+        for (size_t i = 0; i < N; ++i) m_data[i] = other[i];
         return *this;
     }
     constexpr Array& operator=(const std::initializer_list<T>& list) {
@@ -30,30 +22,24 @@ class Array {
     }
 
     // 元素访问
-    [[nodiscard]] constexpr reference at(size_type pos) {
+    [[nodiscard]] constexpr T& at(size_t pos) {
         if (pos >= N or pos < 0) throw std::out_of_range("");
         return m_data[pos];
     }
-    [[nodiscard]] constexpr const_reference at(size_type pos) const {
+    [[nodiscard]] constexpr const T& at(size_t pos) const {
         if (pos >= N or pos < 0) throw std::out_of_range("");
         return m_data[pos];
     }
-    [[nodiscard]] constexpr reference operator[](size_type pos) {
+    [[nodiscard]] constexpr T& operator[](size_t pos) { return m_data[pos]; }
+    [[nodiscard]] constexpr const T& operator[](size_t pos) const {
         return m_data[pos];
     }
-    [[nodiscard]] constexpr const_reference operator[](size_type pos) const {
-        return m_data[pos];
-    }
-    [[nodiscard]] constexpr reference front() { return m_data[0]; }
-    [[nodiscard]] constexpr const_reference front() const { return m_data[0]; }
-    [[nodiscard]] constexpr reference back() { return m_data[N - 1]; }
-    [[nodiscard]] constexpr const_reference back() const {
-        return m_data[N - 1];
-    }
-    [[nodiscard]] constexpr pointer data() noexcept { return m_data; }
-    [[nodiscard]] constexpr const_pointer data() const noexcept {
-        return m_data;
-    }
+    [[nodiscard]] constexpr T& front() { return m_data[0]; }
+    [[nodiscard]] constexpr const T& front() const { return m_data[0]; }
+    [[nodiscard]] constexpr T& back() { return m_data[N - 1]; }
+    [[nodiscard]] constexpr const T& back() const { return m_data[N - 1]; }
+    [[nodiscard]] constexpr T* data() noexcept { return m_data; }
+    [[nodiscard]] constexpr const T* data() const noexcept { return m_data; }
 
     // 迭代器
     [[nodiscard]] constexpr iterator<T> begin() noexcept {
@@ -95,20 +81,20 @@ class Array {
 
     // 容量
     [[nodiscard]] constexpr bool empty() const noexcept { return N == 0; }
-    [[nodiscard]] constexpr size_type size() const noexcept { return N; }
-    [[nodiscard]] constexpr size_type max_size() const noexcept { return N; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return N; }
+    [[nodiscard]] constexpr size_t max_size() const noexcept { return N; }
 
     // 操作
-    constexpr void fill(const_reference value) {
+    constexpr void fill(const T& value) {
         for (auto it = begin(); it != end(); ++it) *it = value;
     }
     constexpr void swap(Array& other) noexcept {
-        for (size_type i = 0; i < N; ++i) std::swap(m_data[i], other[i]);
+        for (size_t i = 0; i < N; ++i) std::swap(m_data[i], other[i]);
     }
 
     // 比较
     constexpr bool operator==(const Array<T, N>& other) const {
-        for (size_type i = 0; i < N; ++i) {
+        for (size_t i = 0; i < N; ++i) {
             if (m_data[i] != other[i]) {
                 return false;
             }
@@ -117,7 +103,7 @@ class Array {
     }
 
     constexpr auto operator<=>(const Array<T, N>& other) const {
-        for (size_type i = 0; i < N; ++i) {
+        for (size_t i = 0; i < N; ++i) {
             if (m_data[i] < other[i]) return -1;
             else if (other[i] < m_data[i]) return 1;
         }
@@ -160,4 +146,3 @@ void swap(Array<T, N>& lhs, Array<T, N>& rhs) noexcept {
 }
 
 }  // namespace std
-
