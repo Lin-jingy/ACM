@@ -4,7 +4,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-#include <ext/rope>
 template <class _KEY, class _Compare = std::less<_KEY>>
 using pbds_set =
     __gnu_pbds::tree<_KEY, __gnu_pbds::null_type, _Compare,
@@ -17,8 +16,6 @@ using pbds_map =
 template <class T, class Comp = std::less<T>>
 using pbds_heap =
     __gnu_pbds::priority_queue<T, Comp, __gnu_pbds::pairing_heap_tag>;
-template <class T>
-using rope = __gnu_cxx::rope<T>;
 #endif
 template <class K, class V>
 std::istream &operator>>(std::istream &in, std::pair<K, V> &v);
@@ -100,7 +97,6 @@ class vector : public std::vector<T, A> {
                   << std::endl;                                          \
         exit(-1);                                                        \
     }
-#define int long long
 constexpr int inf = INT_MAX;
 constexpr long long INF = LONG_LONG_MAX;
 template <class T>
@@ -205,43 +201,64 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    std::cin >> T;
+    // std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
-constexpr static void Floyd(std::vector<std::vector<int>> &v) {
-    int n = v.size() - 1;
-    for (int k = 1; k <= n; ++k) {
-        for (int i = 1; i <= n; ++i) {
-            for (int j = 1; j <= n; ++j) {
-                if (v[i][j] > v[i][k] + v[k][j]) v[i][j] = v[i][k] + v[k][j];
-            }
-        }
-    }
-}
+constexpr int N = 1005;
+using G = arr<arr<bool, N>, N>;
+G a, b;
+
+int px[] = {1, -1, 0, 0};
+int py[] = {0, 0, 1, -1};
 
 void solve() {
     int n, m;
     std::cin >> n >> m;
-    vec<arr<int, 3>> edge(m);
-    vec<vec<int>> dis(n + 1, vec<int>(n + 1, 1e15));
-    for (int i = 0; i < m; ++i) {
-        int a, b, c;
-        std::cin >> a >> b >> c;
-        edge[i] = {a, b, c};
-        dis[a][b] = dis[b][a] = 1;
-    }
-    for (int i = 1; i <= n; ++i) dis[i][i] = 0;
-    Floyd(dis);
-    int ans = 1e15;
-    for (auto [u, v, w] : edge) {
-        ans = std::min(ans, (dis[1][u] + dis[v][n] + dis[u][v]) * w);
-        ans = std::min(ans, (dis[1][v] + dis[u][n] + dis[u][v]) * w);
-        for (int i = 1; i <= n; ++i) {
-            ans = std::min(ans, (dis[u][i] + 2 + dis[1][i] + dis[i][n]) * w);
-            ans = std::min(ans, (dis[v][i] + 2 + dis[1][i] + dis[i][n]) * w);
+    vec<vec<char>> v(n + 1, vec<char>(m + 1));
+    Pii begin, end;
+    for (int i = 1; i <= n; ++i) {
+        for (int j = 1; j <= m; ++j) {
+            std::cin >> v[i][j];
+            if (v[i][j] == 'S') begin = {i, j};
+            else if (v[i][j] == 'E') end = {i, j};
         }
     }
-    std::cout << ans << '\n';
+    auto bfs = [&](G &p, Pii begin) -> void {
+        std::queue<Pii> q;
+        q.push(begin);
+        while (!q.empty()) {
+            auto [x, y] = q.front();
+            q.pop();
+            if (p[x][y] or v[x][y] == '#') continue;
+            p[x][y] = 1;
+            for (int i = 0; i < 4; ++i) {
+                int xx = x + px[i];
+                int yy = y + py[i];
+                if (xx >= 1 and xx <= n and yy >= 1 and yy <= m and
+                    v[x][y] != '#')
+                    q.emplace(xx, yy);
+            }
+        }
+    };
+    bfs(a, begin);
+    bfs(b, end);
+    vec<int> vx(n + 5), vy(m + 5);
+    for (int i = 1; i <= n; ++i) {
+        for (int j = 1; j <= m; ++j) {
+            if (!b[i][j]) continue;
+            vx[i - 1] = vx[i] = vx[i + 1] = 1;
+            vy[j - 1] = vy[j] = vy[j + 1] = 1;
+        }
+    }
+    for (int i = 1; i <= n; ++i) {
+        for (int j = 1; j <= m; ++j) {
+            if (a[i][j] and (vx[i] or vy[j])) {
+                std::cout << "YES\n";
+                return;
+            }
+        }
+    }
+    std::cout << "NO\n";
 }

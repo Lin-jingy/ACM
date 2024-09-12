@@ -4,7 +4,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-#include <ext/rope>
 template <class _KEY, class _Compare = std::less<_KEY>>
 using pbds_set =
     __gnu_pbds::tree<_KEY, __gnu_pbds::null_type, _Compare,
@@ -17,8 +16,6 @@ using pbds_map =
 template <class T, class Comp = std::less<T>>
 using pbds_heap =
     __gnu_pbds::priority_queue<T, Comp, __gnu_pbds::pairing_heap_tag>;
-template <class T>
-using rope = __gnu_cxx::rope<T>;
 #endif
 template <class K, class V>
 std::istream &operator>>(std::istream &in, std::pair<K, V> &v);
@@ -100,7 +97,6 @@ class vector : public std::vector<T, A> {
                   << std::endl;                                          \
         exit(-1);                                                        \
     }
-#define int long long
 constexpr int inf = INT_MAX;
 constexpr long long INF = LONG_LONG_MAX;
 template <class T>
@@ -210,38 +206,37 @@ signed main() {
     return 0;
 }
 
-constexpr static void Floyd(std::vector<std::vector<int>> &v) {
-    int n = v.size() - 1;
-    for (int k = 1; k <= n; ++k) {
-        for (int i = 1; i <= n; ++i) {
-            for (int j = 1; j <= n; ++j) {
-                if (v[i][j] > v[i][k] + v[k][j]) v[i][j] = v[i][k] + v[k][j];
+void solve() {
+    int n, m, t;
+    std::cin >> n >> m >> t;
+    vec<int> x(m);
+    std::cin >> x;
+    if (t < n) {
+        std::cout << 0 << '\n';
+        return;
+    }
+    int ans = n;
+    vec<int> v;
+    std::sort(All(x));
+    for (int i = 1; i < m; ++i) {
+        v.pb(x[i] - x[i - 1]);
+    }
+    std::sort(All(v));
+    v.erase(std::unique(All(v)), v.end());
+    vec<bool> vis(t + 1);
+    vis[n] = 1;
+    for (auto i : v) {
+        for (int j = n; j <= t; ++j) {
+            if (vis[j]) {
+                if (j + 2 * i <= t) vis[j + 2 * i] = 1;
+                else break;
             }
         }
     }
-}
-
-void solve() {
-    int n, m;
-    std::cin >> n >> m;
-    vec<arr<int, 3>> edge(m);
-    vec<vec<int>> dis(n + 1, vec<int>(n + 1, 1e15));
-    for (int i = 0; i < m; ++i) {
-        int a, b, c;
-        std::cin >> a >> b >> c;
-        edge[i] = {a, b, c};
-        dis[a][b] = dis[b][a] = 1;
-    }
-    for (int i = 1; i <= n; ++i) dis[i][i] = 0;
-    Floyd(dis);
-    int ans = 1e15;
-    for (auto [u, v, w] : edge) {
-        ans = std::min(ans, (dis[1][u] + dis[v][n] + dis[u][v]) * w);
-        ans = std::min(ans, (dis[1][v] + dis[u][n] + dis[u][v]) * w);
-        for (int i = 1; i <= n; ++i) {
-            ans = std::min(ans, (dis[u][i] + 2 + dis[1][i] + dis[i][n]) * w);
-            ans = std::min(ans, (dis[v][i] + 2 + dis[1][i] + dis[i][n]) * w);
+    for (int i = t; i >= n; --i) {
+        if (vis[i]) {
+            std::cout << i << '\n';
+            return;
         }
     }
-    std::cout << ans << '\n';
 }

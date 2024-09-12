@@ -1,100 +1,82 @@
 #include <bits/stdc++.h>
-#include <math.h>
 
 template <class _Key, class _Value, class _Hash = std::hash<_Key>,
           class _Equal = std::equal_to<_Key>>
 class HashTable {
    private:
-    constexpr static size_t prime[26] = {
-        53,        97,        193,      389,       769,       1543,
-        3079,      6151,      12289,    24593,     49157,     98317,
-        196613,    393241,    786433,   1572869,   3145739,   6291469,
-        12582917,  25165843,  50331653, 100663319, 201326611, 402653189,
-        805306457, 1610612741};
-    struct node {
-        _Key key;
-        _Value value;
-        node *next = nullptr;
-    };
-    using nodePoint = node *;
+    constexpr static size_t prime[29] = {
+        7,         13,        29,        53,        97,        193,
+        389,       769,       1543,      3079,      6151,      12289,
+        24593,     49157,     98317,     196613,    393241,    786433,
+        1572869,   3145739,   6291469,   12582917,  25165843,  50331653,
+        100663319, 201326611, 402653189, 805306457, 1610612741};
+    using pair = std::pair<_Key, _Value>;
+    using list = std::forward_list<pair>;
 
    private:
-    int _findNextPrime(int x) {
-        return *std::upper_bound(prime, prime + 26, x);
+    constexpr int _findNextPrime(int x) {
+        return *std::upper_bound(prime, prime + 29, x);
     }
-    nodePoint _findAndGetPre(const _Key &key) {
-        size_t pos = _Hash{}(key) % m_bucket.size();
-        if (m_bucket[pos].next == nullptr) return nullptr;
-
-        nodePoint it = &m_bucket[pos];
-        while (it->next) {
-            if (_Equal{}(it->next->key, key)) return it;
-            it = it->next;
+    constexpr auto _find(std::vector<list> &bucket, const _Key &key) {
+        const size_t hashcode = _Hash{}(key) % bucket.size();
+        auto &it = bucket[hashcode];
+        for (auto i = it.begin(); i != it.end(); ++i) {
+            if (_Equal{}(i->first, key)) return std::make_pair(i, &it);
         }
-        return nullptr;
+        return std::make_pair(it.end(), &it);
     }
-    bool _insert(std::vector<node> &bucket,
-                 const std::pair<_Key, _Value> &value) {
-        ++m_size;
-        size_t pos = _Hash{}(value.first) % bucket.size();
-        nodePoint it = &bucket[pos];
-        while (1) {
-            if (_Equal{}(*(it->key), value.first)) return false;
-            if (it->next == nullptr) break;
-            it = it->next;
-        }
-        it->next = new nodePoint;
-        *(it->next->key) = value.first;
-        *(it->next->value) = value.second;
+    constexpr bool _insert(std::vector<list> &bucket,
+                 const pair &value) {
+        auto it = _find(bucket, value.first);
+        if (it.first != it.second->end()) return false;
+        it.second->push_front(value);
         return true;
     }
-    void _destroyed(std::vector<nodePoint> &bucket) {
-        for (auto it : m_bucket) {
-            nodePoint next = it;
-            while (it) {
-                next = it->next;
-                delete it;
-                it = next;
-            }
-        }
-    }
 
-    void _expand() {
-        if (m_size + 1 < m_bucket.size()) return;
-        m_size = 0;
-        std::vector<nodePoint> m_tmp(_findNextPrime(m_bucket.size()));
-        forEach([this](const std::pair<_Key, _Value> &value) {
-            _insert(m_tmp, value);
-        });
+    constexpr bool _expand() {
+        if (m_size <= (int)m_bucket.size() * 0.75) return false;
+        std::vector<list> m_tmp(_findNextPrime(m_bucket.size()));
+        for (auto &it : m_bucket)
+            for (auto &value : it) _insert(m_tmp, value);
         m_bucket.swap(m_tmp);
-        _destroyed(m_tmp);
+        return true;
     }
 
    public:
-    HashTable() = default;
-    ~HashTable() { _destroyed(m_bucket); }
-    bool insert(const std::pair<_Key, _Value> &value) {
+    constexpr HashTable() : m_bucket(3), m_size(0){};
+    constexpr bool insert(const pair &value) {
+        ++m_size;
         _expand();
-        return insert(m_bucket, value);
+        return _insert(m_bucket, value);
     }
-    void forEach(auto func) {
-        for (auto it : m_bucket) {
-            while (it) {
-                func({it->key, it->value});
-                it = it->next;
-            }
+    constexpr bool count(const _Key &key) {
+        auto it = _find(m_bucket, key);
+        return it.first != it.second->end();
+    }
+    constexpr void erase(const _Key &key) {
+        --m_size;
+        auto &it = m_bucket[_Hash{}(key) % m_bucket.size()];
+        if (_Equal{}(it.front().first, key)) return it.pop_front(), void();
+        auto last = it.begin();
+        for (auto i = it.begin(); i != it.end(); ++i) {
+            last = i;
+            if (_Equal{}(i->second, key)) return it.erase_after(last), void();
         }
     }
-    bool count(const _Key &key) {
-        // TODO
+    constexpr _Value &operator[](const _Key &key) {
+        auto it = _find(m_bucket, key);
+        if (it.first == it.second->end()) {
+            ++m_size;
+            if (_expand()) it = _find(m_bucket, key);
+            it.second->push_front({key, {}});
+            it.first = it.second->begin();
+        }
+        return it.first->second;
     }
-    void erase(const _Key key) {
-        // TODO
-    }
-    size_t size() { return m_size; }
-    bool empty() { return m_size == 0; }
+    constexpr size_t size() { return m_size; }
+    constexpr bool empty() { return m_size == 0; }
 
    private:
-    std::vector<nodePoint> m_bucket;
+    std::vector<list> m_bucket;
     size_t m_size;
 };

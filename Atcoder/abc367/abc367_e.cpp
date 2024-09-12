@@ -4,9 +4,8 @@
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/priority_queue.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
-#include<ext/rope>
-template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tree<_KEY,__gnu_pbds::null_type,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template<class _KEY,class _VALUE,class _Compare=std::less<_KEY>>using pbds_map=__gnu_pbds::tree<_KEY,_VALUE,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template<class T,class Comp=std::less<T>>using pbds_heap=__gnu_pbds::priority_queue<T,Comp,__gnu_pbds::pairing_heap_tag>;template<class T>using rope=__gnu_cxx::rope<T>;
-#endif 
+template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tree<_KEY,__gnu_pbds::null_type,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template<class _KEY,class _VALUE,class _Compare=std::less<_KEY>>using pbds_map=__gnu_pbds::tree<_KEY,_VALUE,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template<class T,class Comp=std::less<T>>using pbds_heap=__gnu_pbds::priority_queue<T,Comp,__gnu_pbds::pairing_heap_tag>;
+#endif
 template<class K,class V>std::istream&operator>>(std::istream&in,std::pair<K,V>&v);template<class K,class V>std::ostream&operator<<(std::ostream&out,const std::pair<K,V>&v);template<class T>std::istream&operator>>(std::istream&in,std::vector<T>&v);template<class T>std::ostream&operator<<(std::ostream&out,const std::vector<T>&v);template<class T,size_t size>std::istream&operator>>(std::istream&in,std::array<T,size>&v);template<class T,size_t size>std::ostream&operator<<(std::ostream&out,const std::array<T,size>&v);template<class T>std::ostream&operator<<(std::ostream&out,const std::set<T>&s);template<class K,class V>std::ostream&operator<<(std::ostream&out,const std::map<K,V>&mp);
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
 using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}
@@ -32,7 +31,28 @@ signed main() {
     while (T--) solve();
     return 0;
 }
-
+#define int long long 
 void solve() {
-
+    int n, k;
+    std::cin >> n >> k;
+    vec<int> a(n + 1), x(n + 1);
+    for(int i = 1; i <= n; ++i) std::cin >> x[i];
+    for(int i = 1; i <= n; ++i) std::cin >> a[i];
+    vvec<int> p(n + 1, vec<int>(100));
+    for(int i = 1; i <= n; ++i) p[i][0] = x[i];
+    for (int j = 1; j <= 60; ++j) 
+        for (int i = 1; i <= n; ++i) p[i][j] = p[p[i][j - 1]][j - 1];
+    vec<int> pos(n + 1);
+    std::iota(All(pos), 0);
+    // logs(pos);
+    for (int i = 60; i >= 0; --i) {
+        if ((1LL << i) <= k) {
+            k -= (1LL << i);
+            vec<int> tmp(n + 1);
+            for (int j = 1; j <= n; ++j) tmp[j] = p[pos[j]][i];
+            pos.swap(tmp);
+        }
+    }
+    // logs(pos);
+    for (int i = 1; i <= n; ++i) std::cout << a[pos[i]] << ' ';
 }
