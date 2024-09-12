@@ -4,6 +4,7 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
+#include <ext/rope>
 template <class _KEY, class _Compare = std::less<_KEY>>
 using pbds_set =
     __gnu_pbds::tree<_KEY, __gnu_pbds::null_type, _Compare,
@@ -16,8 +17,9 @@ using pbds_map =
 template <class T, class Comp = std::less<T>>
 using pbds_heap =
     __gnu_pbds::priority_queue<T, Comp, __gnu_pbds::pairing_heap_tag>;
+template <class T>
+using rope = __gnu_cxx::rope<T>;
 #endif
-#define int long long
 template <class K, class V>
 std::istream &operator>>(std::istream &in, std::pair<K, V> &v);
 template <class K, class V>
@@ -210,88 +212,48 @@ signed main() {
     while (T--) solve();
     return 0;
 }
-using ull = unsigned long long;
-class BIT {
-#define lowb(x) ((-x) & x)
-   private:
-    int n;
-    std::vector<ull> c;
-
-   public:
-    BIT() = default;
-    BIT(int N) : n(N), c(N + 1) {}
-    void add(int i, int z) {
-        for (; i <= n; i += lowb(i)) c[i] += z;
-    }
-    ull pre(int i) {
-        ull sum = 0;
-        for (; i > 0; i -= lowb(i)) sum += c[i];
-        return sum;
-    }
-    int sum(int i, int j) { return pre(j) - pre(i - 1); }
-#undef lowb
-};
 
 void solve() {
     int n, m;
     std::cin >> n >> m;
-    vec<int> a(m + 1), p(n + 1);
-    vvec<int> list(n + 1);
-    for (int i = 1; i <= m; ++i) std::cin >> a[i], list[a[i]].pb(i);
-    for (int i = 1; i <= n; ++i) std::cin >> p[i];
-    int k;
-    std::cin >> k;
-    vec<arr<int, 3>> Q(k + 1);
-    for (int i = 1; i <= k; ++i) std::cin >> Q[i];
-    vec<int> ans(n + 1, k + 1);
-    BIT T(m + 2);
-    vec<int> need(n + 1);
-    std::iota(All(need), 0);
-    auto dfs = [&](auto self, int l, int r, int Llim, int Rlim) -> void {
-        if (Llim > Rlim) return;
-        int mid = (l + r) >> 1;
-        for (int i = l; i <= mid; ++i) {
-            auto [l, r, val] = Q[i];
-            if (l <= r) {
-                T.add(l, val);
-                T.add(r + 1, -val);
-            } else {
-                T.add(l, val);
-                T.add(m + 1, -val);
-                T.add(1, val);
-                T.add(r + 1, -val);
-            }
-        }
-        vec<int> L, R;
-        for (int j = Llim; j <= Rlim; ++j) {
-            auto i = need[j];
-            int tot = 0;
-            for (auto x : list[i]) tot += T.pre(x);
-            if (tot >= (ull)p[i]) L.pb(i), ans[i] = std::min(ans[i], mid);
-            else R.pb(i), p[i] -= tot;
-        }
-        // logs(l, r, p);
-        for (int i = l; i <= mid; ++i) {
-            auto [l, r, val] = Q[i];
-            if (l <= r) {
-                T.add(l, -val);
-                T.add(r + 1, val);
-            } else {
-                T.add(l, -val);
-                T.add(m + 1, val);
-                T.add(1, -val);
-                T.add(r + 1, val);
-            }
-        }
-        if (l == r) return;
-        std::copy(All(L), need.begin() + Llim);
-        std::copy(All(R), need.begin() + Llim + L.size());
-        if (!L.empty()) self(self, l, mid, Llim, Llim + L.size() - 1);
-        if (!R.empty()) self(self, mid + 1, r, Llim + L.size(), Rlim);
+    vector<rope<int> *> version(m + 1);
+    auto find = [&](auto self, int r, int p) -> int {
+        if (version[r]->at(p) < 0) return p;
+        else return self(self, r, version[r]->at(p));
     };
-    dfs(dfs, 1, k, 1, n);
-    for (int i = 1; i <= n; ++i) {
-        if (ans[i] == k + 1) std::cout << "NIE\n";
-        else std::cout << ans[i] << '\n';
+    version.front() = new rope<int>;
+    for (int i = 0; i <= n; ++i) version.front()->push_back(-1);
+    for (int i = 1; i <= m; ++i) {
+        int op;
+        std::cin >> op;
+        if (op == 1) {
+            version[i] = new rope<int>(*version[i - 1]);
+            int a, b;
+            std::cin >> a >> b;
+            a = find(find, i, a);
+            b = find(find, i, b);
+            int sizeA = version[i]->at(a);
+            int sizeB = version[i]->at(b);
+            if (sizeA <= sizeB) {
+                version[i]->replace(b, version[i]->at(b) - version[i]->at(a));
+                version[i]->replace(a, b);
+            } else {
+                version[i]->replace(a, version[i]->at(a) - version[i]->at(b));
+                version[i]->replace(b, a);
+            }
+
+        } else if (op == 2) {
+            int k;
+            std::cin >> k;
+            version[i] = new rope<int>(*version[k]);
+        } else {
+            version[i] = new rope<int>(*version[i - 1]);
+            int a, b;
+            std::cin >> a >> b;
+            a = find(find, i, a);
+            b = find(find, i, b);
+            if (a == b) std::cout << "1\n";
+            else std::cout << "0\n";
+        }
     }
 }
