@@ -4,6 +4,7 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
+#include <ext/rope>
 template <class _KEY, class _Compare = std::less<_KEY>>
 using pbds_set =
     __gnu_pbds::tree<_KEY, __gnu_pbds::null_type, _Compare,
@@ -16,8 +17,9 @@ using pbds_map =
 template <class T, class Comp = std::less<T>>
 using pbds_heap =
     __gnu_pbds::priority_queue<T, Comp, __gnu_pbds::pairing_heap_tag>;
+template <class T>
+using rope = __gnu_cxx::rope<T>;
 #endif
-#define int long long
 template <class K, class V>
 std::istream &operator>>(std::istream &in, std::pair<K, V> &v);
 template <class K, class V>
@@ -210,88 +212,123 @@ signed main() {
     while (T--) solve();
     return 0;
 }
-using ull = unsigned long long;
-class BIT {
-#define lowb(x) ((-x) & x)
+
+class LastingTree {
    private:
-    int n;
-    std::vector<ull> c;
+    struct node {
+        int num = 0, l, r;
+    };
+    vec<node> f;
+    int tot = 0;
 
    public:
-    BIT() = default;
-    BIT(int N) : n(N), c(N + 1) {}
-    void add(int i, int z) {
-        for (; i <= n; i += lowb(i)) c[i] += z;
+    LastingTree(int n) : f(n << 5), tot(n + 10) {}
+    void insert(int last, int now, int val, int l, int r) {
+        if (l == r) return f[now].num = f[last].num + 1, void();
+        int mid = (l + r) >> 1;
+        f[now] = f[last];
+        f[now].num++;
+        if (val <= mid)
+            f[now].l = ++tot, insert(f[last].l, f[now].l, val, l, mid);
+        else f[now].r = ++tot, insert(f[last].r, f[now].r, val, mid + 1, r);
     }
-    ull pre(int i) {
-        ull sum = 0;
-        for (; i > 0; i -= lowb(i)) sum += c[i];
-        return sum;
+    void del(int last, int now, int val, int l, int r) {
+        if (l == r) return f[now].num = std::max(0, f[last].num - 1), void();
+        int mid = (l + r) >> 1;
+        f[now] = f[last];
+        f[now].num--;
+        if (val <= mid) f[now].l = ++tot, del(f[last].l, f[now].l, val, l, mid);
+        else f[now].r = ++tot, del(f[last].r, f[now].r, val, mid + 1, r);
     }
-    int sum(int i, int j) { return pre(j) - pre(i - 1); }
-#undef lowb
+    int askXRand(int version, int x, int l, int r) {  // 查询x的排名
+        if (l == r) return 1;
+        int mid = (l + r) >> 1;
+        if (x <= mid) return askXRand(f[version].l, x, l, mid);
+        else return f[f[version].l].num + askXRand(f[version].r, x, mid + 1, r);
+    }
+    int askRandX(int version, int x, int l, int r) {  // 查询排名为x的数
+        if (l == r) return l;
+        int mid = (l + r) >> 1;
+        if (f[f[version].l].num >= x) return askRandX(f[version].l, x, l, mid);
+        else return askRandX(f[version].r, x - f[f[version].l].num, mid + 1, r);
+    }
+    int askMaxBeforeX(int version, int l, int r, int x) {
+        if (l == r) return f[version].num ? l : INT_MIN + 2;
+        if (f[version].num == 0) return INT_MIN + 2;
+        int mid = (l + r) >> 1;
+        if (x <= mid) {
+            return askMaxBeforeX(f[version].l, l, mid, x);
+        } else {
+            return std::max(askMaxBeforeX(f[version].l, l, mid, x),
+                            askMaxBeforeX(f[version].r, mid + 1, r, x));
+        }
+    }
+    int askMinAfterX(int version, int l, int r, int x) {
+        if (l == r) return f[version].num ? l : INT_MAX;
+        if (f[version].num == 0) return INT_MAX;
+        int mid = (l + r) >> 1;
+        if (x > mid) {
+            return askMinAfterX(f[version].r, mid + 1, r, x);
+        } else {
+            return std::min(askMinAfterX(f[version].l, l, mid, x),
+                            askMinAfterX(f[version].r, mid + 1, r, x));
+        }
+    }
 };
 
 void solve() {
-    int n, m;
-    std::cin >> n >> m;
-    vec<int> a(m + 1), p(n + 1);
-    vvec<int> list(n + 1);
-    for (int i = 1; i <= m; ++i) std::cin >> a[i], list[a[i]].pb(i);
-    for (int i = 1; i <= n; ++i) std::cin >> p[i];
-    int k;
-    std::cin >> k;
-    vec<arr<int, 3>> Q(k + 1);
-    for (int i = 1; i <= k; ++i) std::cin >> Q[i];
-    vec<int> ans(n + 1, k + 1);
-    BIT T(m + 2);
-    vec<int> need(n + 1);
-    std::iota(All(need), 0);
-    auto dfs = [&](auto self, int l, int r, int Llim, int Rlim) -> void {
-        if (Llim > Rlim) return;
-        int mid = (l + r) >> 1;
-        for (int i = l; i <= mid; ++i) {
-            auto [l, r, val] = Q[i];
-            if (l <= r) {
-                T.add(l, val);
-                T.add(r + 1, -val);
-            } else {
-                T.add(l, val);
-                T.add(m + 1, -val);
-                T.add(1, val);
-                T.add(r + 1, -val);
-            }
-        }
-        vec<int> L, R;
-        for (int j = Llim; j <= Rlim; ++j) {
-            auto i = need[j];
-            int tot = 0;
-            for (auto x : list[i]) tot += T.pre(x);
-            if (tot >= (ull)p[i]) L.pb(i), ans[i] = std::min(ans[i], mid);
-            else R.pb(i), p[i] -= tot;
-        }
-        // logs(l, r, p);
-        for (int i = l; i <= mid; ++i) {
-            auto [l, r, val] = Q[i];
-            if (l <= r) {
-                T.add(l, -val);
-                T.add(r + 1, val);
-            } else {
-                T.add(l, -val);
-                T.add(m + 1, val);
-                T.add(1, -val);
-                T.add(r + 1, val);
-            }
-        }
-        if (l == r) return;
-        std::copy(All(L), need.begin() + Llim);
-        std::copy(All(R), need.begin() + Llim + L.size());
-        if (!L.empty()) self(self, l, mid, Llim, Llim + L.size() - 1);
-        if (!R.empty()) self(self, mid + 1, r, Llim + L.size(), Rlim);
-    };
-    dfs(dfs, 1, k, 1, n);
+    // Timer<1> _;
+    // freopen("C:/Users/sugon/Desktop/ACM/P3835_19.in", "r", stdin);
+    // freopen("C:/Users/sugon/Desktop/ACM/1.out", "w", stdout);
+    int n;
+    std::cin >> n;
+    vec<arr<int, 3>> v(n + 1);
+    vec<int> mp;
     for (int i = 1; i <= n; ++i) {
-        if (ans[i] == k + 1) std::cout << "NIE\n";
-        else std::cout << ans[i] << '\n';
+        std::cin >> v[i];
+        if (v[1][1] != 4) mp.eb(v[i][2]);
+    }
+    std::ranges::sort(mp);
+    mp.erase(std::unique(All(mp)), mp.end());
+    mp.insert(mp.begin(), INT_MIN);
+    auto get = [&](int x) -> int {
+        return std::ranges::lower_bound(mp, x) - mp.begin();
+    };
+    int N = static_cast<int>(mp.size()) - 1;
+    LastingTree T(mp.size() + 100);
+    vec<int> V(n + 1);
+    auto find = [&](auto self, int p) -> int {
+        return V[p] == p ? p : V[p] = self(self, V[p]);
+    };
+    std::iota(All(V), 0);
+    for (int i = 1; i <= n; ++i) {
+        auto [version, op, x] = v[i];
+        if (op == 1) T.insert(find(find, version), i, get(x), 1, N);
+        else if (op == 2) T.del(find(find, version), i, get(x), 1, N);
+        else if (op == 3) {
+            V[i] = version;
+            std::cout << T.askXRand(find(find, version), get(x), 1, N) << '\n';
+        } else if (op == 4) {
+            V[i] = version;
+            std::cout << mp[T.askRandX(find(find, version), x, 1, N)] << '\n';
+        } else if (op == 5) {
+            V[i] = version;
+            if (get(x) == 1) {
+                std::cout << INT_MIN + 2 << '\n';
+                continue;
+            }
+            int ans = T.askMaxBeforeX(find(find, version), 1, N, get(x) - 1);
+            if (ans == INT_MIN + 2) std::cout << ans << '\n';
+            else std::cout << mp[ans] << '\n';
+        } else {
+            V[i] = version;
+            if (get(x) == N) {
+                std::cout << INT_MAX << '\n';
+                continue;
+            }
+            int ans = T.askMinAfterX(find(find, version), 1, N, get(x) + 1);
+            if (ans == INT_MAX) std::cout << ans << '\n';
+            else std::cout << mp[ans] << '\n';
+        }
     }
 }

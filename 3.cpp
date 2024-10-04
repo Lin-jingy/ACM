@@ -4,6 +4,7 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
+#include <ext/rope>
 template <class _KEY, class _Compare = std::less<_KEY>>
 using pbds_set =
     __gnu_pbds::tree<_KEY, __gnu_pbds::null_type, _Compare,
@@ -16,8 +17,9 @@ using pbds_map =
 template <class T, class Comp = std::less<T>>
 using pbds_heap =
     __gnu_pbds::priority_queue<T, Comp, __gnu_pbds::pairing_heap_tag>;
+template <class T>
+using rope = __gnu_cxx::rope<T>;
 #endif
-#define int long long
 template <class K, class V>
 std::istream &operator>>(std::istream &in, std::pair<K, V> &v);
 template <class K, class V>
@@ -210,88 +212,48 @@ signed main() {
     while (T--) solve();
     return 0;
 }
-using ull = unsigned long long;
-class BIT {
-#define lowb(x) ((-x) & x)
-   private:
-    int n;
-    std::vector<ull> c;
 
-   public:
-    BIT() = default;
-    BIT(int N) : n(N), c(N + 1) {}
-    void add(int i, int z) {
-        for (; i <= n; i += lowb(i)) c[i] += z;
-    }
-    ull pre(int i) {
-        ull sum = 0;
-        for (; i > 0; i -= lowb(i)) sum += c[i];
-        return sum;
-    }
-    int sum(int i, int j) { return pre(j) - pre(i - 1); }
-#undef lowb
-};
+int dp[105][2][105][105];
 
 void solve() {
-    int n, m;
-    std::cin >> n >> m;
-    vec<int> a(m + 1), p(n + 1);
-    vvec<int> list(n + 1);
-    for (int i = 1; i <= m; ++i) std::cin >> a[i], list[a[i]].pb(i);
-    for (int i = 1; i <= n; ++i) std::cin >> p[i];
-    int k;
-    std::cin >> k;
-    vec<arr<int, 3>> Q(k + 1);
-    for (int i = 1; i <= k; ++i) std::cin >> Q[i];
-    vec<int> ans(n + 1, k + 1);
-    BIT T(m + 2);
-    vec<int> need(n + 1);
-    std::iota(All(need), 0);
-    auto dfs = [&](auto self, int l, int r, int Llim, int Rlim) -> void {
-        if (Llim > Rlim) return;
-        int mid = (l + r) >> 1;
-        for (int i = l; i <= mid; ++i) {
-            auto [l, r, val] = Q[i];
-            if (l <= r) {
-                T.add(l, val);
-                T.add(r + 1, -val);
-            } else {
-                T.add(l, val);
-                T.add(m + 1, -val);
-                T.add(1, val);
-                T.add(r + 1, -val);
-            }
-        }
-        vec<int> L, R;
-        for (int j = Llim; j <= Rlim; ++j) {
-            auto i = need[j];
-            int tot = 0;
-            for (auto x : list[i]) tot += T.pre(x);
-            if (tot >= (ull)p[i]) L.pb(i), ans[i] = std::min(ans[i], mid);
-            else R.pb(i), p[i] -= tot;
-        }
-        // logs(l, r, p);
-        for (int i = l; i <= mid; ++i) {
-            auto [l, r, val] = Q[i];
-            if (l <= r) {
-                T.add(l, -val);
-                T.add(r + 1, val);
-            } else {
-                T.add(l, -val);
-                T.add(m + 1, val);
-                T.add(1, -val);
-                T.add(r + 1, val);
-            }
-        }
-        if (l == r) return;
-        std::copy(All(L), need.begin() + Llim);
-        std::copy(All(R), need.begin() + Llim + L.size());
-        if (!L.empty()) self(self, l, mid, Llim, Llim + L.size() - 1);
-        if (!R.empty()) self(self, mid + 1, r, Llim + L.size(), Rlim);
-    };
-    dfs(dfs, 1, k, 1, n);
+    memset(dp, 0x3f, sizeof(dp));
+    int n;
+    std::cin >> n;
+    vec<int> a(n + 1);
+    vec<bool> vis(n + 1);
+    for (int i = 1; i <= n; ++i) std::cin >> a[i], vis[a[i]] = 1;
+    int cnt0 = 0, cnt1 = 0;
     for (int i = 1; i <= n; ++i) {
-        if (ans[i] == k + 1) std::cout << "NIE\n";
-        else std::cout << ans[i] << '\n';
+        if (!vis[i]) {
+            if (i & 1) cnt1++;
+            else cnt0++;
+        }
+    }
+    if (a[1] != 0) {
+        dp[1][a[1] & 1][cnt0][cnt1] = 0;
+    } else {
+        if (cnt0) dp[1][0][cnt0 - 1][cnt1] = 0;
+        if (cnt1) dp[1][1][cnt0][cnt1 - 1] = 0;
+    }
+    for (int i = 2; i <= n; ++i) {
+        if (a[i] != 0) {
+            for (int c0 = 0; c0 <= cnt0; ++c0) {
+                for (int c1 = 0; c1 <= cnt1; ++c1) {
+                    dp[i][a[i] & 1] = std::min(dp[i - 1])
+                }
+            }
+        }
+        if (a[i - 1] != 0) {
+            for (int c0 = 0; c0 <= cnt0; ++c0) {
+                for (int c1 = 0; c1 <= cnt1; ++c1) {
+                    if (c0)
+                        dp[0][c0 - 1][c1] =
+                            dp[a[i - 1] & 1][c0][c1] + ((a[i] & 1) == 1);
+                    if (c1)
+                        dp[1][c0][c1 - 1] =
+                            dp[a[i - 1] & 1][c0][c1] + ((a[i] & 1) == 0);
+                }
+            }
+        }
     }
 }
