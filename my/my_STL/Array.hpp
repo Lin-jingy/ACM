@@ -1,9 +1,15 @@
+#include <cstddef>
+#include <initializer_list>
 #include <stdexcept>
-
-#include "iterator.hpp"
+#include "reverse_iterator.hpp"
 
 template <class T, std::size_t N>
 class Array {
+    using iterator = T*;
+    using const_iterator = const T*;
+    using const_reverse_iterator = reverse_iterator<T, const T*>;
+    using reverse_iterator = reverse_iterator<T, T*>;
+
    public:
     constexpr Array() = default;
     constexpr Array(const Array& other) { *this = other; }
@@ -42,40 +48,36 @@ class Array {
     [[nodiscard]] constexpr const T* data() const noexcept { return m_data; }
 
     // 迭代器
-    [[nodiscard]] constexpr iterator<T> begin() noexcept {
-        return iterator(m_data);
-    }
-    [[nodiscard]] constexpr const_iterator<T> begin() const noexcept {
+    [[nodiscard]] constexpr iterator begin() noexcept { return m_data; }
+    [[nodiscard]] constexpr const_iterator begin() const noexcept {
         return const_iterator(m_data);
     }
-    [[nodiscard]] constexpr const_iterator<T> cbegin() const noexcept {
+    [[nodiscard]] constexpr const_iterator cbegin() const noexcept {
         return begin();
     }
-    [[nodiscard]] constexpr iterator<T> end() noexcept {
-        return iterator(m_data + N);
-    }
-    [[nodiscard]] constexpr const_iterator<T> end() const noexcept {
+    [[nodiscard]] constexpr iterator end() noexcept { return m_data + N; }
+    [[nodiscard]] constexpr const_iterator end() const noexcept {
         return const_iterator(m_data + N);
     }
-    [[nodiscard]] constexpr const_iterator<T> cend() const noexcept {
+    [[nodiscard]] constexpr const_iterator cend() const noexcept {
         return end();
     }
-    [[nodiscard]] constexpr reverse_iterator<T> rbegin() noexcept {
-        return reverse_iterator(m_data + N - 1);
+    [[nodiscard]] constexpr reverse_iterator rbegin() noexcept {
+        return reverse_iterator(m_data);
     }
-    [[nodiscard]] constexpr const_reverse_iterator<T> rbegin() const noexcept {
-        return const_reverse_iterator(m_data + N - 1);
+    [[nodiscard]] constexpr const_reverse_iterator rbegin() const noexcept {
+        return const_reverse_iterator(m_data);
     }
-    [[nodiscard]] constexpr const_reverse_iterator<T> crbegin() const noexcept {
+    [[nodiscard]] constexpr const_reverse_iterator crbegin() const noexcept {
         return rbegin();
     }
-    [[nodiscard]] constexpr reverse_iterator<T> rend() noexcept {
-        return reverse_iterator(m_data - 1);
+    [[nodiscard]] constexpr reverse_iterator rend() noexcept {
+        return reverse_iterator(m_data + N);
     }
-    [[nodiscard]] constexpr const_reverse_iterator<T> rend() const noexcept {
-        return const_reverse_iterator(m_data - 1);
+    [[nodiscard]] constexpr const_reverse_iterator rend() const noexcept {
+        return const_reverse_iterator(m_data + N);
     }
-    [[nodiscard]] constexpr const_reverse_iterator<T> crend() const noexcept {
+    [[nodiscard]] constexpr const_reverse_iterator crend() const noexcept {
         return rend();
     }
 

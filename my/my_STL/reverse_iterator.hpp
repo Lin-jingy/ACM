@@ -39,6 +39,13 @@ class reverse_iterator {
     reverse_iterator operator+(size_t pos) {
         return reverse_iterator(m_iter - pos);
     }
+    reverse_iterator &operator-=(size_t pos) {
+        m_iter += pos;
+        return *this;
+    }
+    reverse_iterator operator-(size_t pos) {
+        return reverse_iterator(m_iter + pos);
+    }
 
    private:
     Iterator m_iter;

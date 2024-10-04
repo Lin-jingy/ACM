@@ -1,7 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "Array.hpp"
+#include "../Array.hpp"
 
 // 测试框架
 #define TEST(name) void name()
