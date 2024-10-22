@@ -64,10 +64,6 @@ std::ostream &operator<<(std::ostream &out, const __int128 &value) {
     out << s;
     return out;
 }
-template <class... Args>
-void print(const std::string_view &fmtStr, Args &&...args) {
-    std::cout << std::vformat(fmtStr, std::make_format_args(args...));
-}
 #endif
 template <class T, class A = std::allocator<T>>
 class vector : public std::vector<T, A> {
@@ -213,47 +209,55 @@ signed main() {
     return 0;
 }
 
-int dp[105][2][105][105];
-
 void solve() {
-    memset(dp, 0x3f, sizeof(dp));
-    int n;
-    std::cin >> n;
-    vec<int> a(n + 1);
-    vec<bool> vis(n + 1);
-    for (int i = 1; i <= n; ++i) std::cin >> a[i], vis[a[i]] = 1;
-    int cnt0 = 0, cnt1 = 0;
-    for (int i = 1; i <= n; ++i) {
-        if (!vis[i]) {
-            if (i & 1) cnt1++;
-            else cnt0++;
-        }
+    int n, m, k;
+    std::cin >> n >> m >> k;
+    vec<int> list(m), a(n + 1);
+    set<int> s;
+    std::cin >> list;
+    bool flag = 0;
+    if (std::count(All(list), 1) == 1) {
+        flag = 1;
     }
-    if (a[1] != 0) {
-        dp[1][a[1] & 1][cnt0][cnt1] = 0;
+    for (int i = 0; i < k; ++i) {
+        int c, p;
+        std::cin >> c >> p;
+        a[p] = c;
+        s.insert(c);
+    }
+    if (!flag) {
+        for (int i = n; i >= 1; --i) {
+            if (list.empty()) continue;
+            if (a[i] == 0) {
+                if (s.count(list.back())) continue;
+                a[i] = list.back();
+                list.pop_back();
+            } else if (a[i] == list.back()) list.pop_back();
+        }
     } else {
-        if (cnt0) dp[1][0][cnt0 - 1][cnt1] = 0;
-        if (cnt1) dp[1][1][cnt0][cnt1 - 1] = 0;
-    }
-    for (int i = 2; i <= n; ++i) {
-        if (a[i] != 0) {
-            for (int c0 = 0; c0 <= cnt0; ++c0) {
-                for (int c1 = 0; c1 <= cnt1; ++c1) {
-                    dp[i][a[i] & 1] = std::min(dp[i - 1])
-                }
-            }
+        std::reverse(All(list));
+        for (int i = 1; i <= n; ++i) {
+            if (list.empty()) continue;
+            if (a[i] == 0) {
+                if (s.count(list.back())) continue;
+                a[i] = list.back();
+                list.pop_back();
+            } else if (a[i] == list.back()) list.pop_back();
         }
-        if (a[i - 1] != 0) {
-            for (int c0 = 0; c0 <= cnt0; ++c0) {
-                for (int c1 = 0; c1 <= cnt1; ++c1) {
-                    if (c0)
-                        dp[0][c0 - 1][c1] =
-                            dp[a[i - 1] & 1][c0][c1] + ((a[i] & 1) == 1);
-                    if (c1)
-                        dp[1][c0][c1 - 1] =
-                            dp[a[i - 1] & 1][c0][c1] + ((a[i] & 1) == 0);
-                }
+    }
+
+    if (std::count(All(a), 1) == 0) {
+        for (int i = 1; i <= n; ++i) {
+            if (a[i] == 0) {
+                a[i] = 1;
+                break;
             }
         }
     }
+
+    for (int i = 1; i <= n; ++i)
+        if (a[i] == 1) {
+            std::cout << i << '\n';
+            return;
+        }
 }

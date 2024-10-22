@@ -9,7 +9,7 @@ class Boyer_Moore {
 
    public:
     Boyer_Moore(const std::string &s) : bm{s.begin(), s.end()} {}
-    std::vector<int> find(const std::string &text) {
+    std::vector<int> find(std::string_view text) {
         std::vector<int> result;
         for (auto [beg, end] = bm(text.begin(), text.end()); beg != text.end();
              std::tie(beg, end) = bm(end, text.end())) {

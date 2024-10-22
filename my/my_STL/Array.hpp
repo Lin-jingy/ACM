@@ -1,7 +1,12 @@
 #include <cstddef>
 #include <initializer_list>
 #include <stdexcept>
+
 #include "reverse_iterator.hpp"
+#include "stl_algobase.hpp"
+
+
+namespace mystl {
 
 template <class T, std::size_t N>
 class Array {
@@ -91,7 +96,7 @@ class Array {
         for (auto it = begin(); it != end(); ++it) *it = value;
     }
     constexpr void swap(Array& other) noexcept {
-        for (size_t i = 0; i < N; ++i) std::swap(m_data[i], other[i]);
+        for (size_t i = 0; i < N; ++i) mystl::swap(m_data[i], other[i]);
     }
 
     // 比较
@@ -116,7 +121,6 @@ class Array {
     T m_data[N];
 };
 
-namespace std {
 // get
 template <std::size_t I, class T, std::size_t N>
 [[nodiscard]] constexpr T& get(Array<T, N>& a) noexcept {
@@ -147,4 +151,4 @@ void swap(Array<T, N>& lhs, Array<T, N>& rhs) noexcept {
     lhs.swap(rhs);
 }
 
-}  // namespace std
+}  // namespace mystl
