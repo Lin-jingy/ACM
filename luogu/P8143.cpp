@@ -1,7 +1,5 @@
 #include <bits/stdc++.h>
 
-#include <istream>
-
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
@@ -206,79 +204,102 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    std::cin >> T;
+    // std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
-class Point {
-   public:
-    int x, y;
-
-    constexpr Point() = default;
-    constexpr Point(int X, int Y) : x(X), y(Y) {}
-
-    constexpr friend bool operator<(const Point &a, const Point &b) {
-        return a.x != b.x ? a.x < b.x : a.y < b.y;
+template <const int T>
+struct ModInt {
+    constexpr ModInt() = default;
+    constexpr ModInt(int x) : x(x % T) {}
+    constexpr ModInt(long long x) : x(x % T) {}
+    constexpr int val() { return x; }
+    constexpr ModInt operator+(const ModInt a) const {
+        int x0 = x + a.x;
+        return ModInt(x0 < T ? x0 : x0 - T);
     }
-    constexpr friend Point operator+(const Point &a, const Point &b) {
-        return Point(a.x + b.x, a.y + b.y);
+    constexpr ModInt operator-(const ModInt a) const {
+        int x0 = x - a.x;
+        return ModInt(x0 < 0 ? x0 + T : x0);
     }
-    constexpr friend Point operator-(const Point &a, const Point &b) {
-        return Point(a.x - b.x, a.y - b.y);
+    constexpr ModInt operator*(const ModInt a) const {
+        return ModInt(1LL * x * a.x % T);
     }
-    constexpr friend Point operator*(const Point &a, double k) {
-        return Point(a.x * k, a.y * k);
+    constexpr ModInt operator/(const ModInt a) const { return *this * a.inv(); }
+    constexpr bool operator==(const ModInt a) const { return x == a.x; };
+    constexpr bool operator!=(const ModInt a) const { return x != a.x; };
+    constexpr ModInt operator+=(const ModInt a) {
+        x += a.x;
+        if (x >= T) x -= T;
+        return *this;
     }
-    constexpr friend double operator*(const Point &a, const Point &b) {
-        return Dot(a, b);
+    constexpr ModInt operator-=(const ModInt a) {
+        x -= a.x;
+        if (x < 0) x += T;
+        return *this;
     }
-    constexpr friend Point operator/(const Point &a, double b) {
-        return Point(a.x / b, a.y / b);
+    constexpr ModInt operator*=(const ModInt a) {
+        x = 1LL * x * a.x % T;
+        return *this;
     }
-    constexpr friend double operator^(const Point &a, const Point &b) {
-        return Cross(a, b);
+    constexpr ModInt operator/=(const ModInt a) {
+        *this = *this / a;
+        return *this;
     }
-    constexpr bool operator==(const Point &other) const {
-        return x == other.x and y == other.y;
+    constexpr friend ModInt operator+(int y, const ModInt a) {
+        int x0 = y + a.x;
+        return ModInt(x0 < T ? x0 : x0 - T);
     }
-    constexpr bool operator!=(const Point &other) const {
-        return !operator==(other);
+    constexpr friend ModInt operator-(int y, const ModInt a) {
+        int x0 = y - a.x;
+        return ModInt(x0 < 0 ? x0 + T : x0);
     }
-    constexpr static int Dot(const Point &a, const Point &b) {
-        return a.x * b.x + a.y * b.y;
+    constexpr friend ModInt operator*(int y, const ModInt a) {
+        return ModInt(1LL * y * a.x % T);
     }
-    constexpr static int Cross(const Point &a, const Point &b) {
-        return a.x * b.y - a.y * b.x;
+    constexpr friend ModInt operator/(int y, const ModInt a) {
+        return ModInt(y) / a;
     }
-
-    constexpr static std::vector<Point> getConvexHull(
-        std::vector<Point> &points) {
-        auto p = points;
-        if (!std::is_sorted(p.begin(), p.end())) std::sort(p.begin(), p.end());
-        p.erase(std::unique(p.begin(), p.end()), p.end());
-        std::vector<Point> ch;
-        for (int i = 0; i < p.size(); i++) {
-            while (ch.size() >= 2 && ((ch[ch.size() - 1] - ch[ch.size() - 2]) ^
-                                      (p[i] - ch[ch.size() - 2])) < 0)
-                ch.pop_back();
-            ch.push_back(p[i]);
+    constexpr friend std::ostream &operator<<(std::ostream &os,
+                                              const ModInt a) {
+        return os << a.x;
+    }
+    constexpr friend std::istream &operator>>(std::istream &is, ModInt t) {
+        return is >> t.x;
+    }
+    constexpr ModInt operator^(long long n) const {
+        ModInt res(1), mul(x);
+        while (n) {
+            if (n & 1) res *= mul;
+            mul *= mul;
+            n >>= 1;
         }
-        int j = ch.size();
-        for (int i = p.size() - 2; i >= 0; i--) {
-            while (ch.size() > j && ((ch[ch.size() - 1] - ch[ch.size() - 2]) ^
-                                     (p[i] - ch[ch.size() - 2])) < 0)
-                ch.pop_back();
-            ch.push_back(p[i]);
+        return res;
+    }
+
+   private:
+    int x = 0;
+    constexpr ModInt inv() const {
+        int a = x, b = T, u = 1, v = 0;
+        while (b) {
+            int t = a / b;
+            a -= t * b;
+            std::swap(a, b);
+            u -= t * v;
+            std::swap(u, v);
         }
-        ch.pop_back();
-        return ch;
+        if (u < 0) u += T;
+        return u;
     }
 };
+constexpr int mod = 998244353;
+using Mint = ModInt<mod>;
 
 void solve() {
     int n;
     std::cin >> n;
-    vec<Point> a(n);
-    for (int i = 0; i < n; ++i) std::cin >> a[i].x >> a[i].y;
+    Mint ans = 1;
+    for (int i = 1; i <= n; ++i) ans *= i;
+    std::cout << ans / 2 << '\n';
 }

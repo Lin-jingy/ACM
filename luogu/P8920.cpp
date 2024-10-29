@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 
-#include <istream>
+#include <numeric>
 
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
@@ -102,6 +102,7 @@ class vector : public std::vector<T, A> {
                   << std::endl;                                          \
         exit(-1);                                                        \
     }
+#define int long long
 constexpr int inf = INT_MAX;
 constexpr long long INF = LONG_LONG_MAX;
 template <class T>
@@ -206,79 +207,55 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    std::cin >> T;
+    // std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
-class Point {
-   public:
-    int x, y;
+using i128 = __int128;
 
-    constexpr Point() = default;
-    constexpr Point(int X, int Y) : x(X), y(Y) {}
+std::ostream &operator<<(std::ostream &out, __int128 &_x) {
+    __int128 x = _x;
+    if (x < 0) {
+        out << '-';
+        x = -x;
+    }
+    std::string s;
+    while (x) {
+        s.push_back(x % 10 + '0');
+        x /= 10;
+    }
+    std::ranges::reverse(s);
+    if (s.empty()) s = "0";
+    out << s;
+    return out;
+}
 
-    constexpr friend bool operator<(const Point &a, const Point &b) {
-        return a.x != b.x ? a.x < b.x : a.y < b.y;
-    }
-    constexpr friend Point operator+(const Point &a, const Point &b) {
-        return Point(a.x + b.x, a.y + b.y);
-    }
-    constexpr friend Point operator-(const Point &a, const Point &b) {
-        return Point(a.x - b.x, a.y - b.y);
-    }
-    constexpr friend Point operator*(const Point &a, double k) {
-        return Point(a.x * k, a.y * k);
-    }
-    constexpr friend double operator*(const Point &a, const Point &b) {
-        return Dot(a, b);
-    }
-    constexpr friend Point operator/(const Point &a, double b) {
-        return Point(a.x / b, a.y / b);
-    }
-    constexpr friend double operator^(const Point &a, const Point &b) {
-        return Cross(a, b);
-    }
-    constexpr bool operator==(const Point &other) const {
-        return x == other.x and y == other.y;
-    }
-    constexpr bool operator!=(const Point &other) const {
-        return !operator==(other);
-    }
-    constexpr static int Dot(const Point &a, const Point &b) {
-        return a.x * b.x + a.y * b.y;
-    }
-    constexpr static int Cross(const Point &a, const Point &b) {
-        return a.x * b.y - a.y * b.x;
-    }
-
-    constexpr static std::vector<Point> getConvexHull(
-        std::vector<Point> &points) {
-        auto p = points;
-        if (!std::is_sorted(p.begin(), p.end())) std::sort(p.begin(), p.end());
-        p.erase(std::unique(p.begin(), p.end()), p.end());
-        std::vector<Point> ch;
-        for (int i = 0; i < p.size(); i++) {
-            while (ch.size() >= 2 && ((ch[ch.size() - 1] - ch[ch.size() - 2]) ^
-                                      (p[i] - ch[ch.size() - 2])) < 0)
-                ch.pop_back();
-            ch.push_back(p[i]);
-        }
-        int j = ch.size();
-        for (int i = p.size() - 2; i >= 0; i--) {
-            while (ch.size() > j && ((ch[ch.size() - 1] - ch[ch.size() - 2]) ^
-                                     (p[i] - ch[ch.size() - 2])) < 0)
-                ch.pop_back();
-            ch.push_back(p[i]);
-        }
-        ch.pop_back();
-        return ch;
-    }
-};
+template <typename T>
+T max(T a, T b) {
+    return a > b ? a : b;
+}
 
 void solve() {
     int n;
     std::cin >> n;
-    vec<Point> a(n);
-    for (int i = 0; i < n; ++i) std::cin >> a[i].x >> a[i].y;
+    vec<int> a(n), b(n);
+    std::cin >> a >> b;
+    int suma = 0, sumb = std::accumulate(All(b), 0LL);
+    i128 ans = 0, mx = 0;
+    i128 avg = sumb;
+    for (int i = 0; i < n; ++i) {
+        ans += n * b[i] * b[i] - 2 * b[i] * avg + avg * avg / n;
+    }
+    logs(ans);
+    mx = ans;
+    for (int i = 0; i < n; ++i) {
+        ans -= n * b[i] * b[i] - 2 * b[i] * avg + avg * avg / n;
+        logs(1, ans);
+        avg += a[i] - b[i];
+        ans += n * a[i] * a[i] - 2 * a[i] * avg + avg * avg / n;
+        logs(2, ans);
+        mx = max(mx, ans);
+    }
+    std::cout << mx << '\n';
 }

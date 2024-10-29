@@ -1,7 +1,5 @@
 #include <bits/stdc++.h>
 
-#include <istream>
-
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
@@ -211,74 +209,43 @@ signed main() {
     return 0;
 }
 
-class Point {
-   public:
-    int x, y;
-
-    constexpr Point() = default;
-    constexpr Point(int X, int Y) : x(X), y(Y) {}
-
-    constexpr friend bool operator<(const Point &a, const Point &b) {
-        return a.x != b.x ? a.x < b.x : a.y < b.y;
-    }
-    constexpr friend Point operator+(const Point &a, const Point &b) {
-        return Point(a.x + b.x, a.y + b.y);
-    }
-    constexpr friend Point operator-(const Point &a, const Point &b) {
-        return Point(a.x - b.x, a.y - b.y);
-    }
-    constexpr friend Point operator*(const Point &a, double k) {
-        return Point(a.x * k, a.y * k);
-    }
-    constexpr friend double operator*(const Point &a, const Point &b) {
-        return Dot(a, b);
-    }
-    constexpr friend Point operator/(const Point &a, double b) {
-        return Point(a.x / b, a.y / b);
-    }
-    constexpr friend double operator^(const Point &a, const Point &b) {
-        return Cross(a, b);
-    }
-    constexpr bool operator==(const Point &other) const {
-        return x == other.x and y == other.y;
-    }
-    constexpr bool operator!=(const Point &other) const {
-        return !operator==(other);
-    }
-    constexpr static int Dot(const Point &a, const Point &b) {
-        return a.x * b.x + a.y * b.y;
-    }
-    constexpr static int Cross(const Point &a, const Point &b) {
-        return a.x * b.y - a.y * b.x;
-    }
-
-    constexpr static std::vector<Point> getConvexHull(
-        std::vector<Point> &points) {
-        auto p = points;
-        if (!std::is_sorted(p.begin(), p.end())) std::sort(p.begin(), p.end());
-        p.erase(std::unique(p.begin(), p.end()), p.end());
-        std::vector<Point> ch;
-        for (int i = 0; i < p.size(); i++) {
-            while (ch.size() >= 2 && ((ch[ch.size() - 1] - ch[ch.size() - 2]) ^
-                                      (p[i] - ch[ch.size() - 2])) < 0)
-                ch.pop_back();
-            ch.push_back(p[i]);
-        }
-        int j = ch.size();
-        for (int i = p.size() - 2; i >= 0; i--) {
-            while (ch.size() > j && ((ch[ch.size() - 1] - ch[ch.size() - 2]) ^
-                                     (p[i] - ch[ch.size() - 2])) < 0)
-                ch.pop_back();
-            ch.push_back(p[i]);
-        }
-        ch.pop_back();
-        return ch;
-    }
-};
+bool ask(int i, int j) {
+    std::cout << std::format("? {} {}", i, j) << std::endl;
+    bool op;
+    std::cin >> op;
+    return op;
+}
 
 void solve() {
     int n;
     std::cin >> n;
-    vec<Point> a(n);
-    for (int i = 0; i < n; ++i) std::cin >> a[i].x >> a[i].y;
+    if (n == 3) {
+        int op1 = ask(1, 2);
+        int op2 = ask(2, 1);
+        if (op1 == op2) {
+            std::cout << std::format("! {}", 3) << std::endl;
+        } else {
+            int op3 = ask(1, 3);
+            if (op1 == op3) std::cout << std::format("! {}", 2) << std::endl;
+            else std::cout << std::format("! {}", 1) << std::endl;
+        }
+        return;
+    }
+    for (int i = 2; i <= n; i += 2) {
+        int op1 = ask(i - 1, i);
+        int op2 = ask(i, i - 1);
+        if (op1 != op2) {
+            if (i == 2) {
+                int op3 = ask(i - 1, n);
+                if (op3 == op1)
+                    std::cout << std::format("! {}", i) << std::endl;
+                else std::cout << std::format("! {}", i - 1) << std::endl;
+            } else {
+                int op3 = ask(1, i - 1);
+                if (op3 == op1)
+                    std::cout << std::format("! {}", i) << std::endl;
+                else std::cout << std::format("! {}", i - 1) << std::endl;
+            }
+        }
+    }
 }

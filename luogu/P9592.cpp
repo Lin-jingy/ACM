@@ -1,7 +1,5 @@
 #include <bits/stdc++.h>
 
-#include <istream>
-
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
@@ -87,6 +85,7 @@ class vector : public std::vector<T, A> {
     constexpr T &operator[](size_t pos) { return this->at(pos); }
     constexpr const T &operator[](size_t pos) const { return this->at(pos); }
 };
+#define int long long
 #define RETURN(x)         \
     do {                  \
         return x, void(); \
@@ -211,74 +210,50 @@ signed main() {
     return 0;
 }
 
-class Point {
-   public:
-    int x, y;
-
-    constexpr Point() = default;
-    constexpr Point(int X, int Y) : x(X), y(Y) {}
-
-    constexpr friend bool operator<(const Point &a, const Point &b) {
-        return a.x != b.x ? a.x < b.x : a.y < b.y;
-    }
-    constexpr friend Point operator+(const Point &a, const Point &b) {
-        return Point(a.x + b.x, a.y + b.y);
-    }
-    constexpr friend Point operator-(const Point &a, const Point &b) {
-        return Point(a.x - b.x, a.y - b.y);
-    }
-    constexpr friend Point operator*(const Point &a, double k) {
-        return Point(a.x * k, a.y * k);
-    }
-    constexpr friend double operator*(const Point &a, const Point &b) {
-        return Dot(a, b);
-    }
-    constexpr friend Point operator/(const Point &a, double b) {
-        return Point(a.x / b, a.y / b);
-    }
-    constexpr friend double operator^(const Point &a, const Point &b) {
-        return Cross(a, b);
-    }
-    constexpr bool operator==(const Point &other) const {
-        return x == other.x and y == other.y;
-    }
-    constexpr bool operator!=(const Point &other) const {
-        return !operator==(other);
-    }
-    constexpr static int Dot(const Point &a, const Point &b) {
-        return a.x * b.x + a.y * b.y;
-    }
-    constexpr static int Cross(const Point &a, const Point &b) {
-        return a.x * b.y - a.y * b.x;
-    }
-
-    constexpr static std::vector<Point> getConvexHull(
-        std::vector<Point> &points) {
-        auto p = points;
-        if (!std::is_sorted(p.begin(), p.end())) std::sort(p.begin(), p.end());
-        p.erase(std::unique(p.begin(), p.end()), p.end());
-        std::vector<Point> ch;
-        for (int i = 0; i < p.size(); i++) {
-            while (ch.size() >= 2 && ((ch[ch.size() - 1] - ch[ch.size() - 2]) ^
-                                      (p[i] - ch[ch.size() - 2])) < 0)
-                ch.pop_back();
-            ch.push_back(p[i]);
-        }
-        int j = ch.size();
-        for (int i = p.size() - 2; i >= 0; i--) {
-            while (ch.size() > j && ((ch[ch.size() - 1] - ch[ch.size() - 2]) ^
-                                     (p[i] - ch[ch.size() - 2])) < 0)
-                ch.pop_back();
-            ch.push_back(p[i]);
-        }
-        ch.pop_back();
-        return ch;
-    }
-};
-
 void solve() {
-    int n;
-    std::cin >> n;
-    vec<Point> a(n);
-    for (int i = 0; i < n; ++i) std::cin >> a[i].x >> a[i].y;
+    int n, d, k;
+    std::cin >> n >> d >> k;
+    if (n == 1) {
+        std::cout << "NO\n";
+        return;
+    }
+    if (n - 1 > d) {
+        std::cout << "NO\n";
+        return;
+    }
+    int tot = 0;
+    int cn = n;
+    n--;
+    umap<int, int> mp;
+    for (int i = 2; i <= cn; ++i) {
+
+        if (n < k) {
+            std::cout << "NO\n";
+            return;
+        }
+        int val = n * (i - 1) + tot;
+        if (val >= d && tot + k * (i - 1) + (n - k) <= d) {
+            std::cout << "YES\n";
+            int last = val - d;
+            if (i - 2 != 0) mp[2] += last / (i - 2);
+            if (i - 2 != 0) mp[i - last % (i - 2)]++;
+            umap<int, int> tmp;
+            tmp[1] = 1;
+            int f = 2;
+            for (int j = 2; j <= i - 1; ++j) {
+                tmp[j] = f;
+                int len = k;
+                if (mp.count(j)) len += mp[j];
+                cn -= len;
+                while (len--) std::cout << tmp[j - 1] << ' ', ++f;
+            }
+            cn--;
+            for (int j = 1; j <= cn; ++j) std::cout << tmp[i - 1] << ' ';
+            std::cout << '\n';
+            return;
+        }
+        n -= k;
+        tot += k * (i - 1);
+    }
+    std::cout << "NO\n";
 }

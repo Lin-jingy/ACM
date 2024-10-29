@@ -1,7 +1,5 @@
 #include <bits/stdc++.h>
 
-#include <istream>
-
 #if __GNUC__
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
@@ -102,6 +100,7 @@ class vector : public std::vector<T, A> {
                   << std::endl;                                          \
         exit(-1);                                                        \
     }
+#define int long long
 constexpr int inf = INT_MAX;
 constexpr long long INF = LONG_LONG_MAX;
 template <class T>
@@ -206,79 +205,38 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    std::cin >> T;
+    // std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
-class Point {
-   public:
-    int x, y;
-
-    constexpr Point() = default;
-    constexpr Point(int X, int Y) : x(X), y(Y) {}
-
-    constexpr friend bool operator<(const Point &a, const Point &b) {
-        return a.x != b.x ? a.x < b.x : a.y < b.y;
-    }
-    constexpr friend Point operator+(const Point &a, const Point &b) {
-        return Point(a.x + b.x, a.y + b.y);
-    }
-    constexpr friend Point operator-(const Point &a, const Point &b) {
-        return Point(a.x - b.x, a.y - b.y);
-    }
-    constexpr friend Point operator*(const Point &a, double k) {
-        return Point(a.x * k, a.y * k);
-    }
-    constexpr friend double operator*(const Point &a, const Point &b) {
-        return Dot(a, b);
-    }
-    constexpr friend Point operator/(const Point &a, double b) {
-        return Point(a.x / b, a.y / b);
-    }
-    constexpr friend double operator^(const Point &a, const Point &b) {
-        return Cross(a, b);
-    }
-    constexpr bool operator==(const Point &other) const {
-        return x == other.x and y == other.y;
-    }
-    constexpr bool operator!=(const Point &other) const {
-        return !operator==(other);
-    }
-    constexpr static int Dot(const Point &a, const Point &b) {
-        return a.x * b.x + a.y * b.y;
-    }
-    constexpr static int Cross(const Point &a, const Point &b) {
-        return a.x * b.y - a.y * b.x;
-    }
-
-    constexpr static std::vector<Point> getConvexHull(
-        std::vector<Point> &points) {
-        auto p = points;
-        if (!std::is_sorted(p.begin(), p.end())) std::sort(p.begin(), p.end());
-        p.erase(std::unique(p.begin(), p.end()), p.end());
-        std::vector<Point> ch;
-        for (int i = 0; i < p.size(); i++) {
-            while (ch.size() >= 2 && ((ch[ch.size() - 1] - ch[ch.size() - 2]) ^
-                                      (p[i] - ch[ch.size() - 2])) < 0)
-                ch.pop_back();
-            ch.push_back(p[i]);
-        }
-        int j = ch.size();
-        for (int i = p.size() - 2; i >= 0; i--) {
-            while (ch.size() > j && ((ch[ch.size() - 1] - ch[ch.size() - 2]) ^
-                                     (p[i] - ch[ch.size() - 2])) < 0)
-                ch.pop_back();
-            ch.push_back(p[i]);
-        }
-        ch.pop_back();
-        return ch;
-    }
-};
-
 void solve() {
     int n;
     std::cin >> n;
-    vec<Point> a(n);
-    for (int i = 0; i < n; ++i) std::cin >> a[i].x >> a[i].y;
+    vec<int> a(n), b(n);
+    std::cin >> a >> b;
+
+    std::sort(All(a));
+    std::sort(All(b));
+
+    unsigned long long ans = 0;
+
+    umap<int, int> mp;
+
+    auto find = [&](auto self, int p) -> int {
+        if (!mp.count(p) || mp[p] == p) return mp[p] = p;
+        return mp[p] = self(self, mp[p]);
+    };
+
+    vec<int> add(n);
+    for (int i = n - 1; i >= 0; --i) {
+        int num = find(find, a[i]);
+        add[i] = num - a[i];
+        mp[num] = num + 1;
+    }
+    std::sort(All(add), std::greater<>());
+    for (int i = 0; i < n; ++i) {
+        ans += add[i] * b[i];
+    }
+    std::cout << ans << '\n';
 }
