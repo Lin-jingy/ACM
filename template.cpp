@@ -1,17 +1,17 @@
-#include <bits/stdc++.h>
-
+#include<bits/stdc++.h>
 #if __GNUC__
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/priority_queue.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
 #include<ext/rope>
 template<class _KEY,class _Compare=std::less<_KEY>>using pbds_set=__gnu_pbds::tree<_KEY,__gnu_pbds::null_type,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template<class _KEY,class _VALUE,class _Compare=std::less<_KEY>>using pbds_map=__gnu_pbds::tree<_KEY,_VALUE,_Compare,__gnu_pbds::rb_tree_tag,__gnu_pbds::tree_order_statistics_node_update>;template<class T,class Comp=std::less<T>>using pbds_heap=__gnu_pbds::priority_queue<T,Comp,__gnu_pbds::pairing_heap_tag>;template<class T>using rope=__gnu_cxx::rope<T>;
-#endif 
+#endif
 template<class K,class V>std::istream&operator>>(std::istream&in,std::pair<K,V>&v);template<class K,class V>std::ostream&operator<<(std::ostream&out,const std::pair<K,V>&v);template<class T>std::istream&operator>>(std::istream&in,std::vector<T>&v);template<class T>std::ostream&operator<<(std::ostream&out,const std::vector<T>&v);template<class T,size_t size>std::istream&operator>>(std::istream&in,std::array<T,size>&v);template<class T,size_t size>std::ostream&operator<<(std::ostream&out,const std::array<T,size>&v);template<class T>std::ostream&operator<<(std::ostream&out,const std::set<T>&s);template<class K,class V>std::ostream&operator<<(std::ostream&out,const std::map<K,V>&mp);
 #if __SIZEOF_POINTER__==8&&__GNUC__&&__cplusplus>=202002L
-using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);out<<s;return out;}
+using i128=__int128;std::istream&operator>>(std::istream&in,__int128&value){std::string s;in>>s;value=0;bool op=0;std::ranges::reverse(s);if(s.back()=='-'){op=1;s.pop_back();}while(!s.empty())value=value*10+s.back()-'0',s.pop_back();if(op)value=-value;return in;}std::ostream&operator<<(std::ostream&out,const __int128&value){__int128 x=(value<0?-value:value);if(value<0)out<<'-';std::string s;while(x){s+=(char)(x%10+'0');x/=10;}std::ranges::reverse(s);if(s.empty())s+='0';out<<s;return out;}
 #endif
 template<class T,class A=std::allocator<T>>class vector:public std::vector<T,A>{public:constexpr vector()noexcept(noexcept(A())):std::vector<T,A>(){}constexpr explicit vector(const A&alloc)noexcept:std::vector<T,A>(alloc){}constexpr vector(size_t count,const T&value=T(),const A&alloc=A()):std::vector<T,A>(count,value,alloc){}template<class InputIt>constexpr vector(InputIt first,InputIt last,const A&alloc=A()):std::vector<T,A>(first,last,alloc){}constexpr vector(const vector&other,const A&alloc=A()):std::vector<T,A>(other,alloc){}constexpr vector(vector&&other,const A&alloc=A()):std::vector<T,A>(other,alloc){}constexpr vector(std::initializer_list<T>init,const A&alloc=A()):std::vector<T,A>(init,alloc){}constexpr T&operator[](size_t pos){return this->at(pos);}constexpr const T&operator[](size_t pos)const{return this->at(pos);}};
+#define int long long
 #define RETURN(x)do{return x,void();}while(0)
 #define All(x)x.begin(),x.end()
 #define pb(x)push_back(x)
@@ -28,11 +28,9 @@ signed main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int T = 1;
-    // std::cin >> T;
+    std::cin >> T;
     while (T--) solve();
     return 0;
 }
 
-void solve() {
-
-}
+void solve() {}

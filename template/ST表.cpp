@@ -4,11 +4,15 @@ template <class T>
 class sparseTable {
    private:
     std::vector<std::vector<T>> ST;
-    std::function<T(const T, const T)> _func;
-    static T default_func(const T t1, const T t2) { return std::max(t1, t2); }
+    std::function<T(const T &, const T &)> _func;
 
    public:
-    sparseTable(const std::vector<T> &v, auto func = default_func) {
+    static T max(const T &t1, const T &t2) { return std::max(t1, t2); }
+    static T min(const T &t1, const T &t2) { return std::min(t1, t2); }
+    static T gcd(const T &t1, const T &t2) { return std::gcd(t1, t2); }
+
+   public:
+    sparseTable(const std::vector<T> &v, auto func) {
         _func = func;
         int len = v.size();
         int L1 = std::__lg(len) + 1;
@@ -22,12 +26,11 @@ class sparseTable {
             }
         }
     }
-    T operator()(int l, int r) {
+    T operator()(int l, int r) const {
         int q = std::__lg(r - l + 1);
         return _func(ST[l][q], ST[r - (1 << q) + 1][q]);
     }
 };
-
 class RMQ_2 {
     template <class T>
     using G = std::vector<std::vector<T>>;

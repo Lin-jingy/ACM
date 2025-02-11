@@ -1,135 +1,98 @@
 #include <bits/stdc++.h>
 
-// 区间和
-class sum_SegmentTree {
+template <class T>
+concept checkTreeNode = requires(T t, T ls, T rs, int l, int r, int d) {
+    { t.pushUp(ls, rs) };
+    { t.pushDown(ls, rs, l, r) };
+    { t.rangeChange(l, r, d) };
+    { t.update(rs) };
+    { t = ls };
+    { t.get() };
+};
+template <checkTreeNode T>
+class SegmentTree {
+#define getmid ((l + r) >> 1)
+#define ls(p) (p << 1)
+#define rs(p) (p << 1 | 1)
+#define lsArgs ls(p), l, mid
+#define rsArgs rs(p), mid + 1, r
+
    private:
-    struct Treenode {
-        int f, tag;
-    };
-    std::vector<Treenode> v;
-    std::vector<int> *a;
-    int n;
-#define f(x) (v[x].f)
-#define tag(x) (v[x].tag)
-#define ls(x) (x << 1)
-#define rs(x) (x << 1 | 1)
+    void pushUp(int p) { data[p].pushUp(data[ls(p)], data[rs(p)]); }
     void pushDown(int p, int l, int r) {
-        if (!tag(p)) return;
-        int mid = (l + r) >> 1;
-        f(ls(p)) += tag(p) * (mid - l + 1);
-        f(rs(p)) += tag(p) * (r - mid);
-        tag(ls(p)) += tag(p);
-        tag(rs(p)) += tag(p);
-        tag(p) = 0;
+        data[p].pushDown(data[ls(p)], data[rs(p)], l, r);
     }
-    void pushUp(int p) { f(p) = f(ls(p)) + f(rs(p)); }
-    void build(int p, int l, int r) {
+    template <class X>
+    void build(int p, int l, int r, const std::vector<X> &v) {
         if (l == r) {
-            f(p) = (*a)[l];
+            data[p] = v[l];
             return;
         }
-        int mid = (l + r) >> 1;
-        build(ls(p), l, mid);
-        build(rs(p), mid + 1, r);
+        int mid = getmid;
+        build(lsArgs, v);
+        build(rsArgs, v);
         pushUp(p);
     }
-    void Update(int p, int l, int r, int i, int j, int d) {
-        if (i <= l and j >= r) {
-            tag(p) = tag(p) + d;
-            f(p) = f(p) + d * (r - l + 1);
+    void update(int p, int l, int r, int i, int j, int d) {
+        if (i <= l && j >= r) {
+            data[p].rangeChange(l, r, d);
             return;
         }
         pushDown(p, l, r);
-        int mid = (l + r) >> 1;
-        if (i <= mid) Update(ls(p), l, mid, i, j, d);
-        if (j > mid) Update(rs(p), mid + 1, r, i, j, d);
+        int mid = getmid;
+        if (i <= mid) update(lsArgs, i, j, d);
+        if (j > mid) update(rsArgs, i, j, d);
         pushUp(p);
     }
-    int Query(int p, int l, int r, int i, int j) {
-        if (i <= l and j >= r) return f(p);
+
+    void set(int p, int l, int r, int pos, int d) {
+        if (l == r) return data[p] = d, void();
         pushDown(p, l, r);
-        int mid = (l + r) >> 1, sum = 0;
-        if (i <= mid) sum += Query(ls(p), l, mid, i, j);
-        if (j > mid) sum += Query(rs(p), mid + 1, r, i, j);
-        return sum;
+        int mid = getmid;
+        if (pos <= mid) set(lsArgs, pos, d);
+        else set(rsArgs, pos, d);
+        pushUp(p);
+    }
+
+    T query(int p, int l, int r, int i, int j) {
+        if (i <= l && j >= r) return data[p];
+        pushDown(p, l, r);
+        int mid = getmid;
+        T x;
+        if (i <= mid) x.update(query(lsArgs, i, j));
+        if (j > mid) x.update(query(rsArgs, i, j));
+        return x;
     }
 
    public:
-    sum_SegmentTree(int N, std::vector<int> *A) : n(N), v(N << 2), a(A) {
-        build(1, 1, n);
+    SegmentTree() = default;
+
+    SegmentTree(int n) : data(n << 2) {}
+
+    template <class X>
+    SegmentTree(const std::vector<X> &v)
+        : n(v.size() - 1), data(v.size() << 2) {
+        build(1, 1, n, v);
     }
-    void update(int l, int r, int d) { Update(1, 1, n, l, r, d); }
-    int query(int i, int j) { return Query(1, 1, n, i, j); }
-#undef f
-#undef tag
-#undef ls
-#undef rs
+
+    void update(int l, int r, int d) { update(1, 1, n, l, r, d); }
+    auto query(int l, int r) { return query(1, 1, n, l, r).get(); }
+    void set(int pos, int d) { set(1, 1, n, pos, d); }
+
+   private:
+    std::vector<T> data;
+    int n;
 };
 
-// 区间最值
-class max_SegmentTree {
-   private:
-    struct Treenode {
-        int f, tag;
-    };
-    std::vector<Treenode> v;
-    std::vector<int> *a;
-    int n;
-#define f(x) (v[x].f)
-#define tag(x) (v[x].tag)
-#define ls(x) (x << 1)
-#define rs(x) (x << 1 | 1)
-    void pushDown(int p, int l, int r) {
-        if (!tag(p)) return;
-        int mid = (l + r) >> 1;
-        f(ls(p)) += tag(p) * (mid - l + 1);
-        f(rs(p)) += tag(p) * (r - mid);
-        tag(ls(p)) += tag(p);
-        tag(rs(p)) += tag(p);
-        tag(p) = 0;
+struct node {
+    int sum = 0, tag = 0;
+    void pushUp(const node &ls, const node &rs) {}
+    void pushDown(node &ls, node &rs, int l, int r) {}
+    void rangeChange(int l, int r, int d) {  // update
     }
-    void pushUp(int p) { f(p) = std::max(f(ls(p)), f(rs(p))); }
-    void build(int p, int l, int r) {
-        if (l == r) {
-            f(p) = (*a)[l];
-            return;
-        }
-        int mid = (l + r) >> 1;
-        build(ls(p), l, mid);
-        build(rs(p), mid + 1, r);
-        pushUp(p);
-    }
-    void Update(int p, int l, int r, int i, int j, int d) {
-        if (i <= l and j >= r) {
-            tag(p) = tag(p) + d;
-            f(p) = f(p) + d * (r - l + 1);
-            return;
-        }
-        pushDown(p, l, r);
-        int mid = (l + r) >> 1;
-        if (i <= mid) Update(ls(p), l, mid, i, j, d);
-        if (j > mid) Update(rs(p), mid + 1, r, i, j, d);
-        pushUp(p);
-    }
-    int Query(int p, int l, int r, int i, int j) {
-        if (i <= l and j >= r) return f(p);
-        pushDown(p, l, r);
-        int mid = (l + r) >> 1, mx = 0;
-        if (i <= mid) mx = Query(ls(p), l, mid, i, j);
-        if (j > mid) mx = std::max(mx, Query(rs(p), mid + 1, r, i, j));
-        return mx;
-    }
-
-   public:
-    max_SegmentTree(int N, std::vector<int> *A) : n(N), v(N << 2), a(A) {
-        build(1, 1, n);
-    }
-    void update(int l, int r, int d) { Update(1, 1, n, l, r, d); }
-    int query(int i, int j) { return Query(1, 1, n, i, j); }
-#undef f
-#undef tag
-#undef ls
-#undef rs
+    void operator=(int x) {}       // build赋值
+    void update(const node &x) {}  // query
+    int get() {}                   // query
 };
 
 // 主席树（可持久化线段树）
@@ -153,8 +116,7 @@ class Lasting_tree {
         int mid = (l + r - 1) / 2;
         if (pos <= mid)
             ls(now) = ++f, update(ls(last), ls(now), pos, val, l, mid);
-        else
-            rs(now) = ++f, update(rs(last), rs(now), pos, val, mid + 1, r);
+        else rs(now) = ++f, update(rs(last), rs(now), pos, val, mid + 1, r);
         pushUp(now);
     }
     int kth(int last, int now, int k, int l, int r) {
@@ -162,8 +124,7 @@ class Lasting_tree {
         int mid = (l + r - 1) / 2;
         int SUM = sum(ls(now)) - sum(ls(last));
         if (SUM >= k) return kth(ls(last), ls(now), k, l, mid);
-        else
-            return kth(rs(last), rs(now), k - SUM, mid + 1, r);
+        else return kth(rs(last), rs(now), k - SUM, mid + 1, r);
     }
 
    public:

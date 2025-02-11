@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 
-enum OPTION {
+enum class OPTION {
     Nature,
     Single,
     Double,
@@ -60,33 +60,34 @@ class StringHash {
    public:
     StringHash(std::string_view s) : hash1(s.size() + 1), p1(s.size() + 1) {
         init_mod();
-        if constexpr (op == Nature) init_nature(s);
-        if constexpr (op == Single) init_single(s);
-        if constexpr (op == Double) init_double(s);
+        if constexpr (op == OPTION::Nature) init_nature(s);
+        if constexpr (op == OPTION::Single) init_single(s);
+        if constexpr (op == OPTION::Double) init_double(s);
     }
     template <enum OPTION O = op>
-    std::enable_if_t<O == Nature, int> get(int l, int r) {
+    std::enable_if_t<O == OPTION::Nature, int> get(int l, int r) {
         ++l, ++r;
         return hash1[r] - hash1[l - 1] * p1[r - l + 1];
     }
     template <enum OPTION O = op>
-    std::enable_if_t<O == Single, int> get(int l, int r) {
+    std::enable_if_t<O == OPTION::Single, int> get(int l, int r) {
         ++l, ++r;
         return (hash1[r] + (mod1 - hash1[l - 1]) * p1[r - l + 1]) % mod1;
     }
     template <enum OPTION O = op>
-    std::enable_if_t<O == Double, std::pair<int, int>> get(int l, int r) {
+    std::enable_if_t<O == OPTION::Double, std::pair<int, int>> get(int l,
+                                                                   int r) {
         ++l, ++r;
         return {
             (hash1[r] + 1LL * (mod1 - hash1[l - 1]) * p1[r - l + 1]) % mod1,
             (hash2[r] + 1LL * (mod2 - hash2[l - 1]) * p2[r - l + 1]) % mod2};
     }
     template <enum OPTION O = op>
-    std::enable_if_t<O == Nature || O == Single, int> getAll() {
+    std::enable_if_t<O == OPTION::Nature || O == OPTION::Single, int> getAll() {
         return hash1.back();
     }
     template <enum OPTION O = op>
-    std::enable_if_t<O == Double, std::pair<int, int>> getAll() {
+    std::enable_if_t<O == OPTION::Double, std::pair<int, int>> getAll() {
         return {hash1.back(), hash2.back()};
     }
 #undef int

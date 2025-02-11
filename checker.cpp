@@ -11,6 +11,6 @@ int main() {
     system(std::format("{}.exe > in.txt", rand_name).c_str());
     system(std::format("{}.exe < in.txt > {}.txt", check_name, check_name).c_str());
     system(std::format("{}.exe < in.txt > {}.txt", code_name, code_name).c_str());
-    system(std::format("fc {}.txt {}.txt", code_name, check_name).c_str());
     system(std::format("del {}.exe {}.exe {}.exe {}.txt {}.txt {}.txt", rand_name, check_name, code_name, "in", check_name, code_name).c_str());
+    system(std::format("fc {}.txt {}.txt", code_name, check_name).c_str());
 }
